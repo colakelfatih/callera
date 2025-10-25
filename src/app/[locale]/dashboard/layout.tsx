@@ -1,14 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { TopBar } from '@/components/dashboard/topbar'
+import { useParams } from 'next/navigation'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const params = useParams()
+  const locale = params.locale as string
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isDark, setIsDark] = useState(false)
 
@@ -24,15 +27,16 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background-light dark:bg-background-dark">
-      <Sidebar 
-        isCollapsed={isCollapsed} 
+      <Sidebar
+        isCollapsed={isCollapsed}
         onToggle={toggleSidebar}
-        currentPath={typeof window !== 'undefined' ? window.location.pathname : '/dashboard/inbox'}
+        currentPath={typeof window !== 'undefined' ? window.location.pathname : `/${locale}/dashboard/inbox`}
+        locale={locale}
       />
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar onThemeToggle={toggleTheme} isDark={isDark} />
-        
+
         <main className="flex-1 overflow-auto">
           {children}
         </main>
