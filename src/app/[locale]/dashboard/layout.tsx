@@ -15,13 +15,23 @@ export default function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isDark, setIsDark] = useState(false)
 
+  useEffect(() => {
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('callera-theme')
+    if (savedTheme === 'dark') {
+      setIsDark(true)
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed)
   }
 
   const toggleTheme = () => {
-    setIsDark(!isDark)
-    // In a real app, you'd persist this to localStorage
+    const newTheme = !isDark
+    setIsDark(newTheme)
+    localStorage.setItem('callera-theme', newTheme ? 'dark' : 'light')
     document.documentElement.classList.toggle('dark')
   }
 

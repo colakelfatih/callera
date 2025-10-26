@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Search, Plus, User, Calendar, Tag } from 'lucide-react'
-// import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations } from 'next-intl'
 
 const tagColors = {
   'AI Suggestion': 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-200',
@@ -14,12 +14,12 @@ const tagColors = {
 
 export default function CRMPipelinePage() {
   const [searchQuery, setSearchQuery] = useState('')
-  // const { t } = useLanguage()
+  const t = useTranslations('crm')
 
   const pipelineData = [
     {
       id: 'lead-in',
-      title: 'Lead In',
+      title: t('leadIn'),
       count: 4,
       value: '$92,000',
       deals: [
@@ -43,7 +43,7 @@ export default function CRMPipelinePage() {
     },
     {
       id: 'contact-made',
-      title: 'Contact Made',
+      title: t('contactMade'),
       count: 2,
       value: '$55,000',
       deals: [
@@ -59,7 +59,7 @@ export default function CRMPipelinePage() {
     },
     {
       id: 'meeting-scheduled',
-      title: 'Meeting Scheduled',
+      title: t('meetingScheduled'),
       count: 1,
       value: '$75,000',
       deals: [
@@ -75,14 +75,14 @@ export default function CRMPipelinePage() {
     },
     {
       id: 'proposal',
-      title: 'Proposal',
+      title: t('proposal'),
       count: 0,
       value: '$0',
       deals: []
     },
     {
       id: 'won',
-      title: 'Won',
+      title: t('won'),
       count: 1,
       value: '$150,000',
       deals: [
@@ -102,13 +102,13 @@ export default function CRMPipelinePage() {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Top Navigation */}
       <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-8 py-4 shrink-0">
-        <h1 className="text-xl font-bold text-navy dark:text-white">CRM Pipeline</h1>
+        <h1 className="text-xl font-bold text-navy dark:text-white">{t('title')}</h1>
         <div className="flex flex-1 items-center justify-end gap-4">
           <div className="w-full max-w-xs relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               className="h-10 w-full rounded-lg border-none bg-gray-50 dark:bg-navy-700 pl-10 pr-4 text-sm text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:outline-none"
-              placeholder="Search deals..."
+              placeholder={t('searchDeals')}
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -116,7 +116,7 @@ export default function CRMPipelinePage() {
           </div>
           <button className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide">
             <Plus size={16} />
-            New Deal
+            {t('newDeal')}
           </button>
         </div>
       </header>
@@ -125,21 +125,21 @@ export default function CRMPipelinePage() {
       <div className="flex items-center gap-3 p-6 shrink-0 bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700">
         <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
           <User size={16} />
-          <p className="text-sm font-medium">Assigned User</p>
+          <p className="text-sm font-medium">{t('assignedUser')}</p>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M7 10l5 5 5-5z" />
           </svg>
         </button>
         <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
           <Calendar size={16} />
-          <p className="text-sm font-medium">Date Range</p>
+          <p className="text-sm font-medium">{t('dateRange')}</p>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M7 10l5 5 5-5z" />
           </svg>
         </button>
         <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
           <Tag size={16} />
-          <p className="text-sm font-medium">Tags</p>
+          <p className="text-sm font-medium">{t('tags')}</p>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M7 10l5 5 5-5z" />
           </svg>
@@ -182,7 +182,7 @@ export default function CRMPipelinePage() {
                   ))
                 ) : (
                   <div className="flex flex-1 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-navy-700/50 h-32">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Drag deals here</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('dragDealsHere')}</p>
                   </div>
                 )}
               </div>

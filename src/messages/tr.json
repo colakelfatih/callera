@@ -7,7 +7,16 @@
         "flows": "Akışlar",
         "insights": "İçgörüler",
         "studio": "Stüdyo",
-        "settings": "Ayarlar"
+        "settings": "Ayarlar",
+        "expandSidebar": "Kenar çubuğunu genişlet",
+        "collapseSidebar": "Kenar çubuğunu daralt"
+    },
+    "topbar": {
+        "searchPlaceholder": "Konuşmaları, kişileri veya aramaları ara...",
+        "switchToLight": "Açık temaya geç",
+        "switchToDark": "Koyu temaya geç",
+        "notifications": "Bildirimler",
+        "admin": "Yönetici"
     },
     "common": {
         "search": "Ara",

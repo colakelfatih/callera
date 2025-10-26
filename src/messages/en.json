@@ -7,7 +7,16 @@
         "flows": "Flows",
         "insights": "Insights",
         "studio": "Studio",
-        "settings": "Settings"
+        "settings": "Settings",
+        "expandSidebar": "Expand sidebar",
+        "collapseSidebar": "Collapse sidebar"
+    },
+    "topbar": {
+        "searchPlaceholder": "Search conversations, contacts or calls...",
+        "switchToLight": "Switch to light theme",
+        "switchToDark": "Switch to dark theme",
+        "notifications": "Notifications",
+        "admin": "Admin"
     },
     "common": {
         "search": "Search",

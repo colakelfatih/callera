@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import {
   MessageSquare,
   Phone,
@@ -21,15 +22,17 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false, onToggle, locale = 'tr' }: SidebarProps) {
+  const t = useTranslations('navigation')
+  
   const navigation = [
-    { name: 'Inbox', href: `/${locale}/dashboard/inbox`, icon: MessageSquare },
-    { name: 'Dialer', href: `/${locale}/dashboard/dialer`, icon: Phone },
-    { name: 'CRM', href: `/${locale}/dashboard/crm`, icon: Users },
-    { name: 'Pipeline', href: `/${locale}/dashboard/crm-pipeline`, icon: Users },
-    { name: 'Flows', href: `/${locale}/dashboard/flows`, icon: Zap },
-    { name: 'Insights', href: `/${locale}/dashboard/insights`, icon: BarChart3 },
-    { name: 'Studio', href: `/${locale}/dashboard/studio`, icon: Calendar },
-    { name: 'Settings', href: `/${locale}/dashboard/settings`, icon: Settings },
+    { name: t('inbox'), href: `/${locale}/dashboard/inbox`, icon: MessageSquare },
+    { name: t('dialer'), href: `/${locale}/dashboard/dialer`, icon: Phone },
+    { name: t('crm'), href: `/${locale}/dashboard/crm`, icon: Users },
+    { name: t('pipeline'), href: `/${locale}/dashboard/crm-pipeline`, icon: Users },
+    { name: t('flows'), href: `/${locale}/dashboard/flows`, icon: Zap },
+    { name: t('insights'), href: `/${locale}/dashboard/insights`, icon: BarChart3 },
+    { name: t('studio'), href: `/${locale}/dashboard/studio`, icon: Calendar },
+    { name: t('settings'), href: `/${locale}/dashboard/settings`, icon: Settings },
   ]
 
   return (
@@ -52,6 +55,7 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
             "hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors",
             isCollapsed ? "p-4" : "p-2"
           )}
+          aria-label={isCollapsed ? t('expandSidebar') : t('collapseSidebar')}
         >
           <Menu size={isCollapsed ? 28 : 20} />
         </button>
