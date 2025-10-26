@@ -194,6 +194,35 @@ src/
 
 ## 🚀 Deployment
 
+### Docker Deployment
+
+The application includes Docker support for easy deployment:
+
+#### Production Build
+```bash
+# Build the Docker image
+docker build -t callera .
+
+# Run the container
+docker run -p 3000:3000 callera
+```
+
+#### Using Docker Compose
+```bash
+# Production deployment
+docker-compose up -d
+
+# Development with hot reload
+docker-compose --profile dev up callera-dev
+```
+
+#### Docker Files
+- `Dockerfile` - Production optimized multi-stage build
+- `Dockerfile.dev` - Development environment
+- `docker-compose.yml` - Orchestration for both environments
+- `.dockerignore` - Optimized build context
+
+### Other Deployment Options
 The application is ready for deployment on:
 - Vercel (recommended)
 - Netlify
