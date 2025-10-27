@@ -1,0 +1,168 @@
+{
+    "navigation": {
+        "inbox": "Inbox",
+        "dialer": "Dialer",
+        "crm": "CRM",
+        "pipeline": "Pipeline",
+        "flows": "Flows",
+        "insights": "Insights",
+        "studio": "Studio",
+        "settings": "Settings",
+        "expandSidebar": "Expand sidebar",
+        "collapseSidebar": "Collapse sidebar"
+    },
+    "topbar": {
+        "searchPlaceholder": "Search conversations, contacts or calls...",
+        "switchToLight": "Switch to light theme",
+        "switchToDark": "Switch to dark theme",
+        "notifications": "Notifications",
+        "admin": "Admin"
+    },
+    "common": {
+        "search": "Search",
+        "add": "Add",
+        "new": "New",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "warning": "Warning",
+        "info": "Info"
+    },
+    "dialer": {
+        "title": "AI Dialer",
+        "status": "DIALER STATUS",
+        "active": "Dialer is Active",
+        "paused": "Dialer is Paused",
+        "callQueue": "Call Queue",
+        "recentActivity": "Recent Activity",
+        "campaignProgress": "Campaign Progress",
+        "callsCompleted": "Calls Completed",
+        "connectionRate": "Connection Rate",
+        "callbacksScheduled": "Callbacks Scheduled",
+        "nextCall": "Next call:",
+        "activeCampaign": "Active Campaign:",
+        "addContact": "Add Contact",
+        "pauseDialer": "Pause Dialer",
+        "newCampaign": "New Campaign",
+        "searchContacts": "Search contacts...",
+        "connected": "Connected",
+        "voicemailLeft": "Voicemail Left",
+        "noAnswer": "No Answer",
+        "viewLog": "View Log"
+    },
+    "crm": {
+        "title": "CRM & Pipeline",
+        "searchDeals": "Search deals, contacts...",
+        "newDeal": "New Deal",
+        "assignedUser": "Assigned User",
+        "dateRange": "Date Range",
+        "tags": "Tags",
+        "leadIn": "Lead In",
+        "contactMade": "Contact Made",
+        "meetingScheduled": "Meeting Scheduled",
+        "proposal": "Proposal",
+        "won": "Won",
+        "dragDealsHere": "Drag deals here"
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your profile, preferences, and workspace settings.",
+        "myProfile": "My Profile",
+        "preferences": "Preferences",
+        "notifications": "Notifications",
+        "integrations": "Integrations",
+        "billing": "Billing",
+        "personalInfo": "Personal Information",
+        "personalInfoDesc": "Update your personal details here.",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "role": "Role",
+        "password": "Password",
+        "passwordDesc": "Manage your password settings.",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "uploadNewPicture": "Upload new picture",
+        "saveChanges": "Save Changes"
+    },
+    "landing": {
+        "header": {
+            "features": "Features",
+            "pricing": "Pricing",
+            "about": "About",
+            "requestDemo": "Request Demo",
+            "menu": "Menu"
+        },
+        "hero": {
+            "title": "An AI assistant that calls your customers for you.",
+            "subtitle": "Social messages, calls, and CRM in one flow. Upload, teach, and let it talk.",
+            "requestDemo": "Request Demo",
+            "tryFree": "Try Free",
+            "trustedBy": "TRUSTED BY THE WORLD'S MOST INNOVATIVE TEAMS"
+        },
+        "features": {
+            "title": "Everything you need to manage customer relationships",
+            "subtitle": "From AI-powered calling to unified inbox management, Callera brings all your customer touchpoints together.",
+            "unifiedInbox": {
+                "title": "Unified Inbox",
+                "description": "All your customer conversations in one place. Instagram, WhatsApp, Email, and Phone calls unified.",
+                "stats": "3× faster first contact"
+            },
+            "aiCalling": {
+                "title": "AI Calling & Callback",
+                "description": "AI makes outbound calls, handles conversations, and schedules callbacks automatically.",
+                "stats": "70% reduction in manual work"
+            },
+            "autoLabeling": {
+                "title": "Auto Labeling",
+                "description": "AI automatically labels conversations by intent, sentiment, and priority.",
+                "stats": "Reduce manual labeling by 70%"
+            },
+            "crm": {
+                "title": "CRM & Pipeline",
+                "description": "Seamless CRM integration with pipeline management and contact tracking.",
+                "stats": "Complete customer view"
+            },
+            "automation": {
+                "title": "Automation Flows",
+                "description": "No-code automation builder for complex workflows and customer journeys.",
+                "stats": "Unlimited possibilities"
+            },
+            "reports": {
+                "title": "Reports",
+                "description": "Comprehensive analytics and insights into your customer interactions.",
+                "stats": "Data-driven decisions"
+            }
+        },
+        "footer": {
+            "tagline": "An AI assistant that calls your customers for you. Social messages, calls, and CRM in one flow.",
+            "requestDemo": "Request Demo",
+            "tryFree": "Try Free",
+            "product": "Product",
+            "features": "Features",
+            "pricing": "Pricing",
+            "integrations": "Integrations",
+            "api": "API",
+            "company": "Company",
+            "about": "About",
+            "blog": "Blog",
+            "careers": "Careers",
+            "contact": "Contact",
+            "copyright": "© 2024 Callera. All rights reserved.",
+            "privacy": "Privacy",
+            "terms": "Terms",
+            "security": "Security"
+        }
+    },
+    "language": {
+        "switchToEnglish": "Switch to English",
+        "switchToTurkish": "Switch to Turkish"
+    }
+}

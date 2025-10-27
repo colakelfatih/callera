@@ -1,15 +1,26 @@
 import { notFound } from 'next/navigation'
 import { getRequestConfig } from 'next-intl/server'
+import trMessages from './messages/tr/tr.json'
+import enMessages from './messages/en/en.json'
 
-// Can be imported from a shared config
-const locales = ['tr', 'en']
+const locales = ['tr', 'en'] as const
+const fallbackLocale = 'tr'
+
+const messages = {
+    tr: trMessages,
+    en: enMessages
+}
 
 export default getRequestConfig(async ({ locale }) => {
-    // Validate that the incoming `locale` parameter is valid
-    if (!locale || !locales.includes(locale as any)) notFound()
+    // normalize / fallback
+    let activeLocale = locale
+
+    if (!activeLocale || !locales.includes(activeLocale as any)) {
+        activeLocale = fallbackLocale
+    }
 
     return {
-        messages: (await import(`../messages/${locale}.json`)).default,
-        locale
+        messages: messages[activeLocale as keyof typeof messages],
+        locale: activeLocale
     }
 })

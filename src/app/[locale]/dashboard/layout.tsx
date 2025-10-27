@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { TopBar } from '@/components/dashboard/topbar'
-import { useParams } from 'next/navigation'
 
 export default function DashboardLayout({
-  children,
+  children
 }: {
   children: React.ReactNode
 }) {

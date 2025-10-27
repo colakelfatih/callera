@@ -1,8 +1,17 @@
+import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
 
 const locales = ['tr', 'en']
+
+export const metadata: Metadata = {
+  title: 'Callera - AI Assistant Platform',
+  description: 'An AI assistant that calls your customers for you. Social messages, calls, and CRM in one flow.',
+}
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }))
+}
 
 export default async function LocaleLayout({
   children,
@@ -12,19 +21,17 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  
-  // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) {
-    notFound()
-  }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
+  // Load messages using next-intl's built-in method
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      {children}
-    </NextIntlClientProvider>
+    <html lang={locale}>
+      <body className="font-sans bg-background-light dark:bg-background-dark text-navy dark:text-gray-200">
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
+    </html>
   )
 }

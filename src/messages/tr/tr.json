@@ -1,0 +1,168 @@
+{
+    "navigation": {
+        "inbox": "Gelen Kutusu",
+        "dialer": "Arayıcı",
+        "crm": "CRM",
+        "pipeline": "Pipeline",
+        "flows": "Akışlar",
+        "insights": "İçgörüler",
+        "studio": "Stüdyo",
+        "settings": "Ayarlar",
+        "expandSidebar": "Kenar çubuğunu genişlet",
+        "collapseSidebar": "Kenar çubuğunu daralt"
+    },
+    "topbar": {
+        "searchPlaceholder": "Konuşmaları, kişileri veya aramaları ara...",
+        "switchToLight": "Açık temaya geç",
+        "switchToDark": "Koyu temaya geç",
+        "notifications": "Bildirimler",
+        "admin": "Yönetici"
+    },
+    "common": {
+        "search": "Ara",
+        "add": "Ekle",
+        "new": "Yeni",
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "close": "Kapat",
+        "back": "Geri",
+        "next": "İleri",
+        "previous": "Önceki",
+        "loading": "Yükleniyor...",
+        "error": "Hata",
+        "success": "Başarılı",
+        "warning": "Uyarı",
+        "info": "Bilgi"
+    },
+    "dialer": {
+        "title": "AI Arayıcı",
+        "status": "ARAYICI DURUMU",
+        "active": "Arayıcı Aktif",
+        "paused": "Arayıcı Duraklatıldı",
+        "callQueue": "Arama Kuyruğu",
+        "recentActivity": "Son Aktiviteler",
+        "campaignProgress": "Kampanya İlerlemesi",
+        "callsCompleted": "Tamamlanan Aramalar",
+        "connectionRate": "Bağlantı Oranı",
+        "callbacksScheduled": "Planlanan Geri Aramalar",
+        "nextCall": "Sonraki arama:",
+        "activeCampaign": "Aktif Kampanya:",
+        "addContact": "Kişi Ekle",
+        "pauseDialer": "Arayıcıyı Duraklat",
+        "newCampaign": "Yeni Kampanya",
+        "searchContacts": "Kişileri ara...",
+        "connected": "Bağlandı",
+        "voicemailLeft": "Sesli Mesaj Bırakıldı",
+        "noAnswer": "Cevap Yok",
+        "viewLog": "Günlüğü Görüntüle"
+    },
+    "crm": {
+        "title": "CRM & Pipeline",
+        "searchDeals": "Anlaşmaları, kişileri ara...",
+        "newDeal": "Yeni Anlaşma",
+        "assignedUser": "Atanan Kullanıcı",
+        "dateRange": "Tarih Aralığı",
+        "tags": "Etiketler",
+        "leadIn": "Gelen Lead",
+        "contactMade": "İletişim Kuruldu",
+        "meetingScheduled": "Toplantı Planlandı",
+        "proposal": "Teklif",
+        "won": "Kazanıldı",
+        "dragDealsHere": "Anlaşmaları buraya sürükleyin"
+    },
+    "settings": {
+        "title": "Ayarlar",
+        "description": "Profilinizi, tercihlerinizi ve çalışma alanı ayarlarınızı yönetin.",
+        "myProfile": "Profilim",
+        "preferences": "Tercihler",
+        "notifications": "Bildirimler",
+        "integrations": "Entegrasyonlar",
+        "billing": "Faturalandırma",
+        "personalInfo": "Kişisel Bilgiler",
+        "personalInfoDesc": "Kişisel detaylarınızı buradan güncelleyin.",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "role": "Rol",
+        "password": "Şifre",
+        "passwordDesc": "Şifre ayarlarınızı yönetin.",
+        "currentPassword": "Mevcut Şifre",
+        "newPassword": "Yeni Şifre",
+        "uploadNewPicture": "Yeni resim yükle",
+        "saveChanges": "Değişiklikleri Kaydet"
+    },
+    "landing": {
+        "header": {
+            "features": "Özellikler",
+            "pricing": "Fiyatlandırma",
+            "about": "Hakkımızda",
+            "requestDemo": "Demo Talep Et",
+            "menu": "Menü"
+        },
+        "hero": {
+            "title": "Müşterileriniz için sizi arayan bir AI asistanı.",
+            "subtitle": "Sosyal mesajlar, aramalar ve CRM tek bir akışta. Yükleyin, öğretin ve konuşturun.",
+            "requestDemo": "Demo Talep Et",
+            "tryFree": "Ücretsiz Dene",
+            "trustedBy": "DÜNYANIN EN İNOVATIF TAKIMLARI TARAFINDAN GÜVENİLEN"
+        },
+        "features": {
+            "title": "Müşteri ilişkilerini yönetmek için ihtiyacınız olan her şey",
+            "subtitle": "AI destekli aramalardan birleşik gelen kutusu yönetimine kadar, Callera tüm müşteri dokunuş noktalarınızı bir araya getirir.",
+            "unifiedInbox": {
+                "title": "Birleşik Gelen Kutusu",
+                "description": "Tüm müşteri konuşmalarınız tek bir yerde. Instagram, WhatsApp, E-posta ve Telefon aramaları birleşik.",
+                "stats": "İlk temas 3× daha hızlı"
+            },
+            "aiCalling": {
+                "title": "AI Arama ve Geri Arama",
+                "description": "AI giden aramalar yapar, konuşmaları yönetir ve geri aramaları otomatik olarak planlar.",
+                "stats": "Manuel işte %70 azalma"
+            },
+            "autoLabeling": {
+                "title": "Otomatik Etiketleme",
+                "description": "AI konuşmaları otomatik olarak niyete, duyguya ve önceliğe göre etiketler.",
+                "stats": "Manuel etiketlemeyi %70 azaltın"
+            },
+            "crm": {
+                "title": "CRM ve Pipeline",
+                "description": "Pipeline yönetimi ve kişi takibi ile sorunsuz CRM entegrasyonu.",
+                "stats": "Tam müşteri görünümü"
+            },
+            "automation": {
+                "title": "Otomasyon Akışları",
+                "description": "Karmaşık iş akışları ve müşteri yolculukları için no-code otomasyon oluşturucu.",
+                "stats": "Sınırsız olasılıklar"
+            },
+            "reports": {
+                "title": "Raporlar",
+                "description": "Müşteri etkileşimlerinize kapsamlı analitik ve içgörüler.",
+                "stats": "Veri odaklı kararlar"
+            }
+        },
+        "footer": {
+            "tagline": "Müşterileriniz için sizi arayan bir AI asistanı. Sosyal mesajlar, aramalar ve CRM tek bir akışta.",
+            "requestDemo": "Demo Talep Et",
+            "tryFree": "Ücretsiz Dene",
+            "product": "Ürün",
+            "features": "Özellikler",
+            "pricing": "Fiyatlandırma",
+            "integrations": "Entegrasyonlar",
+            "api": "API",
+            "company": "Şirket",
+            "about": "Hakkımızda",
+            "blog": "Blog",
+            "careers": "Kariyer",
+            "contact": "İletişim",
+            "copyright": "© 2024 Callera. Tüm hakları saklıdır.",
+            "privacy": "Gizlilik",
+            "terms": "Şartlar",
+            "security": "Güvenlik"
+        }
+    },
+    "language": {
+        "switchToEnglish": "İngilizce'ye geç",
+        "switchToTurkish": "Türkçe'ye geç"
+    }
+}
