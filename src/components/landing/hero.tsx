@@ -9,36 +9,36 @@ export function Hero() {
   const t = useTranslations('landing.hero')
 
   return (
-    <section className="py-16 sm:py-24 lg:py-32">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-        <div className="flex flex-col gap-8 text-center lg:text-left">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-4xl font-black leading-tight tracking-tighter text-navy dark:text-white sm:text-5xl lg:text-6xl">
+    <section className="py-12 sm:py-16 lg:py-24 xl:py-32">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+        <div className="flex flex-col gap-6 sm:gap-8 text-center lg:text-left">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tighter text-navy dark:text-white">
               {t('title')}
             </h1>
-            <p className="text-base font-normal leading-relaxed text-navy/70 dark:text-gray-400 sm:text-lg">
+            <p className="text-sm sm:text-base md:text-lg font-normal leading-relaxed text-navy/70 dark:text-gray-400">
               {t('subtitle')}
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-            <Button size="lg">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center lg:justify-start">
+            <Button size="lg" className="w-full sm:w-auto">
               {t('requestDemo')}
             </Button>
-            <Button variant="secondary" size="lg">
+            <Button variant="secondary" size="lg" className="w-full sm:w-auto">
               {t('tryFree')}
             </Button>
           </div>
 
-          <div className="mt-8">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 text-center lg:text-left">
+          <div className="mt-6 sm:mt-8">
+            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 sm:mb-4 text-center lg:text-left">
               {t('trustedBy')}
             </p>
-            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-x-8 gap-y-4 opacity-60 dark:opacity-40">
-              <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
-              <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
-              <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
-              <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4 opacity-60 dark:opacity-40">
+              <div className="h-5 sm:h-6 w-16 sm:w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              <div className="h-5 sm:h-6 w-16 sm:w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              <div className="h-5 sm:h-6 w-16 sm:w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              <div className="h-5 sm:h-6 w-16 sm:w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
             </div>
           </div>
         </div>
@@ -46,9 +46,9 @@ export function Hero() {
         <div className="relative w-full aspect-[4/3] lg:aspect-square">
           <div className="absolute w-full h-full" style={{ perspective: '1000px' }}>
             {/* Unified Inbox Mockup */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] sm:w-[70%] lg:w-[90%] transform transition-transform duration-500 ease-in-out hover:rotate-y-0"
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[75%] lg:w-[90%] xl:w-[85%] transform transition-transform duration-500 ease-in-out hover:rotate-y-0"
               style={{ transform: 'rotateY(-10deg) rotateX(10deg) translateZ(50px)' }}>
-              <div className="relative w-full bg-white dark:bg-navy rounded-xl shadow-2xl overflow-hidden p-2 sm:p-4 border border-gray-200 dark:border-gray-700">
+              <div className="relative w-full bg-white dark:bg-navy rounded-xl shadow-2xl overflow-hidden p-2 sm:p-3 lg:p-4 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-navy-900 rounded-lg">
                   <div className="flex items-center gap-2">
                     <span className="block w-3 h-3 bg-red-400 rounded-full"></span>
@@ -86,7 +86,7 @@ export function Hero() {
             </div>
 
             {/* AI Calling Mockup */}
-            <div className="absolute bottom-[-10%] right-[-10%] sm:bottom-[-5%] sm:right-[-5%] lg:bottom-[-10%] lg:right-[-5%] w-[60%] sm:w-[50%] lg:w-[55%] bg-white dark:bg-navy rounded-xl shadow-2xl p-2 sm:p-4 border border-gray-200 dark:border-gray-700 transition-transform duration-500 ease-in-out hover:scale-105"
+            <div className="absolute bottom-[-10%] right-[-10%] sm:bottom-[-8%] sm:right-[-8%] md:bottom-[-5%] md:right-[-5%] lg:bottom-[-10%] lg:right-[-5%] w-[60%] sm:w-[55%] md:w-[50%] lg:w-[55%] bg-white dark:bg-navy rounded-xl shadow-2xl p-2 sm:p-3 lg:p-4 border border-gray-200 dark:border-gray-700 transition-transform duration-500 ease-in-out hover:scale-105"
               style={{ transform: 'rotateY(15deg) rotateX(-5deg) translateZ(100px)' }}>
               <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
                 <p className="text-xs font-bold text-primary">AI OUTBOUND CALL</p>

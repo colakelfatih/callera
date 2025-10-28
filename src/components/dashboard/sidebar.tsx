@@ -23,7 +23,7 @@ interface SidebarProps {
 
 export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false, onToggle, locale = 'tr' }: SidebarProps) {
   const t = useTranslations('navigation')
-  
+
   const navigation = [
     { name: t('inbox'), href: `/${locale}/dashboard/inbox`, icon: MessageSquare },
     { name: t('dialer'), href: `/${locale}/dashboard/dialer`, icon: Phone },
@@ -37,7 +37,7 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
 
   return (
     <div className={cn(
-      'bg-white dark:bg-navy-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300',
+      'bg-white dark:bg-navy-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 h-full overflow-y-auto',
       isCollapsed ? 'w-16' : 'w-64'
     )}>
       <div className={cn(

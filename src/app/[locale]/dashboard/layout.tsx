@@ -14,6 +14,7 @@ export default function DashboardLayout({
   const locale = params.locale as string
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isDark, setIsDark] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // Check for saved theme preference
@@ -22,10 +23,24 @@ export default function DashboardLayout({
       setIsDark(true)
       document.documentElement.classList.add('dark')
     }
+
+    // Handle window resize
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed)
+  }
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
   const toggleTheme = () => {
@@ -37,15 +52,44 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background-light dark:bg-background-dark">
-      <Sidebar
-        isCollapsed={isCollapsed}
-        onToggle={toggleSidebar}
-        currentPath={typeof window !== 'undefined' ? window.location.pathname : `/${locale}/dashboard/inbox`}
-        locale={locale}
-      />
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar
+          isCollapsed={isCollapsed}
+          onToggle={toggleSidebar}
+          currentPath={typeof window !== 'undefined' ? window.location.pathname : `/${locale}/dashboard/inbox`}
+          locale={locale}
+        />
+      </div>
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar onThemeToggle={toggleTheme} isDark={isDark} />
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div className={`
+        lg:hidden fixed left-0 top-0 h-full z-50 transition-transform duration-300
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <Sidebar
+          isCollapsed={false}
+          onToggle={toggleMobileMenu}
+          currentPath={typeof window !== 'undefined' ? window.location.pathname : `/${locale}/dashboard/inbox`}
+          locale={locale}
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col overflow-hidden lg:w-0">
+        <TopBar
+          onThemeToggle={toggleTheme}
+          isDark={isDark}
+          onMobileMenuToggle={toggleMobileMenu}
+          isMobileMenuOpen={isMobileMenuOpen}
+        />
 
         <main className="flex-1 overflow-auto">
           {children}

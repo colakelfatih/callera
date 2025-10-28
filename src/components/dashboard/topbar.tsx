@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, Bell, Moon, Sun } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { useTranslations } from 'next-intl'
@@ -9,17 +9,28 @@ import { useTranslations } from 'next-intl'
 interface TopBarProps {
   onThemeToggle?: () => void
   isDark?: boolean
+  onMobileMenuToggle?: () => void
+  isMobileMenuOpen?: boolean
 }
 
-export function TopBar({ onThemeToggle, isDark = false }: TopBarProps) {
+export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const t = useTranslations('topbar')
 
   return (
-    <div className="bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative max-w-md w-full">
+    <div className="bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Mobile menu button */}
+          <button
+            onClick={onMobileMenuToggle}
+            className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors"
+            aria-label="Toggle menu"
+          >
+            <Menu size={24} />
+          </button>
+
+          <div className="relative max-w-md w-full hidden md:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
@@ -31,7 +42,7 @@ export function TopBar({ onThemeToggle, isDark = false }: TopBarProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -42,14 +53,14 @@ export function TopBar({ onThemeToggle, isDark = false }: TopBarProps) {
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </Button>
 
-          <Button variant="ghost" size="sm" className="p-2 relative" aria-label={t('notifications')}>
+          <Button variant="ghost" size="sm" className="p-2 relative hidden sm:flex" aria-label={t('notifications')}>
             <Bell size={20} />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
           </Button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <Avatar name="John Doe" size="sm" />
-            <div className="hidden sm:block">
+            <div className="hidden lg:block">
               <p className="text-sm font-medium text-navy dark:text-white">John Doe</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('admin')}</p>
             </div>

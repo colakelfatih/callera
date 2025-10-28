@@ -48,28 +48,28 @@ export function Features() {
   ]
 
   return (
-    <section id="features" className="py-16 sm:py-24">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl font-bold text-navy dark:text-white sm:text-4xl lg:text-5xl mb-4">
+    <section id="features" className="py-12 sm:py-16 lg:py-24">
+      <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy dark:text-white mb-3 sm:mb-4">
           {t('title')}
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-4">
           {t('subtitle')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {features.map((feature, index) => (
           <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3 sm:mb-4">
+                <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
-              <CardTitle className="text-xl">{feature.title}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">{feature.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{feature.description}</p>
-              <div className="text-sm font-semibold text-primary">{feature.stats}</div>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">{feature.description}</p>
+              <div className="text-xs sm:text-sm font-semibold text-primary">{feature.stats}</div>
             </CardContent>
           </Card>
         ))}
