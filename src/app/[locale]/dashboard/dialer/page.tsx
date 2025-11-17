@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, Plus, Bell, Phone } from 'lucide-react'
-// import { useTranslations } from 'next-intl'
+import { Search, Bell, Phone } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const callQueueData = [
   {
@@ -57,7 +57,7 @@ const recentActivity = [
 
 export default function DialerPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  // const t = useTranslations()
+  const t = useTranslations('dialer')
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
@@ -65,7 +65,7 @@ export default function DialerPage() {
       <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200/80 dark:border-navy/20 bg-white dark:bg-background-dark px-6 sm:px-10 py-3 sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Phone size={32} className="text-primary" />
-          <h1 className="text-navy dark:text-white text-xl font-bold leading-tight tracking-tight">Dialer</h1>
+          <h1 className="text-navy dark:text-white text-xl font-bold leading-tight tracking-tight">{t('title')}</h1>
         </div>
         <div className="flex flex-1 justify-end items-center gap-4">
           <label className="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
@@ -75,7 +75,7 @@ export default function DialerPage() {
               </div>
               <input
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-navy dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-gray-100 dark:bg-white/5 h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal"
-                placeholder="Search contacts..."
+                placeholder={t('searchContacts')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -101,12 +101,12 @@ export default function DialerPage() {
           <div className="bg-white dark:bg-navy/10 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
             <div className="p-4 border-b border-gray-200/80 dark:border-navy/20">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-navy dark:text-white">Call Queue</h3>
+                <h3 className="font-bold text-navy dark:text-white">{t('callQueue')}</h3>
                 <button className="flex items-center justify-center rounded-lg h-8 px-3 bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20">
-                  <span className="truncate">Add Contact</span>
+                  <span className="truncate">{t('addContact')}</span>
                 </button>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Q4 Lead Takip aramaları için yaklaşan aramalar</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('queueDescription')}</p>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {callQueueData.map((contact) => (
@@ -118,7 +118,7 @@ export default function DialerPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-navy dark:text-white/90">{contact.time}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{contact.date}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{contact.date === 'Today' ? t('today') : contact.date}</p>
                   </div>
                 </div>
               ))}
@@ -132,45 +132,45 @@ export default function DialerPage() {
           <div className="rounded-xl shadow-sm bg-white dark:bg-navy/10 p-6">
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
-                <p className="text-2xl font-bold text-navy dark:text-white tracking-tight mt-1">Active</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('status')}</p>
+                <p className="text-2xl font-bold text-navy dark:text-white tracking-tight mt-1">{t('statusActive')}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-white text-sm font-medium leading-normal hover:bg-primary/90">
-                  <span className="truncate">Pause Dialer</span>
+                  <span className="truncate">{t('pauseDialer')}</span>
                 </button>
                 <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-gray-200 dark:bg-white/10 text-navy dark:text-white text-sm font-medium leading-normal hover:bg-gray-300 dark:hover:bg-white/20">
-                  <span className="truncate">New Campaign</span>
+                  <span className="truncate">{t('newCampaign')}</span>
                 </button>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-200/80 dark:border-navy/20 flex flex-col sm:flex-row items-start sm:items-end gap-3 justify-between">
               <div className="flex flex-col gap-1">
-                <p className="text-base text-gray-600 dark:text-gray-300">Next call: <span className="font-semibold text-navy dark:text-white">John Doe</span> at <span className="font-semibold text-navy dark:text-white">14:30</span></p>
-                <p className="text-base text-gray-600 dark:text-gray-300">Active campaign: <span className="font-semibold text-navy dark:text-white">Q4 Lead Takip</span></p>
+                <p className="text-base text-gray-600 dark:text-gray-300">{t('nextCall')} <span className="font-semibold text-navy dark:text-white">John Doe</span> {t('nextCallAt')} <span className="font-semibold text-navy dark:text-white">14:30</span></p>
+                <p className="text-base text-gray-600 dark:text-gray-300">{t('activeCampaign')} <span className="font-semibold text-navy dark:text-white">Q4 Lead Takip</span></p>
               </div>
               <div className="flex items-baseline gap-1">
-                <p className="text-gray-500 dark:text-gray-400">Sonraki arama:</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('nextCallIn')}</p>
                 <p className="text-xl font-bold text-primary">02:15</p>
               </div>
             </div>
           </div>
 
           {/* Section Header */}
-          <h2 className="text-navy dark:text-white text-xl font-bold leading-tight tracking-tight px-0 pt-2 pb-0">Campaign Progress</h2>
+          <h2 className="text-navy dark:text-white text-xl font-bold leading-tight tracking-tight px-0 pt-2 pb-0">{t('campaignProgress')}</h2>
 
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="flex flex-col gap-2 rounded-xl p-5 border border-gray-200/80 dark:border-navy/20 bg-white dark:bg-navy/10">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Calls Completed</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('callsCompleted')}</p>
               <p className="text-navy dark:text-white text-3xl font-bold leading-tight">128 / 300</p>
             </div>
             <div className="flex flex-col gap-2 rounded-xl p-5 border border-gray-200/80 dark:border-navy/20 bg-white dark:bg-navy/10">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Connection Rate</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('connectionRate')}</p>
               <p className="text-navy dark:text-white text-3xl font-bold leading-tight">42%</p>
             </div>
             <div className="flex flex-col gap-2 rounded-xl p-5 border border-gray-200/80 dark:border-navy/20 bg-white dark:bg-navy/10">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Callbacks Scheduled</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('callbacksScheduled')}</p>
               <p className="text-navy dark:text-white text-3xl font-bold leading-tight">15</p>
             </div>
           </div>
@@ -178,33 +178,40 @@ export default function DialerPage() {
           {/* Recent Activity */}
           <div className="bg-white dark:bg-navy/10 rounded-xl shadow-sm overflow-hidden flex flex-col">
             <div className="p-4 border-b border-gray-200/80 dark:border-navy/20">
-              <h3 className="font-bold text-navy dark:text-white">Recent Activity</h3>
+              <h3 className="font-bold text-navy dark:text-white">{t('recentActivity')}</h3>
             </div>
             <div className="flex-1">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-white/5">
                   <tr>
-                    <th className="px-6 py-3" scope="col">Contact</th>
-                    <th className="px-6 py-3" scope="col">Time</th>
-                    <th className="px-6 py-3" scope="col">Outcome</th>
-                    <th className="px-6 py-3 text-right" scope="col">Actions</th>
+                    <th className="px-6 py-3" scope="col">{t('contact')}</th>
+                    <th className="px-6 py-3" scope="col">{t('time')}</th>
+                    <th className="px-6 py-3" scope="col">{t('outcome')}</th>
+                    <th className="px-6 py-3 text-right" scope="col">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recentActivity.map((activity) => (
-                    <tr key={activity.id} className="bg-white dark:bg-transparent border-b border-gray-200/80 dark:border-navy/20 hover:bg-gray-50 dark:hover:bg-white/5">
-                      <td className="px-6 py-4 font-semibold text-navy dark:text-white">{activity.contact}</td>
-                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{activity.time}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center ${activity.statusColor} text-xs font-medium px-2.5 py-0.5 rounded-full`}>
-                          {activity.outcome}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <a className="font-medium text-primary hover:underline" href="#">View Log</a>
-                      </td>
-                    </tr>
-                  ))}
+                  {recentActivity.map((activity) => {
+                    const outcomeMap: Record<string, string> = {
+                      'Connected': t('connected'),
+                      'Voicemail Left': t('voicemailLeft'),
+                      'No Answer': t('noAnswer')
+                    }
+                    return (
+                      <tr key={activity.id} className="bg-white dark:bg-transparent border-b border-gray-200/80 dark:border-navy/20 hover:bg-gray-50 dark:hover:bg-white/5">
+                        <td className="px-6 py-4 font-semibold text-navy dark:text-white">{activity.contact}</td>
+                        <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{activity.time}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center ${activity.statusColor} text-xs font-medium px-2.5 py-0.5 rounded-full`}>
+                            {outcomeMap[activity.outcome] || activity.outcome}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <a className="font-medium text-primary hover:underline" href="#">{t('viewLog')}</a>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

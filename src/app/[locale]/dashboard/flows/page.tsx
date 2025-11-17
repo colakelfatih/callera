@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button'
 import { mockAutomationFlows } from '@/lib/mock-data'
 import { formatDate } from '@/lib/utils'
 import { Plus, Play, Pause, Settings, Zap, ArrowRight, Circle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export default function FlowsPage() {
   const [selectedFlow, setSelectedFlow] = useState(mockAutomationFlows[0])
+  const t = useTranslations('flows')
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy dark:text-white">Automation Flows</h1>
+        <h1 className="text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
         <Button>
           <Plus size={16} className="mr-2" />
-          Create Flow
+          {t('createFlow')}
         </Button>
       </div>
 
@@ -26,7 +28,7 @@ export default function FlowsPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Active Flows</CardTitle>
+              <CardTitle>{t('activeFlows')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -58,7 +60,7 @@ export default function FlowsPage() {
                           variant={flow.isActive ? 'success' : 'default'}
                           className="text-xs"
                         >
-                          {flow.isActive ? 'Active' : 'Inactive'}
+                          {flow.isActive ? t('active') : t('inactive')}
                         </Badge>
                         <Button variant="ghost" size="sm">
                           <Settings size={16} />
@@ -68,7 +70,7 @@ export default function FlowsPage() {
                     
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Last run: {flow.lastRun ? formatDate(flow.lastRun) : 'Never'}
+                        {t('lastRun')} {flow.lastRun ? formatDate(flow.lastRun) : t('never')}
                       </span>
                     </div>
                     
@@ -80,17 +82,17 @@ export default function FlowsPage() {
                         {flow.isActive ? (
                           <>
                             <Pause size={16} className="mr-2" />
-                            Pause
+                            {t('pause')}
                           </>
                         ) : (
                           <>
                             <Play size={16} className="mr-2" />
-                            Activate
+                            {t('activate')}
                           </>
                         )}
                       </Button>
                       <Button variant="outline" size="sm">
-                        Edit
+                        {t('edit')}
                       </Button>
                     </div>
                   </div>
@@ -112,7 +114,7 @@ export default function FlowsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-3">Trigger</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-3">{t('trigger')}</h4>
                   <div className="bg-gray-50 dark:bg-navy-700 p-3 rounded-lg">
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                       {selectedFlow.trigger}
@@ -121,7 +123,7 @@ export default function FlowsPage() {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-3">Conditions</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-3">{t('conditions')}</h4>
                   <div className="space-y-2">
                     {selectedFlow.conditions.map((condition, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -135,7 +137,7 @@ export default function FlowsPage() {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-3">Actions</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-3">{t('actions')}</h4>
                   <div className="space-y-2">
                     {selectedFlow.actions.map((action, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -150,18 +152,18 @@ export default function FlowsPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-navy dark:text-white">Status</span>
+                    <span className="text-sm font-medium text-navy dark:text-white">{t('status')}</span>
                     <Badge 
                       variant={selectedFlow.isActive ? 'success' : 'default'}
                       className="text-xs"
                     >
-                      {selectedFlow.isActive ? 'Active' : 'Inactive'}
+                      {selectedFlow.isActive ? t('active') : t('inactive')}
                     </Badge>
                   </div>
                   
                   {selectedFlow.lastRun && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Last run</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t('lastRun')}</span>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {formatDate(selectedFlow.lastRun)}
                       </span>
@@ -178,12 +180,12 @@ export default function FlowsPage() {
                     {selectedFlow.isActive ? (
                       <>
                         <Pause size={16} className="mr-2" />
-                        Pause Flow
+                        {t('pauseFlow')}
                       </>
                     ) : (
                       <>
                         <Play size={16} className="mr-2" />
-                        Activate Flow
+                        {t('activateFlow')}
                       </>
                     )}
                   </Button>
@@ -198,10 +200,10 @@ export default function FlowsPage() {
               <CardContent className="text-center py-12">
                 <Zap size={48} className="mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-navy dark:text-white mb-2">
-                  Select a flow
+                  {t('selectFlow')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Choose a flow to view details and manage
+                  {t('selectFlowDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -212,7 +214,7 @@ export default function FlowsPage() {
       {/* Flow Builder Preview */}
       <Card>
         <CardHeader>
-          <CardTitle>Flow Builder</CardTitle>
+          <CardTitle>{t('flowBuilder')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="bg-gray-50 dark:bg-navy-700 p-6 rounded-lg">
@@ -221,8 +223,8 @@ export default function FlowsPage() {
               <div className="bg-white dark:bg-navy-800 p-4 rounded-lg border-2 border-primary shadow-lg">
                 <div className="text-center">
                   <Circle size={24} className="text-primary mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-navy dark:text-white">Trigger</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">New contact added</p>
+                  <p className="text-sm font-semibold text-navy dark:text-white">{t('trigger')}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('newContactAdded')}</p>
                 </div>
               </div>
               
@@ -232,8 +234,8 @@ export default function FlowsPage() {
               <div className="bg-white dark:bg-navy-800 p-4 rounded-lg border-2 border-yellow-400 shadow-lg">
                 <div className="text-center">
                   <Settings size={24} className="text-yellow-600 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-navy dark:text-white">Condition</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Source = website</p>
+                  <p className="text-sm font-semibold text-navy dark:text-white">{t('condition')}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('sourceWebsite')}</p>
                 </div>
               </div>
               
@@ -243,8 +245,8 @@ export default function FlowsPage() {
               <div className="bg-white dark:bg-navy-800 p-4 rounded-lg border-2 border-green-400 shadow-lg">
                 <div className="text-center">
                   <Zap size={24} className="text-green-600 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-navy dark:text-white">Action</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Send welcome email</p>
+                  <p className="text-sm font-semibold text-navy dark:text-white">{t('action')}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('sendWelcomeEmail')}</p>
                 </div>
               </div>
             </div>

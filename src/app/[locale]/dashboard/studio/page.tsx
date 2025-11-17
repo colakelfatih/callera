@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 import { Plus, Calendar, Image, Video, FileText, Send, Clock, CheckCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const mockPosts = [
   {
@@ -62,6 +63,7 @@ export default function StudioPage() {
   const [selectedPost, setSelectedPost] = useState(mockPosts[0])
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
   const [filter, setFilter] = useState('all')
+  const t = useTranslations('studio')
 
   const filteredPosts = filter === 'all' 
     ? mockPosts 
@@ -70,7 +72,7 @@ export default function StudioPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy dark:text-white">Social Studio</h1>
+        <h1 className="text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
             <Button
@@ -79,19 +81,19 @@ export default function StudioPage() {
               onClick={() => setView('calendar')}
             >
               <Calendar size={16} className="mr-2" />
-              Calendar
+              {t('calendar')}
             </Button>
             <Button
               variant={view === 'list' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => setView('list')}
             >
-              List
+              {t('list')}
             </Button>
           </div>
           <Button>
             <Plus size={16} className="mr-2" />
-            Create Post
+            {t('createPost')}
           </Button>
         </div>
       </div>
@@ -106,7 +108,7 @@ export default function StudioPage() {
               onClick={() => setFilter(status)}
               className="capitalize"
             >
-              {status}
+              {t(status as 'all' | 'draft' | 'scheduled' | 'published')}
             </Button>
           ))}
         </div>
@@ -118,7 +120,7 @@ export default function StudioPage() {
           {view === 'list' ? (
             <Card>
               <CardHeader>
-                <CardTitle>Posts</CardTitle>
+                <CardTitle>{t('posts')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -176,7 +178,7 @@ export default function StudioPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Content Calendar</CardTitle>
+                <CardTitle>{t('contentCalendar')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="bg-gray-50 dark:bg-navy-700 p-6 rounded-lg">
@@ -242,14 +244,14 @@ export default function StudioPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-2">Content</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-2">{t('content')}</h4>
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {selectedPost.content}
                   </p>
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-2">Platforms</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-2">{t('platforms')}</h4>
                   <div className="flex flex-wrap gap-1">
                     {selectedPost.platforms.map((platform) => (
                       <Badge key={platform} variant="info" className="text-xs capitalize">
@@ -260,7 +262,7 @@ export default function StudioPage() {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-2">Schedule</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-2">{t('schedule')}</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {formatDate(selectedPost.scheduledDate)}
                   </p>
@@ -268,25 +270,25 @@ export default function StudioPage() {
                 
                 {selectedPost.engagement && (
                   <div>
-                    <h4 className="font-semibold text-navy dark:text-white mb-2">Engagement</h4>
+                    <h4 className="font-semibold text-navy dark:text-white mb-2">{t('engagement')}</h4>
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <p className="text-lg font-bold text-navy dark:text-white">
                           {selectedPost.engagement.likes}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Likes</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('likes')}</p>
                       </div>
                       <div>
                         <p className="text-lg font-bold text-navy dark:text-white">
                           {selectedPost.engagement.comments}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Comments</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('comments')}</p>
                       </div>
                       <div>
                         <p className="text-lg font-bold text-navy dark:text-white">
                           {selectedPost.engagement.shares}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Shares</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('shares')}</p>
                       </div>
                     </div>
                   </div>
@@ -295,10 +297,10 @@ export default function StudioPage() {
                 <div className="flex gap-2">
                   <Button size="sm" className="flex-1">
                     <Send size={16} className="mr-2" />
-                    Publish
+                    {t('publish')}
                   </Button>
                   <Button variant="outline" size="sm">
-                    Edit
+                    {t('edit')}
                   </Button>
                 </div>
               </CardContent>
@@ -308,10 +310,10 @@ export default function StudioPage() {
               <CardContent className="text-center py-12">
                 <Calendar size={48} className="mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-navy dark:text-white mb-2">
-                  Select a post
+                  {t('selectPost')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Choose a post to view details and manage
+                  {t('selectPostDesc')}
                 </p>
               </CardContent>
             </Card>

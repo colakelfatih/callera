@@ -4,6 +4,23 @@ import React, { useState } from 'react'
 import { Search, Plus, User, Calendar, Tag } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+interface Deal {
+  id: number
+  company: string
+  contact: string
+  value: string
+  tags: string[]
+  avatar: string
+}
+
+interface PipelineColumn {
+  id: string
+  title: string
+  count: number
+  value: string
+  deals: Deal[]
+}
+
 const tagColors = {
   'AI Suggestion': 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-200',
   'Enterprise': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-200',
@@ -14,9 +31,11 @@ const tagColors = {
 
 export default function CRMPipelinePage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null)
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null)
   const t = useTranslations('crm')
 
-  const pipelineData = [
+  const [pipelineData, setPipelineData] = useState<PipelineColumn[]>([
     {
       id: 'lead-in',
       title: t('leadIn'),
@@ -96,7 +115,76 @@ export default function CRMPipelinePage() {
         }
       ]
     }
-  ]
+  ])
+
+  const handleDragStart = (e: React.DragEvent, deal: Deal) => {
+    setDraggedDeal(deal)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/html', deal.id.toString())
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5'
+      e.currentTarget.style.transform = 'rotate(2deg)'
+    }
+  }
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1'
+      e.currentTarget.style.transform = 'rotate(0deg)'
+    }
+    setDraggedDeal(null)
+    setDragOverColumn(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent, columnId: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverColumn(columnId)
+  }
+
+  const handleDragLeave = () => {
+    setDragOverColumn(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
+    e.preventDefault()
+    if (draggedDeal) {
+      setPipelineData(prevData => {
+        const newData = prevData.map(column => {
+          // Remove deal from source column
+          if (column.deals.some(deal => deal.id === draggedDeal.id)) {
+            return {
+              ...column,
+              deals: column.deals.filter(deal => deal.id !== draggedDeal.id),
+              count: column.count - 1,
+              value: calculateColumnValue(column.deals.filter(deal => deal.id !== draggedDeal.id))
+            }
+          }
+          // Add deal to target column
+          if (column.id === targetColumnId) {
+            return {
+              ...column,
+              deals: [...column.deals, draggedDeal],
+              count: column.count + 1,
+              value: calculateColumnValue([...column.deals, draggedDeal])
+            }
+          }
+          return column
+        })
+        return newData
+      })
+    }
+    setDraggedDeal(null)
+    setDragOverColumn(null)
+  }
+
+  const calculateColumnValue = (deals: Deal[]): string => {
+    const total = deals.reduce((sum, deal) => {
+      const value = parseFloat(deal.value.replace(/[^0-9.]/g, ''))
+      return sum + value
+    }, 0)
+    return `$${total.toLocaleString()}`
+  }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -150,15 +238,29 @@ export default function CRMPipelinePage() {
       <div className="flex-1 overflow-x-auto p-6">
         <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-6">
           {pipelineData.map((column) => (
-            <div key={column.id} className="flex w-80 flex-col gap-4">
+            <div
+              key={column.id}
+              className={`flex w-80 flex-col gap-4 transition-all duration-300 ${
+                dragOverColumn === column.id ? 'transform scale-105' : ''
+              }`}
+              onDragOver={(e) => handleDragOver(e, column.id)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, column.id)}
+            >
               <h3 className="text-navy dark:text-white text-base font-bold tracking-tight px-1">
                 {column.title} ({column.count}) - {column.value}
               </h3>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 min-h-[200px]">
                 {column.deals.length > 0 ? (
                   column.deals.map((deal) => (
-                    <div key={deal.id} className="rounded-xl bg-white dark:bg-navy-800 p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div
+                      key={deal.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, deal)}
+                      onDragEnd={handleDragEnd}
+                      className="rounded-xl bg-white dark:bg-navy-800 p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-move hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 animate-fade-in"
+                    >
                       <div className="flex flex-col gap-3">
                         <p className="font-bold text-navy dark:text-white">{deal.company}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{deal.contact}</p>
@@ -181,8 +283,18 @@ export default function CRMPipelinePage() {
                     </div>
                   ))
                 ) : (
-                  <div className="flex flex-1 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-navy-700/50 h-32">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('dragDealsHere')}</p>
+                  <div className={`flex flex-1 flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${
+                    dragOverColumn === column.id
+                      ? 'border-primary bg-primary/5 scale-105'
+                      : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-navy-700/50'
+                  } h-32`}>
+                    <p className={`text-sm transition-colors duration-300 ${
+                      dragOverColumn === column.id
+                        ? 'text-primary font-semibold'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {t('dragDealsHere')}
+                    </p>
                   </div>
                 )}
               </div>

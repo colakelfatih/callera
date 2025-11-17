@@ -8,6 +8,8 @@ import { Avatar } from '@/components/ui/avatar'
 import { mockContacts } from '@/lib/mock-data'
 import { formatDate } from '@/lib/utils'
 import { Users, Plus, Search, Filter, Phone, Mail, MessageSquare } from 'lucide-react'
+import type { Contact } from '@/lib/mock-data'
+import { useTranslations } from 'next-intl'
 
 const statusColors = {
   lead: 'bg-yellow-100 text-yellow-700',
@@ -20,17 +22,66 @@ export default function CRMPage() {
   const [selectedContact, setSelectedContact] = useState(mockContacts[0])
   const [view, setView] = useState<'list' | 'kanban'>('list')
   const [filter, setFilter] = useState('all')
+  const [contacts, setContacts] = useState<Contact[]>(mockContacts)
+  const [draggedContact, setDraggedContact] = useState<Contact | null>(null)
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null)
+  const t = useTranslations('crm')
 
   const filteredContacts = filter === 'all' 
-    ? mockContacts 
-    : mockContacts.filter(contact => contact.status === filter)
+    ? contacts 
+    : contacts.filter(contact => contact.status === filter)
 
   const kanbanColumns = [
-    { id: 'lead', title: 'Leads', color: 'bg-yellow-50 dark:bg-yellow-900/20' },
-    { id: 'prospect', title: 'Prospects', color: 'bg-blue-50 dark:bg-blue-900/20' },
-    { id: 'customer', title: 'Customers', color: 'bg-green-50 dark:bg-green-900/20' },
-    { id: 'closed', title: 'Closed', color: 'bg-gray-50 dark:bg-gray-900/20' }
+    { id: 'lead', title: t('leads'), color: 'bg-yellow-50 dark:bg-yellow-900/20' },
+    { id: 'prospect', title: t('prospects'), color: 'bg-blue-50 dark:bg-blue-900/20' },
+    { id: 'customer', title: t('customers'), color: 'bg-green-50 dark:bg-green-900/20' },
+    { id: 'closed', title: t('closed'), color: 'bg-gray-50 dark:bg-gray-900/20' }
   ]
+
+  const handleDragStart = (e: React.DragEvent, contact: Contact) => {
+    setDraggedContact(contact)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/html', contact.id)
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5'
+    }
+  }
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1'
+    }
+    setDraggedContact(null)
+    setDragOverColumn(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent, columnId: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverColumn(columnId)
+  }
+
+  const handleDragLeave = () => {
+    setDragOverColumn(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, columnId: string) => {
+    e.preventDefault()
+    if (draggedContact) {
+      setContacts(prevContacts =>
+        prevContacts.map(contact =>
+          contact.id === draggedContact.id
+            ? { ...contact, status: columnId as Contact['status'] }
+            : contact
+        )
+      )
+      if (selectedContact?.id === draggedContact.id) {
+        setSelectedContact({ ...draggedContact, status: columnId as Contact['status'] })
+      }
+    }
+    setDraggedContact(null)
+    setDragOverColumn(null)
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -43,19 +94,19 @@ export default function CRMPage() {
               size="sm"
               onClick={() => setView('list')}
             >
-              List
+              {t('list')}
             </Button>
             <Button
               variant={view === 'kanban' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => setView('kanban')}
             >
-              Kanban
+              {t('kanban')}
             </Button>
           </div>
           <Button>
             <Plus size={16} className="mr-2" />
-            Add Contact
+            {t('addContact')}
           </Button>
         </div>
       </div>
@@ -65,7 +116,7 @@ export default function CRMPage() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search contacts..."
+            placeholder={t('searchContacts')}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-xl text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
@@ -79,7 +130,7 @@ export default function CRMPage() {
               onClick={() => setFilter(status)}
               className="capitalize"
             >
-              {status}
+              {t(status as 'all' | 'lead' | 'prospect' | 'customer' | 'closed')}
             </Button>
           ))}
         </div>
@@ -91,7 +142,7 @@ export default function CRMPage() {
           {view === 'list' ? (
             <Card>
               <CardHeader>
-                <CardTitle>Contacts</CardTitle>
+                <CardTitle>{t('contacts')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -113,7 +164,7 @@ export default function CRMPage() {
                           {contact.company}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-500">
-                          Last contact: {formatDate(contact.lastContact)}
+                          {t('lastContact')}: {formatDate(contact.lastContact)}
                         </p>
                       </div>
                       
@@ -148,7 +199,15 @@ export default function CRMPage() {
                 const columnContacts = filteredContacts.filter(contact => contact.status === column.id)
                 
                 return (
-                  <div key={column.id} className={`p-4 rounded-lg ${column.color}`}>
+                  <div
+                    key={column.id}
+                    className={`p-4 rounded-lg ${column.color} transition-all duration-300 ${
+                      dragOverColumn === column.id ? 'ring-2 ring-primary ring-offset-2 scale-105' : ''
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, column.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, column.id)}
+                  >
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-navy dark:text-white capitalize">
                         {column.title}
@@ -158,11 +217,14 @@ export default function CRMPage() {
                       </Badge>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-3 min-h-[100px]">
                       {columnContacts.map((contact) => (
                         <div
                           key={contact.id}
-                          className="p-3 bg-white dark:bg-navy-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow"
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, contact)}
+                          onDragEnd={handleDragEnd}
+                          className="p-3 bg-white dark:bg-navy-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-move hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 animate-fade-in"
                           onClick={() => setSelectedContact(contact)}
                         >
                           <div className="flex items-center gap-3 mb-2">
@@ -186,6 +248,11 @@ export default function CRMPage() {
                           </div>
                         </div>
                       ))}
+                      {columnContacts.length === 0 && (
+                        <div className="flex items-center justify-center h-32 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-navy-700/30 transition-all duration-300">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('dropHere')}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
@@ -209,7 +276,7 @@ export default function CRMPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-3">Contact Info</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-3">{t('contactInfo')}</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Mail size={16} className="text-gray-400" />
@@ -244,7 +311,7 @@ export default function CRMPage() {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-navy dark:text-white mb-3">Last Contact</h4>
+                  <h4 className="font-semibold text-navy dark:text-white mb-3">{t('lastContact')}</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {formatDate(selectedContact.lastContact)}
                   </p>
@@ -267,10 +334,10 @@ export default function CRMPage() {
               <CardContent className="text-center py-12">
                 <Users size={48} className="mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-navy dark:text-white mb-2">
-                  Select a contact
+                  {t('selectContact')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Choose a contact to view details
+                  {t('selectContactDesc')}
                 </p>
               </CardContent>
             </Card>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { mockConversations, mockContacts } from '@/lib/mock-data'
 import { formatTime } from '@/lib/utils'
 import { MessageSquare, Phone, Mail, Instagram, Filter, Search, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const channelIcons = {
   email: Mail,
@@ -27,6 +28,7 @@ export default function InboxPage() {
   const [selectedConversation, setSelectedConversation] = useState(mockConversations[0])
   const [filter, setFilter] = useState('all')
   const [showMobileDetail, setShowMobileDetail] = useState(false)
+  const t = useTranslations('inbox')
 
   const filteredConversations = filter === 'all'
     ? mockConversations
@@ -48,10 +50,10 @@ export default function InboxPage() {
       <div className={`w-full lg:w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col ${showMobileDetail ? 'hidden' : 'flex'} lg:flex`}>
         <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl md:text-2xl font-bold text-navy dark:text-white">Inbox</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
             <Button variant="ghost" size="sm" className="hidden sm:flex">
               <Filter size={16} className="mr-2" />
-              Filter
+              {t('filter')}
             </Button>
           </div>
 
@@ -64,7 +66,7 @@ export default function InboxPage() {
                 onClick={() => setFilter(channel)}
                 className="capitalize whitespace-nowrap"
               >
-                {channel}
+                {t(channel as 'all' | 'email' | 'whatsapp' | 'instagram' | 'phone')}
               </Button>
             ))}
           </div>
@@ -155,10 +157,10 @@ export default function InboxPage() {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="flex-1">
                     <Phone size={16} className="mr-2" />
-                    Call
+                    {t('call')}
                   </Button>
                   <Button size="sm" className="flex-1">
-                    Reply
+                    {t('reply')}
                   </Button>
                 </div>
               </div>
@@ -167,13 +169,13 @@ export default function InboxPage() {
                 <Card>
                   <CardHeader>
                     <div className="flex flex-col gap-2">
-                      <CardTitle className="text-lg">Conversation</CardTitle>
+                      <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                       <div className="flex gap-2 flex-wrap">
                         <Badge variant={selectedConversation.sentiment === 'positive' ? 'success' : selectedConversation.sentiment === 'negative' ? 'error' : 'default'}>
-                          {selectedConversation.sentiment}
+                          {t(selectedConversation.sentiment as 'positive' | 'neutral' | 'negative')}
                         </Badge>
                         <Badge variant={selectedConversation.priority === 'high' ? 'error' : selectedConversation.priority === 'medium' ? 'warning' : 'default'}>
-                          {selectedConversation.priority} priority
+                          {t(selectedConversation.priority as 'high' | 'medium' | 'low')} {t('priority')}
                         </Badge>
                       </div>
                     </div>
@@ -188,7 +190,7 @@ export default function InboxPage() {
 
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-navy dark:text-white mb-2">Auto Labels</h4>
+                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('autoLabels')}</h4>
                           <div className="flex flex-wrap gap-1">
                             {selectedConversation.labels.map((label) => (
                               <Badge key={label} variant="info" className="text-xs">
@@ -199,9 +201,9 @@ export default function InboxPage() {
                         </div>
 
                         <div>
-                          <h4 className="font-semibold text-navy dark:text-white mb-2">AI Summary</h4>
+                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiSummary')}</h4>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Customer is interested in scheduling a demo and discussing pricing options.
+                            {t('aiSummaryText')}
                           </p>
                         </div>
                       </div>
@@ -235,10 +237,10 @@ export default function InboxPage() {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm">
                     <Phone size={16} className="mr-2" />
-                    Call
+                    {t('call')}
                   </Button>
                   <Button size="sm">
-                    Reply
+                    {t('reply')}
                   </Button>
                 </div>
               </div>
@@ -248,13 +250,13 @@ export default function InboxPage() {
               <Card>
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                    <CardTitle className="text-lg">Conversation</CardTitle>
+                    <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                     <div className="flex gap-2 flex-wrap">
                       <Badge variant={selectedConversation.sentiment === 'positive' ? 'success' : selectedConversation.sentiment === 'negative' ? 'error' : 'default'}>
-                        {selectedConversation.sentiment}
+                        {t(selectedConversation.sentiment as 'positive' | 'neutral' | 'negative')}
                       </Badge>
                       <Badge variant={selectedConversation.priority === 'high' ? 'error' : selectedConversation.priority === 'medium' ? 'warning' : 'default'}>
-                        {selectedConversation.priority} priority
+                        {t(selectedConversation.priority as 'high' | 'medium' | 'low')} {t('priority')}
                       </Badge>
                     </div>
                   </div>
@@ -269,7 +271,7 @@ export default function InboxPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">Auto Labels</h4>
+                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('autoLabels')}</h4>
                         <div className="flex flex-wrap gap-1">
                           {selectedConversation.labels.map((label) => (
                             <Badge key={label} variant="info" className="text-xs">
@@ -280,9 +282,9 @@ export default function InboxPage() {
                       </div>
 
                       <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">AI Summary</h4>
+                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiSummary')}</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Customer is interested in scheduling a demo and discussing pricing options.
+                          {t('aiSummaryText')}
                         </p>
                       </div>
                     </div>
@@ -296,10 +298,10 @@ export default function InboxPage() {
             <div className="text-center">
               <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
               <h3 className="text-lg font-semibold text-navy dark:text-white mb-2">
-                Select a conversation
+                {t('selectConversation')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Choose a conversation from the list to view details
+                {t('selectConversationDesc')}
               </p>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts'
 import { TrendingUp, TrendingDown, Phone, MessageSquare, Users, Clock } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const callData = [
   { name: 'Mon', calls: 12, completed: 8 },
@@ -36,9 +37,9 @@ const responseTimeData = [
   { name: 'Week 4', time: 3.1 }
 ]
 
-const metrics = [
+const getMetrics = (t: any) => [
   {
-    title: 'Total Calls',
+    title: t('totalCalls'),
     value: '1,247',
     change: '+12%',
     trend: 'up',
@@ -46,7 +47,7 @@ const metrics = [
     color: 'text-blue-600'
   },
   {
-    title: 'Response Time',
+    title: t('responseTime'),
     value: '3.1 min',
     change: '-18%',
     trend: 'down',
@@ -54,7 +55,7 @@ const metrics = [
     color: 'text-green-600'
   },
   {
-    title: 'Active Contacts',
+    title: t('activeContacts'),
     value: '892',
     change: '+8%',
     trend: 'up',
@@ -62,7 +63,7 @@ const metrics = [
     color: 'text-purple-600'
   },
   {
-    title: 'Messages',
+    title: t('messages'),
     value: '3,456',
     change: '+24%',
     trend: 'up',
@@ -72,19 +73,20 @@ const metrics = [
 ]
 
 export default function InsightsPage() {
+  const t = useTranslations('insights')
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy dark:text-white">Insights</h1>
+        <h1 className="text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
         <div className="flex gap-2">
-          <Badge variant="info">Last 30 days</Badge>
-          <Badge variant="default">Export Report</Badge>
+          <Badge variant="info">{t('last30Days')}</Badge>
+          <Badge variant="default">{t('exportReport')}</Badge>
         </div>
       </div>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metrics.map((metric, index) => (
+        {getMetrics(t).map((metric, index) => (
           <Card key={index}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -112,7 +114,7 @@ export default function InsightsPage() {
                   {metric.change}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-                  vs last month
+                  {t('vsLastMonth')}
                 </span>
               </div>
             </CardContent>
@@ -125,7 +127,7 @@ export default function InsightsPage() {
         {/* Call Volume Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Call Volume</CardTitle>
+            <CardTitle>{t('callVolume')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -134,8 +136,8 @@ export default function InsightsPage() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="calls" fill="#2F80ED" name="Scheduled" />
-                <Bar dataKey="completed" fill="#10B981" name="Completed" />
+                <Bar dataKey="calls" fill="#2F80ED" name={t('scheduled')} />
+                <Bar dataKey="completed" fill="#10B981" name={t('completed')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -144,7 +146,7 @@ export default function InsightsPage() {
         {/* Channel Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Channel Distribution</CardTitle>
+            <CardTitle>{t('channelDistribution')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -184,7 +186,7 @@ export default function InsightsPage() {
         {/* Response Time Trend */}
         <Card>
           <CardHeader>
-            <CardTitle>Response Time Trend</CardTitle>
+            <CardTitle>{t('responseTimeTrend')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -198,7 +200,7 @@ export default function InsightsPage() {
                   dataKey="time" 
                   stroke="#2F80ED" 
                   strokeWidth={2}
-                  name="Response Time (min)"
+                  name={t('responseTimeMin')}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -208,7 +210,7 @@ export default function InsightsPage() {
         {/* Sentiment Analysis */}
         <Card>
           <CardHeader>
-            <CardTitle>Sentiment Analysis</CardTitle>
+            <CardTitle>{t('sentimentAnalysis')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -249,15 +251,15 @@ export default function InsightsPage() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>{t('recentActivity')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
-              { action: 'AI call completed', contact: 'John Smith', time: '2 min ago', type: 'call' },
-              { action: 'New lead added', contact: 'Alice Johnson', time: '15 min ago', type: 'lead' },
-              { action: 'Email sent', contact: 'Mike Chen', time: '1 hour ago', type: 'email' },
-              { action: 'WhatsApp message received', contact: 'Sarah Wilson', time: '2 hours ago', type: 'message' }
+              { action: t('aiCallCompleted'), contact: 'John Smith', time: `2 ${t('minAgo')}`, type: 'call' },
+              { action: t('newLeadAdded'), contact: 'Alice Johnson', time: `15 ${t('minAgo')}`, type: 'lead' },
+              { action: t('emailSent'), contact: 'Mike Chen', time: `1 ${t('hourAgo')}`, type: 'email' },
+              { action: t('whatsappMessageReceived'), contact: 'Sarah Wilson', time: `2 ${t('hoursAgo')}`, type: 'message' }
             ].map((activity, index) => (
               <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-navy-700 rounded-lg">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
