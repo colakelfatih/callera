@@ -1,0 +1,272 @@
+// Prisma Schema for Callera
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified Boolean?  @default(false)
+  image         String?
+  password      String?   // Hashed password
+  role          String    @default("user") // user, admin
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  contacts      Contact[]
+  conversations Conversation[]
+  instagramConnections InstagramConnection[]
+  automationFlows AutomationFlow[]
+  calls         Call[]
+
+  @@map("users")
+}
+
+// BetterAuth Account Model
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String? @db.Text
+  refreshToken      String? @db.Text
+  expiresAt         DateTime?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@map("accounts")
+}
+
+// BetterAuth Session Model
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// BetterAuth Verification Model
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@map("verifications")
+}
+
+// Contact Model
+model Contact {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  avatar      String?
+  status      String   @default("lead") // lead, prospect, customer, closed
+  lastContact DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
+  calls       Call[]
+  tags        ContactTag[]
+
+  @@map("contacts")
+}
+
+// Contact Tags (Many-to-Many)
+model ContactTag {
+  id        String   @id @default(cuid())
+  contactId String
+  tag       String
+  createdAt DateTime @default(now())
+
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, tag])
+  @@map("contact_tags")
+}
+
+// Conversation Model
+model Conversation {
+  id          String   @id @default(cuid())
+  userId      String
+  contactId   String
+  channel     String   // email, whatsapp, instagram, phone
+  content     String   @db.Text
+  timestamp   DateTime @default(now())
+  isRead      Boolean  @default(false)
+  isOutbound  Boolean  @default(false)
+  sentiment   String?  // positive, neutral, negative
+  priority    String   @default("medium") // low, medium, high
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  labels      ConversationLabel[]
+  aiResponses AIResponse[]
+
+  @@map("conversations")
+}
+
+// Conversation Labels (Many-to-Many)
+model ConversationLabel {
+  id             String       @id @default(cuid())
+  conversationId String
+  label          String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, label])
+  @@map("conversation_labels")
+}
+
+// Instagram Connection Model
+model InstagramConnection {
+  id              String   @id @default(cuid())
+  userId          String
+  instagramUserId String
+  instagramUsername String
+  accessToken     String   @db.Text
+  tokenExpiresAt  DateTime?
+  pageId          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        InstagramMessage[]
+
+  @@unique([userId, instagramUserId])
+  @@map("instagram_connections")
+}
+
+// Instagram Message Model
+model InstagramMessage {
+  id              String   @id @default(cuid())
+  connectionId    String
+  instagramMessageId String @unique
+  senderId        String
+  senderUsername  String?
+  messageText     String   @db.Text
+  isFromBusiness  Boolean  @default(false)
+  conversationId  String?
+  timestamp       DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  connection      InstagramConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  aiResponses     AIResponse[]
+
+  @@map("instagram_messages")
+}
+
+// AI Response Model
+model AIResponse {
+  id              String   @id @default(cuid())
+  conversationId  String?
+  instagramMessageId String?
+  originalMessage String  @db.Text
+  aiResponse      String  @db.Text
+  modelUsed       String?
+  confidence      Float?
+  createdAt       DateTime @default(now())
+
+  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  instagramMessage InstagramMessage? @relation(fields: [instagramMessageId], references: [id], onDelete: Cascade)
+
+  @@map("ai_responses")
+}
+
+// Call Model
+model Call {
+  id          String   @id @default(cuid())
+  userId      String
+  contactId   String
+  type        String   // inbound, outbound
+  status      String   // scheduled, in-progress, completed, missed
+  duration    Int?     // in seconds
+  transcript  String?  @db.Text
+  summary     String?  @db.Text
+  timestamp   DateTime @default(now())
+  aiGenerated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("calls")
+}
+
+// Automation Flow Model
+model AutomationFlow {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  trigger   String
+  isActive  Boolean  @default(true)
+  lastRun   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conditions AutomationCondition[]
+  actions   AutomationAction[]
+
+  @@map("automation_flows")
+}
+
+// Automation Condition Model
+model AutomationCondition {
+  id        String   @id @default(cuid())
+  flowId    String
+  condition String   @db.Text
+  createdAt DateTime @default(now())
+
+  flow      AutomationFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  @@map("automation_conditions")
+}
+
+// Automation Action Model
+model AutomationAction {
+  id        String   @id @default(cuid())
+  flowId    String
+  action    String   @db.Text
+  createdAt DateTime @default(now())
+
+  flow      AutomationFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  @@map("automation_actions")
+}
+

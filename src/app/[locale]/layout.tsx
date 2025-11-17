@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
+import { AuthProvider } from '@/components/auth/auth-provider'
 
 const locales = ['tr', 'en']
 
@@ -28,9 +29,11 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body className="font-sans bg-background-light dark:bg-background-dark text-navy dark:text-gray-200">
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <AuthProvider>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </AuthProvider>
       </body>
     </html>
   )

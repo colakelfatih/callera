@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { Logo } from '@/components/ui/logo'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
@@ -8,7 +9,10 @@ import { useTranslations } from 'next-intl'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const params = useParams()
+  const locale = params.locale as string
   const t = useTranslations('landing.header')
+  const tAuth = useTranslations('auth')
 
   return (
     <div className="relative">
@@ -37,9 +41,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <Button size="sm" className="hidden sm:inline-flex">
-            {t('requestDemo')}
-          </Button>
+          <a href={`/${locale}/login`} className="text-sm font-medium text-navy/80 dark:text-gray-300 hover:text-navy dark:hover:text-white transition-colors hidden md:block">
+            {tAuth('login')}
+          </a>
+          <a href={`/${locale}/register`}>
+            <Button size="sm" className="hidden sm:inline-flex">
+              {tAuth('register')}
+            </Button>
+          </a>
 
           {/* Mobile menu button */}
           <button
@@ -65,10 +74,17 @@ export function Header() {
             <a href="#about" className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
               {t('about')}
             </a>
-            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-              <Button size="sm" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                {t('requestDemo')}
-              </Button>
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">
+              <a href={`/${locale}/login`} className="block">
+                <Button variant="outline" size="sm" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                  {tAuth('login')}
+                </Button>
+              </a>
+              <a href={`/${locale}/register`} className="block">
+                <Button size="sm" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                  {tAuth('register')}
+                </Button>
+              </a>
             </div>
           </nav>
         </div>

@@ -1,6 +1,28 @@
 version: "3.8"
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: callera-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: callera
+      POSTGRES_PASSWORD: callera_password
+      POSTGRES_DB: callera_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U callera"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - callera-network
+
+  # Main Application
   callera:
     build:
       context: .
@@ -10,7 +32,13 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
+      - DATABASE_URL=postgresql://callera:callera_password@postgres:5432/callera_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+    networks:
+      - callera-network
     healthcheck:
       test:
         [
@@ -35,10 +63,24 @@ services:
       - "3001:3000"
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://callera:callera_password@postgres:5432/callera_db?schema=public
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: npm run dev
     profiles:
       - dev
+    networks:
+      - callera-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  callera-network:
+    driver: bridge

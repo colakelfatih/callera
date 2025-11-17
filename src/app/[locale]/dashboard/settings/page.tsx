@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react'
 import { Search, Bell, HelpCircle, User, Settings, BellRing, Plug, CreditCard, Upload } from 'lucide-react'
-// import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations } from 'next-intl'
+import IntegrationsTab from './integrations-tab'
 
 export default function SettingsPage() {
     const [searchQuery, setSearchQuery] = useState('')
-    // const { t } = useLanguage()
+    const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'notifications' | 'integrations' | 'billing'>('profile')
+    const t = useTranslations('settings')
 
     return (
         <div className="flex flex-1 flex-col overflow-y-auto">
@@ -49,94 +51,156 @@ export default function SettingsPage() {
                 {/* Tabs */}
                 <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
                     <div className="flex gap-8">
-                        <a className="flex items-center justify-center border-b-[3px] border-b-primary text-primary gap-2 pb-3 pt-1" href="#">
+                        <button
+                            onClick={() => setActiveTab('profile')}
+                            className={`flex items-center justify-center border-b-[3px] gap-2 pb-3 pt-1 transition-colors ${
+                                activeTab === 'profile'
+                                    ? 'border-b-primary text-primary'
+                                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
                             <User size={20} />
-                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">My Profile</p>
-                        </a>
-                        <a className="flex items-center justify-center border-b-[3px] border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 gap-2 pb-3 pt-1" href="#">
+                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">{t('myProfile')}</p>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('preferences')}
+                            className={`flex items-center justify-center border-b-[3px] gap-2 pb-3 pt-1 transition-colors ${
+                                activeTab === 'preferences'
+                                    ? 'border-b-primary text-primary'
+                                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
                             <Settings size={20} />
-                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">Preferences</p>
-                        </a>
-                        <a className="flex items-center justify-center border-b-[3px] border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 gap-2 pb-3 pt-1" href="#">
+                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">{t('preferences')}</p>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            className={`flex items-center justify-center border-b-[3px] gap-2 pb-3 pt-1 transition-colors ${
+                                activeTab === 'notifications'
+                                    ? 'border-b-primary text-primary'
+                                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
                             <BellRing size={20} />
-                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">Notifications</p>
-                        </a>
-                        <a className="flex items-center justify-center border-b-[3px] border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 gap-2 pb-3 pt-1" href="#">
+                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">{t('notifications')}</p>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('integrations')}
+                            className={`flex items-center justify-center border-b-[3px] gap-2 pb-3 pt-1 transition-colors ${
+                                activeTab === 'integrations'
+                                    ? 'border-b-primary text-primary'
+                                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
                             <Plug size={20} />
-                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">Integrations</p>
-                        </a>
-                        <a className="flex items-center justify-center border-b-[3px] border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 gap-2 pb-3 pt-1" href="#">
+                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">{t('integrations')}</p>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('billing')}
+                            className={`flex items-center justify-center border-b-[3px] gap-2 pb-3 pt-1 transition-colors ${
+                                activeTab === 'billing'
+                                    ? 'border-b-primary text-primary'
+                                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
                             <CreditCard size={20} />
-                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">Billing</p>
-                        </a>
+                            <p className="text-sm font-bold leading-normal tracking-[0.015em]">{t('billing')}</p>
+                        </button>
                     </div>
                 </div>
 
                 {/* Content Area */}
-                <div className="max-w-4xl mx-auto flex flex-col gap-10">
-                    {/* ProfileHeader */}
-                    <div className="flex p-4 @container">
-                        <div className="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
-                            <div className="flex gap-6 items-center">
-                                <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32" data-alt="User profile picture of Alex Doe" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDwVNcB5wWyhr5XEY0cpH_8b0vb71gQJJtmSYnHJlu7988mGVjRtlrgqk8Am5vww4BPl0qYQVWNrgdY3ZaEYc2joaJ7skoHgPV1nJmKCW2wwIEpLQ9ewy1EdVltRnySJvjBGXjSBk8Ur25rVjxeCzZbZNMVK3GXWb8ZFVv3kSIrDPEEPuBurwD87cVeGcE393C1gWhUG1XwMLmCBFApqhfAUw4QnY-4Vx3jnhcyUXNQ-zYVm7OwmtBI7zJHhU6mcBgQ23jVoSkimuY")' }}></div>
-                                <div className="flex flex-col justify-center gap-1">
-                                    <p className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Alex Doe</p>
-                                    <p className="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Ürün Yöneticisi</p>
-                                    <p className="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">alex.doe@callera.ai</p>
+                <div className="max-w-4xl mx-auto">
+                    {activeTab === 'profile' && (
+                        <div className="flex flex-col gap-10">
+                            {/* ProfileHeader */}
+                            <div className="flex p-4 @container">
+                                <div className="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+                                    <div className="flex gap-6 items-center">
+                                        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32" data-alt="User profile picture of Alex Doe" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDwVNcB5wWyhr5XEY0cpH_8b0vb71gQJJtmSYnHJlu7988mGVjRtlrgqk8Am5vww4BPl0qYQVWNrgdY3ZaEYc2joaJ7skoHgPV1nJmKCW2wwIEpLQ9ewy1EdVltRnySJvjBGXjSBk8Ur25rVjxeCzZbZNMVK3GXWb8ZFVv3kSIrDPEEPuBurwD87cVeGcE393C1gWhUG1XwMLmCBFApqhfAUw4QnY-4Vx3jnhcyUXNQ-zYVm7OwmtBI7zJHhU6mcBgQ23jVoSkimuY")' }}></div>
+                                        <div className="flex flex-col justify-center gap-1">
+                                            <p className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Alex Doe</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Ürün Yöneticisi</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">alex.doe@callera.ai</p>
+                                        </div>
+                                    </div>
+                                    <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] w-full max-w-[480px] @[480px]:w-auto border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
+                                        <Upload size={16} className="mr-2" />
+                                        <span className="truncate">{t('uploadNewPicture')}</span>
+                                    </button>
                                 </div>
                             </div>
-                            <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] w-full max-w-[480px] @[480px]:w-auto border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
-                                <Upload size={16} className="mr-2" />
-                                <span className="truncate">Upload New Picture</span>
-                            </button>
-                        </div>
-                    </div>
 
-                    {/* Personal Info Form Card */}
-                    <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Personal Information</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">Update your personal details</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="firstName">First Name</label>
-                                <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="firstName" type="text" defaultValue="Alex" />
+                            {/* Personal Info Form Card */}
+                            <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('personalInfo')}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">{t('personalInfoDesc')}</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="firstName">{t('firstName')}</label>
+                                        <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="firstName" type="text" defaultValue="Alex" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="lastName">{t('lastName')}</label>
+                                        <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="lastName" type="text" defaultValue="Doe" />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="role">{t('role')}</label>
+                                        <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="role" type="text" defaultValue="Ürün Yöneticisi" />
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="lastName">Last Name</label>
-                                <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="lastName" type="text" defaultValue="Doe" />
+
+                            {/* Change Password Form Card */}
+                            <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('password')}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">{t('passwordDesc')}</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="currentPassword">{t('currentPassword')}</label>
+                                        <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="currentPassword" type="password" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="newPassword">{t('newPassword')}</label>
+                                        <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="newPassword" type="password" />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="role">Role</label>
-                                <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="role" type="text" defaultValue="Ürün Yöneticisi" />
+
+                            {/* Actions Footer */}
+                            <div className="flex justify-end gap-4 mt-4 pb-10">
+                                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
+                                    <span className="truncate">{t('cancel')}</span>
+                                </button>
+                                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
+                                    <span className="truncate">{t('saveChanges')}</span>
+                                </button>
                             </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Change Password Form Card */}
-                    <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Password</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">Change your password</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="currentPassword">Current Password</label>
-                                <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="currentPassword" type="password" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="newPassword">New Password</label>
-                                <input className="form-input w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="newPassword" type="password" />
-                            </div>
+                    {activeTab === 'integrations' && <IntegrationsTab />}
+
+                    {activeTab === 'preferences' && (
+                        <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('preferences')}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Preferences settings coming soon...</p>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Actions Footer */}
-                    <div className="flex justify-end gap-4 mt-4 pb-10">
-                        <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
-                            <span className="truncate">Cancel</span>
-                        </button>
-                        <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
-                            <span className="truncate">Save Changes</span>
-                        </button>
-                    </div>
+                    {activeTab === 'notifications' && (
+                        <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('notifications')}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Notification settings coming soon...</p>
+                        </div>
+                    )}
+
+                    {activeTab === 'billing' && (
+                        <div className="bg-white dark:bg-gray-900/50 p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('billing')}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Billing settings coming soon...</p>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

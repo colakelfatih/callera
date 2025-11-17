@@ -117,7 +117,8 @@
         "currentPassword": "Mevcut Şifre",
         "newPassword": "Yeni Şifre",
         "uploadNewPicture": "Yeni resim yükle",
-        "saveChanges": "Değişiklikleri Kaydet"
+        "saveChanges": "Değişiklikleri Kaydet",
+        "cancel": "İptal"
     },
     "landing": {
         "header": {
@@ -289,5 +290,33 @@
         "edit": "Düzenle",
         "selectPost": "Bir gönderi seçin",
         "selectPostDesc": "Detayları görmek ve yönetmek için bir gönderi seçin"
+    },
+    "auth": {
+        "loginTitle": "Tekrar Hoş Geldiniz",
+        "loginSubtitle": "Devam etmek için hesabınıza giriş yapın",
+        "login": "Giriş Yap",
+        "loggingIn": "Giriş yapılıyor...",
+        "loginError": "Geçersiz e-posta veya şifre",
+        "registerTitle": "Hesap Oluştur",
+        "registerSubtitle": "Callera'ya başlamak için kayıt olun",
+        "register": "Kayıt Ol",
+        "registering": "Hesap oluşturuluyor...",
+        "registerError": "Hesap oluşturulamadı",
+        "registerSuccess": "Hesap başarıyla oluşturuldu!",
+        "redirecting": "Panele yönlendiriliyor...",
+        "email": "E-posta",
+        "emailPlaceholder": "E-postanızı girin",
+        "password": "Şifre",
+        "passwordPlaceholder": "Şifrenizi girin",
+        "passwordHint": "En az 6 karakter olmalıdır",
+        "passwordTooShort": "Şifre en az 6 karakter olmalıdır",
+        "passwordMismatch": "Şifreler eşleşmiyor",
+        "confirmPassword": "Şifreyi Onayla",
+        "confirmPasswordPlaceholder": "Şifrenizi onaylayın",
+        "name": "Ad",
+        "namePlaceholder": "Adınızı girin",
+        "noAccount": "Hesabınız yok mu?",
+        "hasAccount": "Zaten hesabınız var mı?",
+        "logout": "Çıkış Yap"
     }
 }

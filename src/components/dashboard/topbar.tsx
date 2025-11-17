@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, Bell, Moon, Sun, Menu } from 'lucide-react'
+import { useRouter, useParams } from 'next/navigation'
+import { Search, Bell, Moon, Sun, Menu, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { useTranslations } from 'next-intl'
+import { authClient } from '@/components/auth/auth-provider'
 
 interface TopBarProps {
   onThemeToggle?: () => void
@@ -15,7 +17,21 @@ interface TopBarProps {
 
 export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
+  const params = useParams()
+  const locale = params.locale as string
   const t = useTranslations('topbar')
+  const tAuth = useTranslations('auth')
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut()
+      router.push(`/${locale}/login`)
+      router.refresh()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
   return (
     <div className="bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
@@ -64,6 +80,16 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
               <p className="text-sm font-medium text-navy dark:text-white">John Doe</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('admin')}</p>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="p-2"
+              aria-label={tAuth('logout')}
+              title={tAuth('logout')}
+            >
+              <LogOut size={18} />
+            </Button>
           </div>
         </div>
       </div>

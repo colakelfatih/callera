@@ -117,7 +117,8 @@
         "currentPassword": "Current Password",
         "newPassword": "New Password",
         "uploadNewPicture": "Upload new picture",
-        "saveChanges": "Save Changes"
+        "saveChanges": "Save Changes",
+        "cancel": "Cancel"
     },
     "landing": {
         "header": {
@@ -289,5 +290,33 @@
         "edit": "Edit",
         "selectPost": "Select a post",
         "selectPostDesc": "Choose a post to view details and manage"
+    },
+    "auth": {
+        "loginTitle": "Welcome Back",
+        "loginSubtitle": "Sign in to your account to continue",
+        "login": "Sign In",
+        "loggingIn": "Signing in...",
+        "loginError": "Invalid email or password",
+        "registerTitle": "Create Account",
+        "registerSubtitle": "Sign up to get started with Callera",
+        "register": "Sign Up",
+        "registering": "Creating account...",
+        "registerError": "Failed to create account",
+        "registerSuccess": "Account created successfully!",
+        "redirecting": "Redirecting to dashboard...",
+        "email": "Email",
+        "emailPlaceholder": "Enter your email",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "passwordHint": "Must be at least 6 characters",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "confirmPassword": "Confirm Password",
+        "confirmPasswordPlaceholder": "Confirm your password",
+        "name": "Name",
+        "namePlaceholder": "Enter your name",
+        "noAccount": "Don't have an account?",
+        "hasAccount": "Already have an account?",
+        "logout": "Logout"
     }
 }
