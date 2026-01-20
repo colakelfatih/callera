@@ -50,6 +50,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Set permissions
@@ -63,4 +64,6 @@ ENV PORT=3000
 # set hostname to localhost
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["npm", "start"]
+# Run Prisma migrations before starting the app
+# DATABASE_URL must be set as environment variable at runtime
+CMD sh -c "npx prisma migrate deploy && npm start"
