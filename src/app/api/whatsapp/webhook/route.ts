@@ -228,7 +228,8 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
                 connectionId: metadata?.phone_number_id ?? null,
             },
             {
-                jobId: `whatsapp:${channelMessageId}`, // idempotent at queue level too
+                // BullMQ doesn't allow ':' in jobId, use '-' instead
+                jobId: `whatsapp-${channelMessageId}`, // idempotent at queue level too
             }
         )
 
