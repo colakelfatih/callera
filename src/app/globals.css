@@ -1,20 +1,59 @@
+/* stylelint-disable */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
+
+@theme {
+  /* Font Families */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Manrope', sans-serif;
+
+  /* Primary Colors */
+  --color-primary-50: #EBF4FF;
+  --color-primary-100: #D6E8FF;
+  --color-primary-200: #B3D1FF;
+  --color-primary-300: #80B3FF;
+  --color-primary-400: #4D95FF;
+  --color-primary: #2F80ED;
+  --color-primary-500: #2F80ED;
+  --color-primary-600: #1A5BB8;
+  --color-primary-700: #0E3A7A;
+  --color-primary-800: #0E1B3D;
+  --color-primary-900: #0A1530;
+
+  /* Navy Colors */
+  --color-navy-50: #F0F2F7;
+  --color-navy-100: #D9DEE8;
+  --color-navy-200: #B3C0D1;
+  --color-navy-300: #8DA2BA;
+  --color-navy-400: #6784A3;
+  --color-navy-500: #41668C;
+  --color-navy-600: #2A4A6B;
+  --color-navy-700: #1E2A4D;
+  --color-navy: #0E1B3D;
+  --color-navy-800: #0E1B3D;
+  --color-navy-900: #0A1530;
+
+  /* Background Colors */
+  --color-background-light: #F6F7F8;
+  --color-background-dark: #111721;
+
+  /* Border Radius */
+  --radius: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-sans);
   }
-  
+
   body {
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-  
-  .font-display {
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-sans);
   }
 }
 
@@ -22,23 +61,23 @@
   .btn-primary {
     @apply bg-primary text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-sm;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-200/50 dark:bg-white/10 text-navy dark:text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 hover:bg-gray-200 dark:hover:bg-white/20;
   }
-  
+
   .card {
     @apply bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6;
   }
-  
+
   .input {
     @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
   }
-  
+
   .sidebar-item {
     @apply flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-navy-700 hover:text-navy dark:hover:text-white transition-colors;
   }
-  
+
   .sidebar-item.active {
     @apply bg-primary/10 text-primary dark:text-primary-300;
   }
