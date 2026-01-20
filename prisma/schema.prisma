@@ -8,6 +8,29 @@ datasource db {
   provider = "postgresql"
 }
 
+// Unified Messaging (WhatsApp / Instagram / Facebook DM)
+enum MessageChannel {
+  whatsapp
+  instagram
+  facebook_dm
+}
+
+enum MessageProcessingStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum MessageType {
+  text
+  image
+  audio
+  video
+  document
+  other
+}
+
 // User Model
 model User {
   id            String   @id @default(cuid())
@@ -30,6 +53,37 @@ model User {
   calls                Call[]
 
   @@map("users")
+}
+
+model Message {
+  id               String                 @id @default(cuid())
+  channel          MessageChannel
+  channelMessageId String
+
+  // Which connected inbox/number/page received it (optional for now)
+  connectionId     String?
+
+  senderId         String
+  senderName       String?
+
+  messageText      String                 @db.Text
+  messageType      MessageType            @default(text)
+  rawPayload       Json?
+
+  isFromBusiness   Boolean                @default(false)
+
+  conversationId   String?
+  status           MessageProcessingStatus @default(pending)
+  aiResponse       String?                @db.Text
+
+  timestamp        DateTime?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@unique([channel, channelMessageId])
+  @@index([senderId, channel, createdAt])
+  @@index([status, createdAt])
+  @@map("messages")
 }
 
 // BetterAuth Account Model

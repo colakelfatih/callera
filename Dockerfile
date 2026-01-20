@@ -25,6 +25,10 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Prisma 7 loads `prisma.config.ts` even for `prisma generate`.
+# Provide a default DATABASE_URL during build (it won't be used to connect for generate).
+ENV DATABASE_URL=env('DATABASE_URL')
+
 # Generate Prisma Client and build
 RUN npx prisma generate
 RUN npm run build

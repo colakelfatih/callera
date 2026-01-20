@@ -1,6 +1,9 @@
 // WhatsApp Business Cloud API Webhook Handler
 
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+import { dedupeMessage } from '@/lib/redis/dedupe'
+import { getMessageQueue } from '@/lib/queue/message-queue'
 
 const WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
@@ -56,8 +59,8 @@ export async function POST(request: NextRequest) {
     try {
         const bodyText = await request.text()
 
-        // Log webhook payload (good for debugging)
-        console.log('WhatsApp webhook POST received:', bodyText)
+        // Log webhook payload (keep short in prod)
+        console.log('whatsapp.webhook.received', { bytes: bodyText.length })
 
         // Parse JSON payload
         const payload = JSON.parse(bodyText)
@@ -85,15 +88,27 @@ export async function POST(request: NextRequest) {
                     for (const change of entry.changes) {
                         const value = change.value
 
+                        // Debug: Log what fields are present
+                        console.log('whatsapp.webhook.structure', {
+                            hasMessages: !!value.messages,
+                            hasStatuses: !!value.statuses,
+                            messagesCount: value.messages?.length || 0,
+                            statusesCount: value.statuses?.length || 0,
+                            field: change.field,
+                            metadata: value.metadata,
+                        })
+
                         // Process incoming messages
-                        if (value.messages) {
+                        if (value.messages && Array.isArray(value.messages)) {
+                            console.log(`Processing ${value.messages.length} incoming message(s)`)
                             for (const message of value.messages) {
-                                await handleIncomingMessage(message, value.metadata)
+                                await handleIncomingMessage(message, value.metadata, payload)
                             }
                         }
 
                         // Process status updates
-                        if (value.statuses) {
+                        if (value.statuses && Array.isArray(value.statuses)) {
+                            console.log(`Processing ${value.statuses.length} status update(s)`)
                             for (const status of value.statuses) {
                                 await handleStatusUpdate(status)
                             }
@@ -101,6 +116,11 @@ export async function POST(request: NextRequest) {
                     }
                 }
             }
+        } else {
+            console.warn('Unexpected webhook payload structure:', {
+                object: payload.object,
+                hasEntry: !!payload.entry,
+            })
         }
 
         // Always ACK quickly (WhatsApp requires quick response)
@@ -115,28 +135,102 @@ export async function POST(request: NextRequest) {
 /**
  * Handle incoming WhatsApp message
  */
-async function handleIncomingMessage(message: any, metadata: any) {
+async function handleIncomingMessage(message: any, metadata: any, rawPayload: any) {
     try {
-        const messageId = message.id
+        const channelMessageId = message.id
         const from = message.from // Phone number (e.g., "905374872375")
-        const messageText = message.text?.body || message.type
         const timestamp = message.timestamp
+        const type = message.type
 
-        console.log('Received WhatsApp message:', {
-            messageId,
+        // Extract message text based on type
+        let messageText = ''
+        if (type === 'text') {
+            messageText = message.text?.body || ''
+        } else if (type === 'image') {
+            messageText = `[Image] ${message.image?.caption || ''}`
+        } else if (type === 'audio') {
+            messageText = '[Audio]'
+        } else if (type === 'video') {
+            messageText = `[Video] ${message.video?.caption || ''}`
+        } else if (type === 'document') {
+            messageText = `[Document] ${message.document?.filename || ''}`
+        } else {
+            messageText = `[${type}]`
+        }
+
+        console.log('📨 Received WhatsApp message:', {
+            channelMessageId,
             from,
             messageText,
             timestamp,
-            type: message.type,
+            type,
             phoneNumberId: metadata?.phone_number_id,
+            displayPhoneNumber: metadata?.display_phone_number,
+            fullMessage: JSON.stringify(message, null, 2), // Full message for debugging
         })
 
-        // TODO: Save message to database
-        // You'll need to create a WhatsAppMessage model similar to InstagramMessage
-        // For now, just log it
+        // 1) Deduplication (Redis SETNX)
+        const dedupe = await dedupeMessage({
+            channel: 'whatsapp',
+            channelMessageId,
+            ttlSeconds: 60 * 60,
+        })
 
-        // TODO: Generate AI response and send reply
-        // Similar to Instagram webhook implementation
+        if (!dedupe.isNew) {
+            console.log('Duplicate message skipped', { channelMessageId, key: dedupe.key })
+            return
+        }
+
+        // 2) DB insert (upsert by channel+channelMessageId)
+        const saved = await db.message.upsert({
+            where: {
+                channel_channelMessageId: {
+                    channel: 'whatsapp',
+                    channelMessageId,
+                },
+            },
+            create: {
+                channel: 'whatsapp',
+                channelMessageId,
+                connectionId: metadata?.phone_number_id,
+                senderId: from,
+                messageText,
+                messageType:
+                    type === 'text'
+                        ? 'text'
+                        : type === 'image'
+                          ? 'image'
+                          : type === 'audio'
+                            ? 'audio'
+                            : type === 'video'
+                              ? 'video'
+                              : type === 'document'
+                                ? 'document'
+                                : 'other',
+                rawPayload,
+                isFromBusiness: false,
+                timestamp: timestamp ? new Date(Number(timestamp) * 1000) : null,
+                status: 'pending',
+            },
+            update: {},
+        })
+
+        // 3) Queue add(job)
+        const messageQueue = getMessageQueue()
+        await messageQueue.add(
+            'process-message',
+            {
+                messageId: saved.id,
+                channel: 'whatsapp',
+                channelMessageId,
+                senderId: from,
+                messageText,
+                connectionId: metadata?.phone_number_id ?? null,
+            },
+            {
+                jobId: `whatsapp:${channelMessageId}`, // idempotent at queue level too
+            }
+        )
 
     } catch (error: any) {
         console.error('Error handling incoming WhatsApp message:', error)
