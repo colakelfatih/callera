@@ -79,12 +79,17 @@ export default function InboxClient({ initialMessages }: Props) {
   const [showMobileDetail, setShowMobileDetail] = useState(false)
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [composerOpen, setComposerOpen] = useState(false)
+  const [composerText, setComposerText] = useState('')
+  const [sending, setSending] = useState(false)
   const t = useTranslations('inbox')
 
   const seenIdsRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)))
   const threadCursorRef = useRef<Record<string, string | null>>({})
   const threadHasMoreRef = useRef<Record<string, boolean>>({})
   const topSentinelRef = useRef<HTMLDivElement | null>(null)
+  const bottomSentinelRef = useRef<HTMLDivElement | null>(null)
+  const shouldAutoScrollRef = useRef(false)
 
   const threads = useMemo<Thread[]>(() => {
     const map = new Map<string, Thread>()
@@ -140,6 +145,15 @@ export default function InboxClient({ initialMessages }: Props) {
     })
     return { ...th, messages: sorted }
   }, [selectedThreadId, threads])
+
+  // Auto-scroll to bottom when new message arrives in the selected thread (but not while loading older)
+  useEffect(() => {
+    if (loadingMore) return
+    if (!selectedThread) return
+    if (!shouldAutoScrollRef.current) return
+    shouldAutoScrollRef.current = false
+    bottomSentinelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [loadingMore, selectedThread?.messages.length, selectedThreadId])
 
   const loadOlder = async () => {
     if (!selectedThread) return
@@ -246,6 +260,10 @@ export default function InboxClient({ initialMessages }: Props) {
           if (seenIdsRef.current.has(incoming.id)) return
           seenIdsRef.current.add(incoming.id)
           setMessages((prev) => [incoming, ...prev])
+          // If this message belongs to currently selected thread, scroll down
+          if (selectedThreadId && threadIdFor(incoming) === selectedThreadId) {
+            shouldAutoScrollRef.current = true
+          }
           // if nothing selected yet, select this thread
           setSelectedThreadId((prevSelected) => prevSelected ?? threadIdFor(incoming))
         } catch {
@@ -276,6 +294,45 @@ export default function InboxClient({ initialMessages }: Props) {
   const getChannelDisplayName = (channel: string) => {
     if (channel === 'facebook_dm') return 'Facebook'
     return channel.charAt(0).toUpperCase() + channel.slice(1)
+  }
+
+  const openComposer = () => {
+    setComposerOpen(true)
+    setComposerText('')
+  }
+
+  const sendMessage = async () => {
+    if (!selectedThread) return
+    const text = composerText.trim()
+    if (!text) return
+    setSending(true)
+    try {
+      const res = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel: selectedThread.channel,
+          senderId: selectedThread.senderId,
+          connectionId: selectedThread.connectionId,
+          text,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`)
+
+      const outbound = data?.message as Message
+      if (outbound?.id && !seenIdsRef.current.has(outbound.id)) {
+        seenIdsRef.current.add(outbound.id)
+        setMessages((prev) => [outbound, ...prev])
+      }
+      setComposerText('')
+      setComposerOpen(false)
+      shouldAutoScrollRef.current = true
+    } catch {
+      // ignore toast for now; keep UI minimal
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -403,7 +460,7 @@ export default function InboxClient({ initialMessages }: Props) {
                     <Phone size={16} className="mr-2" />
                     {t('call')}
                   </Button>
-                  <Button size="sm" className="flex-1">
+                  <Button size="sm" className="flex-1" onClick={openComposer}>
                     {t('reply')}
                   </Button>
                 </div>
@@ -450,10 +507,28 @@ export default function InboxClient({ initialMessages }: Props) {
                           </div>
                         </div>
                       ))}
+                      <div ref={bottomSentinelRef} />
                     </div>
                   </CardContent>
                 </Card>
               </div>
+
+              {composerOpen && (
+                <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
+                  <div className="flex gap-2">
+                    <input
+                      className="input"
+                      value={composerText}
+                      onChange={(e) => setComposerText(e.target.value)}
+                      placeholder="Mesaj yaz…"
+                      disabled={sending}
+                    />
+                    <Button onClick={sendMessage} disabled={sending || !composerText.trim()}>
+                      {sending ? '...' : 'Send'}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -482,11 +557,26 @@ export default function InboxClient({ initialMessages }: Props) {
                     <Phone size={16} className="mr-2" />
                     {t('call')}
                   </Button>
-                  <Button size="sm">
+                  <Button size="sm" onClick={openComposer}>
                     {t('reply')}
                   </Button>
                 </div>
               </div>
+
+              {composerOpen && (
+                <div className="mt-4 flex gap-2 justify-end">
+                  <input
+                    className="input max-w-xl"
+                    value={composerText}
+                    onChange={(e) => setComposerText(e.target.value)}
+                    placeholder="Mesaj yaz…"
+                    disabled={sending}
+                  />
+                  <Button onClick={sendMessage} disabled={sending || !composerText.trim()}>
+                    {sending ? '...' : 'Send'}
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
@@ -530,6 +620,7 @@ export default function InboxClient({ initialMessages }: Props) {
                         </div>
                       </div>
                     ))}
+                    <div ref={bottomSentinelRef} />
                   </div>
                 </CardContent>
               </Card>
