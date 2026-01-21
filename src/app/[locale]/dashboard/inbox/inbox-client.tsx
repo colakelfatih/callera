@@ -35,8 +35,8 @@ type Message = {
   messageType: string
   status: string
   aiResponse: string | null
-  timestamp: Date | null
-  createdAt: Date
+  timestamp: Date | string | null
+  createdAt: Date | string
 }
 
 type Props = {
