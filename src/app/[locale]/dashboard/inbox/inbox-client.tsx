@@ -89,6 +89,13 @@ export default function InboxClient({ initialMessages }: Props) {
   const topSentinelRef = useRef<HTMLDivElement | null>(null)
   const bottomSentinelRef = useRef<HTMLDivElement | null>(null)
   const shouldAutoScrollRef = useRef(false)
+  const selectedThreadIdRef = useRef<string | null>(null)
+  const mobileScrollRef = useRef<HTMLDivElement | null>(null)
+  const desktopScrollRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    selectedThreadIdRef.current = selectedThreadId
+  }, [selectedThreadId])
 
   const threads = useMemo<Thread[]>(() => {
     const map = new Map<string, Thread>()
@@ -153,6 +160,22 @@ export default function InboxClient({ initialMessages }: Props) {
     shouldAutoScrollRef.current = false
     bottomSentinelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [loadingMore, selectedThread?.messages.length, selectedThreadId])
+
+  // When switching threads, snap to bottom once so it feels like a chat app
+  useEffect(() => {
+    if (!selectedThread) return
+    shouldAutoScrollRef.current = true
+    // allow render to commit first, then force scroll container to bottom
+    const tId = setTimeout(() => {
+      const el = (showMobileDetail ? mobileScrollRef.current : desktopScrollRef.current) ?? null
+      if (el) {
+        el.scrollTop = el.scrollHeight
+      } else {
+        bottomSentinelRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
+      }
+    }, 0)
+    return () => clearTimeout(tId)
+  }, [selectedThreadId, showMobileDetail])
 
   const loadOlder = async () => {
     if (!selectedThread) return
@@ -260,7 +283,8 @@ export default function InboxClient({ initialMessages }: Props) {
           seenIdsRef.current.add(incoming.id)
           setMessages((prev) => [incoming, ...prev])
           // If this message belongs to currently selected thread, scroll down
-          if (selectedThreadId && threadIdFor(incoming) === selectedThreadId) {
+          const currentSelected = selectedThreadIdRef.current
+          if (currentSelected && threadIdFor(incoming) === currentSelected) {
             shouldAutoScrollRef.current = true
           }
           // if nothing selected yet, select this thread
@@ -456,7 +480,7 @@ export default function InboxClient({ initialMessages }: Props) {
                 </div>
               </div>
 
-              <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-navy-900">
+              <div ref={mobileScrollRef} className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-navy-900">
                 <Card>
                   <CardHeader>
                     <div className="flex flex-col gap-2">
@@ -556,7 +580,7 @@ export default function InboxClient({ initialMessages }: Props) {
               </div>
             </div>
 
-            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+            <div ref={desktopScrollRef} className="flex-1 p-4 md:p-6 overflow-y-auto">
               <Card>
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
