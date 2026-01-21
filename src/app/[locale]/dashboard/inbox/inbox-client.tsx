@@ -79,7 +79,6 @@ export default function InboxClient({ initialMessages }: Props) {
   const [showMobileDetail, setShowMobileDetail] = useState(false)
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [composerOpen, setComposerOpen] = useState(false)
   const [composerText, setComposerText] = useState('')
   const [sending, setSending] = useState(false)
   const t = useTranslations('inbox')
@@ -296,11 +295,6 @@ export default function InboxClient({ initialMessages }: Props) {
     return channel.charAt(0).toUpperCase() + channel.slice(1)
   }
 
-  const openComposer = () => {
-    setComposerOpen(true)
-    setComposerText('')
-  }
-
   const sendMessage = async () => {
     if (!selectedThread) return
     const text = composerText.trim()
@@ -326,7 +320,6 @@ export default function InboxClient({ initialMessages }: Props) {
         setMessages((prev) => [outbound, ...prev])
       }
       setComposerText('')
-      setComposerOpen(false)
       shouldAutoScrollRef.current = true
     } catch {
       // ignore toast for now; keep UI minimal
@@ -460,9 +453,6 @@ export default function InboxClient({ initialMessages }: Props) {
                     <Phone size={16} className="mr-2" />
                     {t('call')}
                   </Button>
-                  <Button size="sm" className="flex-1" onClick={openComposer}>
-                    {t('reply')}
-                  </Button>
                 </div>
               </div>
 
@@ -513,22 +503,27 @@ export default function InboxClient({ initialMessages }: Props) {
                 </Card>
               </div>
 
-              {composerOpen && (
-                <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
-                  <div className="flex gap-2">
-                    <input
-                      className="input"
-                      value={composerText}
-                      onChange={(e) => setComposerText(e.target.value)}
-                      placeholder="Mesaj yaz…"
-                      disabled={sending}
-                    />
-                    <Button onClick={sendMessage} disabled={sending || !composerText.trim()}>
-                      {sending ? '...' : 'Send'}
-                    </Button>
-                  </div>
+              {/* Always-on composer (chat app style) */}
+              <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
+                <div className="flex gap-2">
+                  <input
+                    className="input"
+                    value={composerText}
+                    onChange={(e) => setComposerText(e.target.value)}
+                    placeholder="Mesaj yaz…"
+                    disabled={sending || !selectedThread}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        sendMessage()
+                      }
+                    }}
+                  />
+                  <Button onClick={sendMessage} disabled={sending || !composerText.trim() || !selectedThread}>
+                    {sending ? '...' : 'Send'}
+                  </Button>
                 </div>
-              )}
+              </div>
             </>
           )}
         </div>
@@ -557,26 +552,8 @@ export default function InboxClient({ initialMessages }: Props) {
                     <Phone size={16} className="mr-2" />
                     {t('call')}
                   </Button>
-                  <Button size="sm" onClick={openComposer}>
-                    {t('reply')}
-                  </Button>
                 </div>
               </div>
-
-              {composerOpen && (
-                <div className="mt-4 flex gap-2 justify-end">
-                  <input
-                    className="input max-w-xl"
-                    value={composerText}
-                    onChange={(e) => setComposerText(e.target.value)}
-                    placeholder="Mesaj yaz…"
-                    disabled={sending}
-                  />
-                  <Button onClick={sendMessage} disabled={sending || !composerText.trim()}>
-                    {sending ? '...' : 'Send'}
-                  </Button>
-                </div>
-              )}
             </div>
 
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
@@ -624,6 +601,28 @@ export default function InboxClient({ initialMessages }: Props) {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Always-on composer (chat app style) */}
+            <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
+              <div className="flex gap-2">
+                <input
+                  className="input"
+                  value={composerText}
+                  onChange={(e) => setComposerText(e.target.value)}
+                  placeholder="Mesaj yaz…"
+                  disabled={sending || !selectedThread}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      sendMessage()
+                    }
+                  }}
+                />
+                <Button onClick={sendMessage} disabled={sending || !composerText.trim() || !selectedThread}>
+                  {sending ? '...' : 'Send'}
+                </Button>
+              </div>
             </div>
           </>
         ) : (
