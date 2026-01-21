@@ -8,20 +8,22 @@ export function cn(...inputs: ClassValue[]) {
 export function formatTime(date: Date | string | null | undefined): string {
   if (!date) return ''
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('tr-TR', {
+    timeZone: 'Europe/Istanbul', // UTC+3 (TR)
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
+    hour12: false,
   }).format(dateObj)
 }
 
 export function formatDate(date: Date | string | null | undefined): string {
   if (!date) return ''
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+  return new Intl.DateTimeFormat('tr-TR', {
+    timeZone: 'Europe/Istanbul', // UTC+3 (TR)
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   }).format(dateObj)
 }
 
