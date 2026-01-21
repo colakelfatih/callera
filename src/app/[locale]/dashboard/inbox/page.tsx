@@ -1,47 +1,86 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { mockConversations, mockContacts } from '@/lib/mock-data'
 import { formatTime } from '@/lib/utils'
-import { MessageSquare, Phone, Mail, Instagram, Filter, Search, X } from 'lucide-react'
+import { MessageSquare, Phone, Mail, Instagram, Filter, Search, X, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 const channelIcons = {
   email: Mail,
   whatsapp: MessageSquare,
   instagram: Instagram,
-  phone: Phone
+  phone: Phone,
+  facebook_dm: MessageSquare,
 }
 
 const channelColors = {
   email: 'bg-blue-100 text-blue-700',
   whatsapp: 'bg-green-100 text-green-700',
   instagram: 'bg-pink-100 text-pink-700',
-  phone: 'bg-purple-100 text-purple-700'
+  phone: 'bg-purple-100 text-purple-700',
+  facebook_dm: 'bg-blue-100 text-blue-700',
+}
+
+type Message = {
+  id: string
+  channel: string
+  channelMessageId: string
+  senderId: string
+  senderName: string | null
+  messageText: string
+  messageType: string
+  status: string
+  aiResponse: string | null
+  timestamp: string | null
+  createdAt: string
 }
 
 export default function InboxPage() {
-  const [selectedConversation, setSelectedConversation] = useState(mockConversations[0])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
   const [filter, setFilter] = useState('all')
   const [showMobileDetail, setShowMobileDetail] = useState(false)
+  const [loading, setLoading] = useState(true)
   const t = useTranslations('inbox')
 
-  const filteredConversations = filter === 'all'
-    ? mockConversations
-    : mockConversations.filter(conv => conv.channel === filter)
+  useEffect(() => {
+    fetchMessages()
+  }, [filter])
 
-  const getContact = (contactId: string) =>
-    mockContacts.find(contact => contact.id === contactId)
+  const fetchMessages = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (filter !== 'all') {
+        params.set('channel', filter)
+      }
+      const res = await fetch(`/api/messages?${params.toString()}`)
+      const data = await res.json()
+      setMessages(data.messages || [])
+      if (data.messages?.length > 0 && !selectedMessage) {
+        setSelectedMessage(data.messages[0])
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const handleSelectConversation = (conversation: typeof mockConversations[0]) => {
-    setSelectedConversation(conversation)
+  const handleSelectMessage = (message: Message) => {
+    setSelectedMessage(message)
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setShowMobileDetail(true)
     }
+  }
+
+  const getChannelDisplayName = (channel: string) => {
+    if (channel === 'facebook_dm') return 'Facebook'
+    return channel.charAt(0).toUpperCase() + channel.slice(1)
   }
 
   return (
@@ -73,65 +112,75 @@ export default function InboxPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {filteredConversations.map((conversation) => {
-            const contact = getContact(conversation.contactId)
-            const ChannelIcon = channelIcons[conversation.channel]
+          {loading ? (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="animate-spin text-primary" size={24} />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <MessageSquare className="text-gray-400 mb-2" size={32} />
+              <p className="text-gray-600 dark:text-gray-400">{t('noMessages') || 'No messages yet'}</p>
+            </div>
+          ) : (
+            messages.map((message) => {
+              const ChannelIcon = channelIcons[message.channel as keyof typeof channelIcons] || MessageSquare
+              const displayName = message.senderName || message.senderId || 'Unknown'
 
-            return (
-              <div
-                key={conversation.id}
-                className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${selectedConversation?.id === conversation.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+              return (
+                <div
+                  key={message.id}
+                  className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
+                    selectedMessage?.id === message.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''
                   }`}
-                onClick={() => handleSelectConversation(conversation)}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar name={contact?.name || 'Unknown'} size="sm" />
+                  onClick={() => handleSelectMessage(message)}
+                >
+                  <div className="flex items-start gap-3">
+                    <Avatar name={displayName} size="sm" />
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-semibold text-navy dark:text-white truncate">
-                        {contact?.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatTime(conversation.timestamp)}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`p-1 rounded ${channelColors[conversation.channel]}`}>
-                        <ChannelIcon size={12} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-semibold text-navy dark:text-white truncate">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatTime(message.timestamp || message.createdAt)}
+                        </p>
                       </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                        {conversation.channel}
-                      </span>
-                      {!conversation.isRead && (
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      )}
-                    </div>
 
-                    <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                      {conversation.content}
-                    </p>
-
-                    <div className="flex gap-1 mt-2">
-                      {conversation.labels.map((label) => (
-                        <Badge key={label} variant="info" className="text-xs">
-                          {label}
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className={`p-1 rounded ${channelColors[message.channel as keyof typeof channelColors] || 'bg-gray-100 text-gray-700'}`}>
+                          <ChannelIcon size={12} />
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                          {getChannelDisplayName(message.channel)}
+                        </span>
+                        {message.status === 'pending' && (
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        )}
+                        <Badge
+                          variant={message.status === 'completed' ? 'success' : message.status === 'failed' ? 'error' : 'default'}
+                          className="text-xs"
+                        >
+                          {message.status}
                         </Badge>
-                      ))}
+                      </div>
+
+                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                        {message.messageText}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })
+          )}
         </div>
       </div>
 
       {/* Mobile Conversation Detail */}
       {showMobileDetail && (
         <div className="lg:hidden flex-1 flex flex-col">
-          {selectedConversation && (
+          {selectedMessage && (
             <>
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
                 <div className="flex items-center gap-3 mb-3">
@@ -142,13 +191,13 @@ export default function InboxPage() {
                     <X size={20} />
                   </button>
                   <div className="flex items-center gap-3 flex-1">
-                    <Avatar name={getContact(selectedConversation.contactId)?.name || 'Unknown'} size="sm" />
+                    <Avatar name={selectedMessage.senderName || selectedMessage.senderId || 'Unknown'} size="sm" />
                     <div className="flex-1 min-w-0">
                       <h2 className="text-lg font-bold text-navy dark:text-white truncate">
-                        {getContact(selectedConversation.contactId)?.name}
+                        {selectedMessage.senderName || selectedMessage.senderId}
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                        {getContact(selectedConversation.contactId)?.company}
+                        {getChannelDisplayName(selectedMessage.channel)}
                       </p>
                     </div>
                   </div>
@@ -171,11 +220,13 @@ export default function InboxPage() {
                     <div className="flex flex-col gap-2">
                       <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                       <div className="flex gap-2 flex-wrap">
-                        <Badge variant={selectedConversation.sentiment === 'positive' ? 'success' : selectedConversation.sentiment === 'negative' ? 'error' : 'default'}>
-                          {t(selectedConversation.sentiment as 'positive' | 'neutral' | 'negative')}
+                        <Badge
+                          variant={selectedMessage.status === 'completed' ? 'success' : selectedMessage.status === 'failed' ? 'error' : 'default'}
+                        >
+                          {selectedMessage.status}
                         </Badge>
-                        <Badge variant={selectedConversation.priority === 'high' ? 'error' : selectedConversation.priority === 'medium' ? 'warning' : 'default'}>
-                          {t(selectedConversation.priority as 'high' | 'medium' | 'low')} {t('priority')}
+                        <Badge variant="info" className="text-xs capitalize">
+                          {selectedMessage.channel}
                         </Badge>
                       </div>
                     </div>
@@ -183,28 +234,28 @@ export default function InboxPage() {
                   <CardContent>
                     <div className="space-y-4">
                       <div className="bg-gray-50 dark:bg-navy-700 p-4 rounded-lg">
-                        <p className="text-gray-700 dark:text-gray-300">
-                          {selectedConversation.content}
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {selectedMessage.messageText}
                         </p>
                       </div>
 
-                      <div className="space-y-4">
+                      {selectedMessage.aiResponse && (
                         <div>
-                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('autoLabels')}</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {selectedConversation.labels.map((label) => (
-                              <Badge key={label} variant="info" className="text-xs">
-                                {label}
-                              </Badge>
-                            ))}
+                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiResponse') || 'AI Response'}</h4>
+                          <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                              {selectedMessage.aiResponse}
+                            </p>
                           </div>
                         </div>
+                      )}
 
-                        <div>
-                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiSummary')}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {t('aiSummaryText')}
-                          </p>
+                      <div>
+                        <h4 className="font-semibold text-navy dark:text-white mb-2">Message Details</h4>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                          <p>ID: {selectedMessage.channelMessageId}</p>
+                          <p>Type: {selectedMessage.messageType}</p>
+                          <p>Received: {formatTime(selectedMessage.timestamp || selectedMessage.createdAt)}</p>
                         </div>
                       </div>
                     </div>
@@ -218,18 +269,18 @@ export default function InboxPage() {
 
       {/* Desktop Conversation Detail */}
       <div className="hidden lg:flex lg:flex-1 flex-col">
-        {selectedConversation ? (
+        {selectedMessage ? (
           <>
             <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3 md:gap-4">
-                  <Avatar name={getContact(selectedConversation.contactId)?.name || 'Unknown'} size="lg" />
+                  <Avatar name={selectedMessage.senderName || selectedMessage.senderId || 'Unknown'} size="lg" />
                   <div>
                     <h2 className="text-lg md:text-xl font-bold text-navy dark:text-white">
-                      {getContact(selectedConversation.contactId)?.name}
+                      {selectedMessage.senderName || selectedMessage.senderId}
                     </h2>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-                      {getContact(selectedConversation.contactId)?.company}
+                      {getChannelDisplayName(selectedMessage.channel)}
                     </p>
                   </div>
                 </div>
@@ -252,11 +303,13 @@ export default function InboxPage() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                     <div className="flex gap-2 flex-wrap">
-                      <Badge variant={selectedConversation.sentiment === 'positive' ? 'success' : selectedConversation.sentiment === 'negative' ? 'error' : 'default'}>
-                        {t(selectedConversation.sentiment as 'positive' | 'neutral' | 'negative')}
+                      <Badge
+                        variant={selectedMessage.status === 'completed' ? 'success' : selectedMessage.status === 'failed' ? 'error' : 'default'}
+                      >
+                        {selectedMessage.status}
                       </Badge>
-                      <Badge variant={selectedConversation.priority === 'high' ? 'error' : selectedConversation.priority === 'medium' ? 'warning' : 'default'}>
-                        {t(selectedConversation.priority as 'high' | 'medium' | 'low')} {t('priority')}
+                      <Badge variant="info" className="text-xs capitalize">
+                        {selectedMessage.channel}
                       </Badge>
                     </div>
                   </div>
@@ -264,28 +317,30 @@ export default function InboxPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="bg-gray-50 dark:bg-navy-700 p-4 rounded-lg">
-                      <p className="text-gray-700 dark:text-gray-300">
-                        {selectedConversation.content}
+                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                        {selectedMessage.messageText}
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedMessage.aiResponse && (
                       <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('autoLabels')}</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {selectedConversation.labels.map((label) => (
-                            <Badge key={label} variant="info" className="text-xs">
-                              {label}
-                            </Badge>
-                          ))}
+                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiResponse') || 'AI Response'}</h4>
+                        <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg">
+                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                            {selectedMessage.aiResponse}
+                          </p>
                         </div>
                       </div>
+                    )}
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiSummary')}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t('aiSummaryText')}
-                        </p>
+                        <h4 className="font-semibold text-navy dark:text-white mb-2">Message Details</h4>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                          <p>ID: {selectedMessage.channelMessageId}</p>
+                          <p>Type: {selectedMessage.messageType}</p>
+                          <p>Received: {formatTime(selectedMessage.timestamp || selectedMessage.createdAt)}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
