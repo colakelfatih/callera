@@ -10,7 +10,7 @@ export default async function InboxPage() {
       isFromBusiness: false, // Sadece gelen mesajlar
     },
     orderBy: { createdAt: 'desc' },
-    take: 100, // Son 100 mesaj
+    take: 500, // Son 500 mesaj (thread içinde daha fazla context)
   })
 
   return <InboxClient initialMessages={messages} />

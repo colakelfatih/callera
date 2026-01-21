@@ -19,6 +19,8 @@ function getPublisher() {
 export type NewMessageEvent = {
   id: string
   channel: string
+  channelMessageId: string
+  connectionId?: string | null
   senderId: string
   senderName?: string | null
   messageText: string

@@ -238,6 +238,8 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
         publishNewMessage({
             id: saved.id,
             channel: saved.channel,
+            channelMessageId: saved.channelMessageId,
+            connectionId: saved.connectionId ?? null,
             senderId: saved.senderId,
             senderName: saved.senderName ?? null,
             messageText: saved.messageText,

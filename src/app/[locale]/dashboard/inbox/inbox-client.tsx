@@ -29,6 +29,7 @@ type Message = {
   id: string
   channel: string
   channelMessageId: string
+  connectionId?: string | null
   senderId: string
   senderName: string | null
   messageText: string
@@ -43,23 +44,97 @@ type Props = {
   initialMessages: Message[]
 }
 
+type Thread = {
+  id: string
+  channel: string
+  senderId: string
+  senderName: string | null
+  connectionId: string | null
+  lastAt: Date | string
+  lastText: string
+  pendingCount: number
+  messages: Message[]
+}
+
+function threadIdFor(m: Message) {
+  // no ':' (BullMQ restriction does not apply here, but keep it simple)
+  return `${m.channel}|${m.senderId}|${m.connectionId ?? ''}`
+}
+
+function messageSortKey(m: Message) {
+  return m.timestamp ?? m.createdAt
+}
+
+function toDateValue(v: Date | string | null | undefined) {
+  if (!v) return 0
+  const d = typeof v === 'string' ? new Date(v) : v
+  return d.getTime()
+}
+
 export default function InboxClient({ initialMessages }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(initialMessages[0] || null)
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
   const [showMobileDetail, setShowMobileDetail] = useState(false)
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const t = useTranslations('inbox')
 
-  const seenIdsRef = useRef<Set<string>>(new Set(messages.map((m) => m.id)))
-  useEffect(() => {
-    // keep set in sync when initialMessages changes (rare)
-    seenIdsRef.current = new Set(messages.map((m) => m.id))
-  }, [messages])
+  const seenIdsRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)))
 
-  const filteredMessages = useMemo(() => {
-    return filter === 'all' ? messages : messages.filter((msg) => msg.channel === filter)
+  const threads = useMemo<Thread[]>(() => {
+    const map = new Map<string, Thread>()
+
+    for (const m of messages) {
+      const tid = threadIdFor(m)
+      const existing = map.get(tid)
+      const pendingDelta = m.status === 'pending' ? 1 : 0
+
+      if (!existing) {
+        map.set(tid, {
+          id: tid,
+          channel: m.channel,
+          senderId: m.senderId,
+          senderName: m.senderName,
+          connectionId: m.connectionId ?? null,
+          lastAt: messageSortKey(m) ?? m.createdAt,
+          lastText: m.messageText,
+          pendingCount: pendingDelta,
+          messages: [m],
+        })
+      } else {
+        existing.messages.push(m)
+        existing.pendingCount += pendingDelta
+
+        const existingLast = toDateValue(existing.lastAt)
+        const candidateLast = toDateValue(messageSortKey(m) ?? m.createdAt)
+        if (candidateLast >= existingLast) {
+          existing.lastAt = messageSortKey(m) ?? m.createdAt
+          existing.lastText = m.messageText
+          existing.senderName = m.senderName ?? existing.senderName
+        }
+      }
+    }
+
+    const list = Array.from(map.values())
+    list.sort((a, b) => toDateValue(b.lastAt) - toDateValue(a.lastAt))
+    return filter === 'all' ? list : list.filter((th) => th.channel === filter)
   }, [filter, messages])
+
+  useEffect(() => {
+    if (!selectedThreadId && threads.length > 0) {
+      setSelectedThreadId(threads[0].id)
+    }
+  }, [selectedThreadId, threads])
+
+  const selectedThread = useMemo(() => {
+    const th = threads.find((x) => x.id === selectedThreadId) ?? null
+    if (!th) return null
+    // messages oldest -> newest
+    const sorted = [...th.messages].sort((a, b) => {
+      return toDateValue(messageSortKey(a) ?? a.createdAt) - toDateValue(messageSortKey(b) ?? b.createdAt)
+    })
+    return { ...th, messages: sorted }
+  }, [selectedThreadId, threads])
 
   // SSE realtime stream
   const esRef = useRef<EventSource | null>(null)
@@ -79,7 +154,8 @@ export default function InboxClient({ initialMessages }: Props) {
           const incoming: Message = {
             id: data.id,
             channel: data.channel,
-            channelMessageId: data.channelMessageId ?? data.channelMessageId,
+            channelMessageId: data.channelMessageId,
+            connectionId: data.connectionId ?? null,
             senderId: data.senderId,
             senderName: data.senderName ?? null,
             messageText: data.messageText,
@@ -93,7 +169,8 @@ export default function InboxClient({ initialMessages }: Props) {
           if (seenIdsRef.current.has(incoming.id)) return
           seenIdsRef.current.add(incoming.id)
           setMessages((prev) => [incoming, ...prev])
-          setSelectedMessage((prevSelected) => prevSelected ?? incoming)
+          // if nothing selected yet, select this thread
+          setSelectedThreadId((prevSelected) => prevSelected ?? threadIdFor(incoming))
         } catch (err) {
           console.warn('inbox.sse.parse_failed', err)
         }
@@ -120,7 +197,7 @@ export default function InboxClient({ initialMessages }: Props) {
   }, [])
 
   const handleSelectMessage = (message: Message) => {
-    setSelectedMessage(message)
+    setSelectedThreadId(threadIdFor(message))
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setShowMobileDetail(true)
     }
@@ -133,7 +210,7 @@ export default function InboxClient({ initialMessages }: Props) {
 
   return (
     <div className="flex flex-col lg:flex-row h-full">
-      {/* Conversations List */}
+      {/* Threads List */}
       <div className={`w-full lg:w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col ${showMobileDetail ? 'hidden' : 'flex'} lg:flex`}>
         <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
@@ -144,11 +221,9 @@ export default function InboxClient({ initialMessages }: Props) {
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 mb-3">
+          {/* Small realtime indicator only (no i18n key spam) */}
+          <div className="flex items-center gap-2 mb-3" title={realtimeConnected ? 'Realtime connected' : 'Realtime reconnecting'}>
             <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {realtimeConnected ? (t('realtimeOn') || 'Realtime on') : (t('realtimeOff') || 'Realtime reconnecting...')}
-            </span>
           </div>
 
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
@@ -167,23 +242,28 @@ export default function InboxClient({ initialMessages }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {filteredMessages.length === 0 ? (
+          {threads.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
               <MessageSquare className="text-gray-400 mb-2" size={32} />
               <p className="text-gray-600 dark:text-gray-400">{t('noMessages') || 'No messages yet'}</p>
             </div>
           ) : (
-            filteredMessages.map((message) => {
-              const ChannelIcon = channelIcons[message.channel as keyof typeof channelIcons] || MessageSquare
-              const displayName = message.senderName || message.senderId || 'Unknown'
+            threads.map((thread) => {
+              const ChannelIcon = channelIcons[thread.channel as keyof typeof channelIcons] || MessageSquare
+              const displayName = thread.senderName || thread.senderId || 'Unknown'
 
               return (
                 <div
-                  key={message.id}
+                  key={thread.id}
                   className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
-                    selectedMessage?.id === message.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                    selectedThreadId === thread.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''
                   }`}
-                  onClick={() => handleSelectMessage(message)}
+                  onClick={() => {
+                    setSelectedThreadId(thread.id)
+                    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                      setShowMobileDetail(true)
+                    }
+                  }}
                 >
                   <div className="flex items-start gap-3">
                     <Avatar name={displayName} size="sm" />
@@ -194,30 +274,24 @@ export default function InboxClient({ initialMessages }: Props) {
                           {displayName}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatTime(message.timestamp || message.createdAt)}
+                          {formatTime(thread.lastAt)}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`p-1 rounded ${channelColors[message.channel as keyof typeof channelColors] || 'bg-gray-100 text-gray-700'}`}>
+                        <div className={`p-1 rounded ${channelColors[thread.channel as keyof typeof channelColors] || 'bg-gray-100 text-gray-700'}`}>
                           <ChannelIcon size={12} />
                         </div>
                         <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                          {getChannelDisplayName(message.channel)}
+                          {getChannelDisplayName(thread.channel)}
                         </span>
-                        {message.status === 'pending' && (
+                        {thread.pendingCount > 0 && (
                           <div className="w-2 h-2 bg-primary rounded-full"></div>
                         )}
-                        <Badge
-                          variant={message.status === 'completed' ? 'success' : message.status === 'failed' ? 'error' : 'default'}
-                          className="text-xs"
-                        >
-                          {message.status}
-                        </Badge>
                       </div>
 
                       <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                        {message.messageText}
+                        {thread.lastText}
                       </p>
                     </div>
                   </div>
@@ -228,10 +302,10 @@ export default function InboxClient({ initialMessages }: Props) {
         </div>
       </div>
 
-      {/* Mobile Conversation Detail */}
+      {/* Mobile Thread Detail */}
       {showMobileDetail && (
         <div className="lg:hidden flex-1 flex flex-col">
-          {selectedMessage && (
+          {selectedThread && (
             <>
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800">
                 <div className="flex items-center gap-3 mb-3">
@@ -242,13 +316,13 @@ export default function InboxClient({ initialMessages }: Props) {
                     <X size={20} />
                   </button>
                   <div className="flex items-center gap-3 flex-1">
-                    <Avatar name={selectedMessage.senderName || selectedMessage.senderId || 'Unknown'} size="sm" />
+                    <Avatar name={selectedThread.senderName || selectedThread.senderId || 'Unknown'} size="sm" />
                     <div className="flex-1 min-w-0">
                       <h2 className="text-lg font-bold text-navy dark:text-white truncate">
-                        {selectedMessage.senderName || selectedMessage.senderId}
+                        {selectedThread.senderName || selectedThread.senderId}
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                        {getChannelDisplayName(selectedMessage.channel)}
+                        {getChannelDisplayName(selectedThread.channel)}
                       </p>
                     </div>
                   </div>
@@ -272,43 +346,39 @@ export default function InboxClient({ initialMessages }: Props) {
                       <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                       <div className="flex gap-2 flex-wrap">
                         <Badge
-                          variant={selectedMessage.status === 'completed' ? 'success' : selectedMessage.status === 'failed' ? 'error' : 'default'}
+                          variant={selectedThread.pendingCount > 0 ? 'warning' : 'success'}
                         >
-                          {selectedMessage.status}
+                          {selectedThread.pendingCount > 0 ? 'pending' : 'ok'}
                         </Badge>
                         <Badge variant="info" className="text-xs capitalize">
-                          {selectedMessage.channel}
+                          {selectedThread.channel}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="bg-gray-50 dark:bg-navy-700 p-4 rounded-lg">
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                          {selectedMessage.messageText}
-                        </p>
-                      </div>
-
-                      {selectedMessage.aiResponse && (
-                        <div>
-                          <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiResponse') || 'AI Response'}</h4>
-                          <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg">
-                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                              {selectedMessage.aiResponse}
-                            </p>
+                      {selectedThread.messages.map((m) => (
+                        <div key={m.id} className="space-y-2">
+                          {/* incoming */}
+                          <div className="flex justify-start">
+                            <div className="max-w-[85%] bg-gray-50 dark:bg-navy-700 p-3 rounded-lg">
+                              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{m.messageText}</p>
+                              <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+                                {formatTime(m.timestamp || m.createdAt)}
+                              </p>
+                            </div>
                           </div>
+                          {/* ai/outgoing (stored on message row) */}
+                          {m.aiResponse && (
+                            <div className="flex justify-end">
+                              <div className="max-w-[85%] bg-primary/5 dark:bg-primary/10 p-3 rounded-lg">
+                                <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.aiResponse}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-
-                      <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">Message Details</h4>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                          <p>ID: {selectedMessage.channelMessageId}</p>
-                          <p>Type: {selectedMessage.messageType}</p>
-                          <p>Received: {formatTime(selectedMessage.timestamp || selectedMessage.createdAt)}</p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -318,20 +388,20 @@ export default function InboxClient({ initialMessages }: Props) {
         </div>
       )}
 
-      {/* Desktop Conversation Detail */}
+      {/* Desktop Thread Detail */}
       <div className="hidden lg:flex lg:flex-1 flex-col">
-        {selectedMessage ? (
+        {selectedThread ? (
           <>
             <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3 md:gap-4">
-                  <Avatar name={selectedMessage.senderName || selectedMessage.senderId || 'Unknown'} size="lg" />
+                  <Avatar name={selectedThread.senderName || selectedThread.senderId || 'Unknown'} size="lg" />
                   <div>
                     <h2 className="text-lg md:text-xl font-bold text-navy dark:text-white">
-                      {selectedMessage.senderName || selectedMessage.senderId}
+                      {selectedThread.senderName || selectedThread.senderId}
                     </h2>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-                      {getChannelDisplayName(selectedMessage.channel)}
+                      {getChannelDisplayName(selectedThread.channel)}
                     </p>
                   </div>
                 </div>
@@ -355,45 +425,37 @@ export default function InboxClient({ initialMessages }: Props) {
                     <CardTitle className="text-lg">{t('conversation')}</CardTitle>
                     <div className="flex gap-2 flex-wrap">
                       <Badge
-                        variant={selectedMessage.status === 'completed' ? 'success' : selectedMessage.status === 'failed' ? 'error' : 'default'}
+                        variant={selectedThread.pendingCount > 0 ? 'warning' : 'success'}
                       >
-                        {selectedMessage.status}
+                        {selectedThread.pendingCount > 0 ? 'pending' : 'ok'}
                       </Badge>
                       <Badge variant="info" className="text-xs capitalize">
-                        {selectedMessage.channel}
+                        {selectedThread.channel}
                       </Badge>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="bg-gray-50 dark:bg-navy-700 p-4 rounded-lg">
-                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                        {selectedMessage.messageText}
-                      </p>
-                    </div>
-
-                    {selectedMessage.aiResponse && (
-                      <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">{t('aiResponse') || 'AI Response'}</h4>
-                        <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg">
-                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                            {selectedMessage.aiResponse}
-                          </p>
+                    {selectedThread.messages.map((m) => (
+                      <div key={m.id} className="space-y-2">
+                        <div className="flex justify-start">
+                          <div className="max-w-[75%] bg-gray-50 dark:bg-navy-700 p-3 rounded-lg">
+                            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{m.messageText}</p>
+                            <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+                              {formatTime(m.timestamp || m.createdAt)}
+                            </p>
+                          </div>
                         </div>
+                        {m.aiResponse && (
+                          <div className="flex justify-end">
+                            <div className="max-w-[75%] bg-primary/5 dark:bg-primary/10 p-3 rounded-lg">
+                              <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.aiResponse}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold text-navy dark:text-white mb-2">Message Details</h4>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                          <p>ID: {selectedMessage.channelMessageId}</p>
-                          <p>Type: {selectedMessage.messageType}</p>
-                          <p>Received: {formatTime(selectedMessage.timestamp || selectedMessage.createdAt)}</p>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
