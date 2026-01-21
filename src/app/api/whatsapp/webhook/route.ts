@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dedupeMessage } from '@/lib/redis/dedupe'
 import { getMessageQueue } from '@/lib/queue/message-queue'
+import { publishNewMessage } from '@/lib/redis/pubsub'
 
 const WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
@@ -232,6 +233,22 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
                 jobId: `whatsapp-${channelMessageId}`, // idempotent at queue level too
             }
         )
+
+        // 4) Realtime publish (best-effort)
+        publishNewMessage({
+            id: saved.id,
+            channel: saved.channel,
+            senderId: saved.senderId,
+            senderName: saved.senderName ?? null,
+            messageText: saved.messageText,
+            messageType: saved.messageType,
+            status: saved.status,
+            aiResponse: saved.aiResponse ?? null,
+            timestamp: saved.timestamp ? saved.timestamp.toISOString() : null,
+            createdAt: saved.createdAt.toISOString(),
+        }).catch((err) => {
+            console.warn('realtime.publish_failed', { messageId: saved.id, err: String(err?.message ?? err) })
+        })
 
     } catch (error: any) {
         console.error('Error handling incoming WhatsApp message:', error)

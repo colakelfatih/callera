@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
@@ -44,14 +44,80 @@ type Props = {
 }
 
 export default function InboxClient({ initialMessages }: Props) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(initialMessages[0] || null)
   const [filter, setFilter] = useState('all')
   const [showMobileDetail, setShowMobileDetail] = useState(false)
+  const [realtimeConnected, setRealtimeConnected] = useState(false)
   const t = useTranslations('inbox')
 
-  const filteredMessages = filter === 'all'
-    ? initialMessages
-    : initialMessages.filter(msg => msg.channel === filter)
+  const seenIdsRef = useRef<Set<string>>(new Set(messages.map((m) => m.id)))
+  useEffect(() => {
+    // keep set in sync when initialMessages changes (rare)
+    seenIdsRef.current = new Set(messages.map((m) => m.id))
+  }, [messages])
+
+  const filteredMessages = useMemo(() => {
+    return filter === 'all' ? messages : messages.filter((msg) => msg.channel === filter)
+  }, [filter, messages])
+
+  // SSE realtime stream
+  const esRef = useRef<EventSource | null>(null)
+  useEffect(() => {
+    let retryTimer: any = null
+
+    const connect = () => {
+      if (esRef.current) esRef.current.close()
+      const es = new EventSource('/api/messages/stream')
+      esRef.current = es
+
+      es.addEventListener('ready', () => setRealtimeConnected(true))
+
+      es.addEventListener('message', (e) => {
+        try {
+          const data = JSON.parse((e as MessageEvent).data) as any
+          const incoming: Message = {
+            id: data.id,
+            channel: data.channel,
+            channelMessageId: data.channelMessageId ?? data.channelMessageId,
+            senderId: data.senderId,
+            senderName: data.senderName ?? null,
+            messageText: data.messageText,
+            messageType: data.messageType,
+            status: data.status,
+            aiResponse: data.aiResponse ?? null,
+            timestamp: data.timestamp ?? null,
+            createdAt: data.createdAt,
+          }
+
+          if (seenIdsRef.current.has(incoming.id)) return
+          seenIdsRef.current.add(incoming.id)
+          setMessages((prev) => [incoming, ...prev])
+          setSelectedMessage((prevSelected) => prevSelected ?? incoming)
+        } catch (err) {
+          console.warn('inbox.sse.parse_failed', err)
+        }
+      })
+
+      es.onerror = () => {
+        setRealtimeConnected(false)
+        // EventSource auto-reconnects, but we add backoff to avoid tight loops in some proxies
+        if (!retryTimer) {
+          retryTimer = setTimeout(() => {
+            retryTimer = null
+            connect()
+          }, 1500)
+        }
+      }
+    }
+
+    connect()
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer)
+      esRef.current?.close()
+      esRef.current = null
+    }
+  }, [])
 
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message)
@@ -76,6 +142,13 @@ export default function InboxClient({ initialMessages }: Props) {
               <Filter size={16} className="mr-2" />
               {t('filter')}
             </Button>
+          </div>
+
+          <div className="flex items-center gap-2 mb-3">
+            <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {realtimeConnected ? (t('realtimeOn') || 'Realtime on') : (t('realtimeOff') || 'Realtime reconnecting...')}
+            </span>
           </div>
 
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
