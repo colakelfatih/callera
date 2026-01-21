@@ -30,6 +30,7 @@ type Message = {
   channel: string
   channelMessageId: string
   connectionId?: string | null
+  isFromBusiness: boolean
   senderId: string
   senderName: string | null
   messageText: string
@@ -77,9 +78,13 @@ export default function InboxClient({ initialMessages }: Props) {
   const [filter, setFilter] = useState('all')
   const [showMobileDetail, setShowMobileDetail] = useState(false)
   const [realtimeConnected, setRealtimeConnected] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const t = useTranslations('inbox')
 
   const seenIdsRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)))
+  const threadCursorRef = useRef<Record<string, string | null>>({})
+  const threadHasMoreRef = useRef<Record<string, boolean>>({})
+  const topSentinelRef = useRef<HTMLDivElement | null>(null)
 
   const threads = useMemo<Thread[]>(() => {
     const map = new Map<string, Thread>()
@@ -136,6 +141,77 @@ export default function InboxClient({ initialMessages }: Props) {
     return { ...th, messages: sorted }
   }, [selectedThreadId, threads])
 
+  const loadOlder = async () => {
+    if (!selectedThread) return
+    if (loadingMore) return
+
+    const tid = selectedThread.id
+    if (threadHasMoreRef.current[tid] === false) return
+
+    const oldest = selectedThread.messages[0]
+    const cursor = threadCursorRef.current[tid] ?? (oldest ? oldest.id : null)
+    if (!cursor) return
+
+    setLoadingMore(true)
+    try {
+      const sp = new URLSearchParams()
+      sp.set('channel', selectedThread.channel)
+      sp.set('senderId', selectedThread.senderId)
+      if (selectedThread.connectionId) sp.set('connectionId', selectedThread.connectionId)
+      sp.set('cursor', cursor)
+      sp.set('limit', '50')
+
+      const res = await fetch(`/api/messages/thread?${sp.toString()}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+
+      const fetched: Message[] = Array.isArray(data.messages) ? data.messages : []
+      // fetched are newest->older (desc); merge and let derived sorting handle ordering
+      let anyNew = false
+      setMessages((prev) => {
+        const next = [...prev]
+        for (const m of fetched) {
+          if (m?.id && !seenIdsRef.current.has(m.id)) {
+            seenIdsRef.current.add(m.id)
+            next.push(m)
+            anyNew = true
+          }
+        }
+        return next
+      })
+
+      threadCursorRef.current[tid] = data.nextCursor ?? null
+      threadHasMoreRef.current[tid] = Boolean(data.hasMore)
+
+      // If API returned no new rows, stop trying
+      if (!anyNew && fetched.length === 0) {
+        threadHasMoreRef.current[tid] = false
+      }
+    } catch {
+      // ignore; keep UI resilient
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  // Infinite scroll: when the top sentinel becomes visible, load older messages
+  useEffect(() => {
+    if (!selectedThreadId) return
+    const el = topSentinelRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          loadOlder()
+        }
+      },
+      { root: null, threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [selectedThreadId, selectedThread?.messages.length, loadingMore])
+
   // SSE realtime stream
   const esRef = useRef<EventSource | null>(null)
   useEffect(() => {
@@ -156,6 +232,7 @@ export default function InboxClient({ initialMessages }: Props) {
             channel: data.channel,
             channelMessageId: data.channelMessageId,
             connectionId: data.connectionId ?? null,
+            isFromBusiness: Boolean(data.isFromBusiness),
             senderId: data.senderId,
             senderName: data.senderName ?? null,
             messageText: data.messageText,
@@ -171,8 +248,8 @@ export default function InboxClient({ initialMessages }: Props) {
           setMessages((prev) => [incoming, ...prev])
           // if nothing selected yet, select this thread
           setSelectedThreadId((prevSelected) => prevSelected ?? threadIdFor(incoming))
-        } catch (err) {
-          console.warn('inbox.sse.parse_failed', err)
+        } catch {
+          // ignore malformed payload
         }
       })
 
@@ -195,13 +272,6 @@ export default function InboxClient({ initialMessages }: Props) {
       esRef.current = null
     }
   }, [])
-
-  const handleSelectMessage = (message: Message) => {
-    setSelectedThreadId(threadIdFor(message))
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setShowMobileDetail(true)
-    }
-  }
 
   const getChannelDisplayName = (channel: string) => {
     if (channel === 'facebook_dm') return 'Facebook'
@@ -358,25 +428,26 @@ export default function InboxClient({ initialMessages }: Props) {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
+                      <div ref={topSentinelRef} />
+                      {loadingMore && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Loading older…</p>
+                      )}
                       {selectedThread.messages.map((m) => (
                         <div key={m.id} className="space-y-2">
-                          {/* incoming */}
-                          <div className="flex justify-start">
-                            <div className="max-w-[85%] bg-gray-50 dark:bg-navy-700 p-3 rounded-lg">
-                              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{m.messageText}</p>
+                          <div className={`flex ${m.isFromBusiness ? 'justify-end' : 'justify-start'}`}>
+                            <div
+                              className={`max-w-[85%] p-3 rounded-lg ${
+                                m.isFromBusiness
+                                  ? 'bg-primary/5 dark:bg-primary/10'
+                                  : 'bg-gray-50 dark:bg-navy-700'
+                              }`}
+                            >
+                              <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.messageText}</p>
                               <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
                                 {formatTime(m.timestamp || m.createdAt)}
                               </p>
                             </div>
                           </div>
-                          {/* ai/outgoing (stored on message row) */}
-                          {m.aiResponse && (
-                            <div className="flex justify-end">
-                              <div className="max-w-[85%] bg-primary/5 dark:bg-primary/10 p-3 rounded-lg">
-                                <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.aiResponse}</p>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -437,23 +508,26 @@ export default function InboxClient({ initialMessages }: Props) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    <div ref={topSentinelRef} />
+                    {loadingMore && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Loading older…</p>
+                    )}
                     {selectedThread.messages.map((m) => (
                       <div key={m.id} className="space-y-2">
-                        <div className="flex justify-start">
-                          <div className="max-w-[75%] bg-gray-50 dark:bg-navy-700 p-3 rounded-lg">
-                            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{m.messageText}</p>
+                        <div className={`flex ${m.isFromBusiness ? 'justify-end' : 'justify-start'}`}>
+                          <div
+                            className={`max-w-[75%] p-3 rounded-lg ${
+                              m.isFromBusiness
+                                ? 'bg-primary/5 dark:bg-primary/10'
+                                : 'bg-gray-50 dark:bg-navy-700'
+                            }`}
+                          >
+                            <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.messageText}</p>
                             <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
                               {formatTime(m.timestamp || m.createdAt)}
                             </p>
                           </div>
                         </div>
-                        {m.aiResponse && (
-                          <div className="flex justify-end">
-                            <div className="max-w-[75%] bg-primary/5 dark:bg-primary/10 p-3 rounded-lg">
-                              <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{m.aiResponse}</p>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>

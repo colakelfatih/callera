@@ -240,6 +240,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
             channel: saved.channel,
             channelMessageId: saved.channelMessageId,
             connectionId: saved.connectionId ?? null,
+            isFromBusiness: saved.isFromBusiness,
             senderId: saved.senderId,
             senderName: saved.senderName ?? null,
             messageText: saved.messageText,

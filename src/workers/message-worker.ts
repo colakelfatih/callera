@@ -4,6 +4,7 @@ import { db } from '../lib/db'
 import type { MessageJob } from '../types/message'
 import { createResponse } from '../lib/clients/openai-responses'
 import { sendWhatsAppTextMessage } from '../lib/clients/whatsapp-client'
+import { publishNewMessage } from '../lib/redis/pubsub'
 
 const concurrency = Number(process.env.QUEUE_CONCURRENCY ?? 10)
 
@@ -58,12 +59,48 @@ const worker = new Worker<MessageJob>(
       if (!phoneNumberId) throw new Error('Missing WhatsApp phoneNumberId (connectionId/WHATSAPP_PHONE_NUMBER_ID)')
       if (!accessToken) throw new Error('WHATSAPP_ACCESS_TOKEN is not set')
 
-      await sendWhatsAppTextMessage({
+      const sendResult = await sendWhatsAppTextMessage({
         phoneNumberId,
         accessToken,
         to: senderId,
         text: aiText,
       })
+
+      const outboundChannelMessageId =
+        sendResult?.messages?.[0]?.id ?? `out-${messageId}-${Date.now()}`
+
+      // Save outbound message as its own row (so UI can render sent messages on the right)
+      const outbound = await db.message.create({
+        data: {
+          channel: 'whatsapp',
+          channelMessageId: outboundChannelMessageId,
+          connectionId: phoneNumberId,
+          senderId, // keep same senderId for thread grouping
+          senderName: msg.senderName ?? null,
+          messageText: aiText,
+          messageType: 'text',
+          rawPayload: sendResult ?? undefined,
+          isFromBusiness: true,
+          timestamp: new Date(),
+          status: 'completed',
+        },
+      })
+
+      publishNewMessage({
+        id: outbound.id,
+        channel: outbound.channel,
+        channelMessageId: outbound.channelMessageId,
+        connectionId: outbound.connectionId ?? null,
+        isFromBusiness: true,
+        senderId: outbound.senderId,
+        senderName: outbound.senderName ?? null,
+        messageText: outbound.messageText,
+        messageType: outbound.messageType,
+        status: outbound.status,
+        aiResponse: outbound.aiResponse ?? null,
+        timestamp: outbound.timestamp ? outbound.timestamp.toISOString() : null,
+        createdAt: outbound.createdAt.toISOString(),
+      }).catch(() => {})
     } else {
       // TODO: add other channel send implementations
       console.log('worker.skip_send_unsupported_channel', { channel })

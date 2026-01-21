@@ -21,6 +21,7 @@ export type NewMessageEvent = {
   channel: string
   channelMessageId: string
   connectionId?: string | null
+  isFromBusiness: boolean
   senderId: string
   senderName?: string | null
   messageText: string
