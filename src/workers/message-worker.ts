@@ -2,7 +2,7 @@ import { Worker, QueueEvents } from 'bullmq'
 import { getMessageQueue } from '../lib/queue/message-queue'
 import { db } from '../lib/db'
 import type { MessageJob } from '../types/message'
-import { createResponse } from '../lib/clients/openai-responses'
+import { createWiroChatResponse } from '../lib/clients/wiro-chat'
 import { sendWhatsAppTextMessage } from '../lib/clients/whatsapp-client'
 import { publishNewMessage } from '../lib/redis/pubsub'
 
@@ -42,15 +42,18 @@ const worker = new Worker<MessageJob>(
       data: { status: 'processing' },
     })
 
-    const ai = await createResponse({
-      input: messageText,
-      system:
-        'You are a helpful customer support agent. Reply in Turkish. Keep it short and actionable.',
+    const ai = await createWiroChatResponse({
+      prompt: messageText,
+      // Use senderId as user_id so Wiro can persist chat history per user (as documented).
+      user_id: senderId,
+      // Keep all WhatsApp interactions in the same session unless you decide to separate sessions.
+      session_id: channel,
+      system_prompt: 'Sen bir müşteri destek temsilcisisin. Türkçe yanıt ver. Kısa ve net ol.',
     })
 
     const aiText = (ai.text || '').trim()
     if (!aiText) {
-      throw new Error('OpenAI returned empty text')
+      throw new Error('Wiro returned empty text')
     }
 
     if (channel === 'whatsapp') {
