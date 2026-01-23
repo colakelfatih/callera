@@ -82,38 +82,40 @@ export async function runWiroChatTask(params: {
 }) {
   const authHeaders = buildWiroAuthHeaders()
 
-  const form = new FormData()
-  form.append('selectedModel', params.selectedModel ?? process.env.WIRO_SELECTED_MODEL ?? '617')
-  form.append('selectedModelPrivate', params.selectedModelPrivate ?? '')
-  form.append('prompt', params.prompt ?? '')
-  form.append('user_id', params.user_id ?? '')
-  form.append('session_id', params.session_id ?? '')
-  form.append(
-    'system_prompt',
-    params.system_prompt ??
-      'You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. \nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\'t know the answer to a question, please don\'t share false information.'
-  )
-  form.append('temperature', params.temperature ?? '0.7')
-  form.append('top_p', params.top_p ?? '0.95')
-  form.append('top_k', String(params.top_k ?? 0))
-  form.append('repetition_penalty', params.repetition_penalty ?? '1.0')
-  form.append('length_penalty', params.length_penalty ?? '1')
-  form.append('max_tokens', String(params.max_tokens ?? 0))
-  form.append('min_tokens', String(params.min_tokens ?? 0))
-  form.append('stop_sequences', params.stop_sequences ?? '')
-  form.append('seed', params.seed ?? '123456')
-  form.append('quantization', params.quantization ?? '--quantization')
-  form.append('do_sample', params.do_sample ?? '--do_sample')
-  if (params.callbackUrl) form.append('callbackUrl', params.callbackUrl)
+  // Docs show: Content-Type: multipart/form-data with a JSON body (-d '{...}').
+  // We follow that format exactly (do not guess alternate encodings).
+  const body = JSON.stringify({
+    selectedModel: params.selectedModel ?? process.env.WIRO_SELECTED_MODEL ?? '617',
+    selectedModelPrivate: params.selectedModelPrivate ?? '',
+    prompt: params.prompt ?? '',
+    user_id: params.user_id ?? '',
+    session_id: params.session_id ?? '',
+    system_prompt:
+      params.system_prompt ??
+      'You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. \nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\'t know the answer to a question, please don\'t share false information.',
+    temperature: params.temperature ?? '0.7',
+    top_p: params.top_p ?? '0.95',
+    top_k: params.top_k ?? 0,
+    repetition_penalty: params.repetition_penalty ?? '1.0',
+    length_penalty: params.length_penalty ?? '1',
+    max_tokens: params.max_tokens ?? 0,
+    min_tokens: params.min_tokens ?? 0,
+    max_new_tokens: 0,
+    min_new_tokens: -1,
+    stop_sequences: params.stop_sequences ?? '',
+    seed: params.seed ?? '123456',
+    quantization: params.quantization ?? '--quantization',
+    do_sample: params.do_sample ?? '--do_sample',
+    ...(params.callbackUrl ? { callbackUrl: params.callbackUrl } : {}),
+  })
 
   const res = await fetch('https://api.wiro.ai/v1/Run/wiro/chat', {
     method: 'POST',
     headers: {
       ...authHeaders,
-      // Content-Type is documented as multipart/form-data; when using FormData,
-      // fetch sets the correct boundary automatically.
+      'Content-Type': 'multipart/form-data',
     } as any,
-    body: form as any,
+    body,
   })
 
   const json = (await res.json().catch(() => null)) as WiroRunTaskResponse | null
@@ -128,15 +130,15 @@ export async function runWiroChatTask(params: {
 
 export async function getWiroTaskDetailById(taskid: string) {
   const authHeaders = buildWiroAuthHeaders()
-  const form = new FormData()
-  form.append('taskid', taskid)
+  const body = JSON.stringify({ taskid })
 
   const res = await fetch('https://api.wiro.ai/v1/Task/Detail', {
     method: 'POST',
     headers: {
       ...authHeaders,
+      'Content-Type': 'multipart/form-data',
     } as any,
-    body: form as any,
+    body,
   })
 
   const json = (await res.json().catch(() => null)) as WiroTaskDetailResponse | null

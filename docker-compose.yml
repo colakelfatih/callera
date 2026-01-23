@@ -67,6 +67,33 @@ services:
       retries: 3
       start_period: 40s
 
+  # Background Worker (BullMQ) - processes incoming messages and sends AI replies
+  callera-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - DATABASE_URL=postgresql://callera:callera_password@postgres:5432/callera_db?schema=public
+      - REDIS_URL=redis://redis:6379
+      # Provide these via your deployment environment (recommended):
+      # - WIRO_API_KEY=...
+      # - WIRO_API_SECRET=...
+      # - WHATSAPP_ACCESS_TOKEN=...
+      # - WHATSAPP_PHONE_NUMBER_ID=...
+      # Optional tuning:
+      # - QUEUE_CONCURRENCY=10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - callera-network
+    command: npm run worker:messages
+
   # Development service (optional)
   callera-dev:
     build:
