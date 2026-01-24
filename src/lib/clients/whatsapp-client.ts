@@ -58,9 +58,8 @@ export async function sendWhatsAppTypingIndicator(params: WhatsAppTypingParams) 
     body: JSON.stringify({
       messaging_product: 'whatsapp',
       to: params.to,
-      type: 'typing',
       typing: {
-        action: params.action, // 'typing' to show, 'read' to mark as read
+        action: params.action, // 'typing' to show typing indicator, 'read' to mark as read
       },
     }),
   })
