@@ -218,21 +218,31 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
 
         // 3) Queue add(job)
         const messageQueue = getMessageQueue()
-        await messageQueue.add(
-            'process-message',
-            {
+        try {
+            const job = await messageQueue.add(
+                'process-message',
+                {
+                    messageId: saved.id,
+                    channel: 'whatsapp',
+                    channelMessageId,
+                    senderId: from,
+                    messageText,
+                    connectionId: metadata?.phone_number_id ?? null,
+                },
+                {
+                    // BullMQ doesn't allow ':' in jobId, use '-' instead
+                    jobId: `whatsapp-${channelMessageId}`, // idempotent at queue level too
+                }
+            )
+            console.log('✅ Job added to queue:', { jobId: job.id, messageId: saved.id })
+        } catch (queueError: any) {
+            console.error('❌ Failed to add job to queue:', {
+                error: queueError?.message ?? queueError,
                 messageId: saved.id,
-                channel: 'whatsapp',
                 channelMessageId,
-                senderId: from,
-                messageText,
-                connectionId: metadata?.phone_number_id ?? null,
-            },
-            {
-                // BullMQ doesn't allow ':' in jobId, use '-' instead
-                jobId: `whatsapp-${channelMessageId}`, // idempotent at queue level too
-            }
-        )
+            })
+            // Still continue - message is saved, can be processed manually later
+        }
 
         // 4) Realtime publish (best-effort)
         publishNewMessage({

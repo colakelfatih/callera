@@ -26,14 +26,16 @@ const worker = new Worker<MessageJob>(
   async (job) => {
     const { messageId, channel, senderId, messageText, connectionId } = job.data
 
+    console.log('🔄 Worker processing job:', { jobId: job.id, messageId, channel, senderId, messageText: messageText?.substring(0, 50) })
+
     const msg = await db.message.findUnique({ where: { id: messageId } })
     if (!msg) {
-      console.warn('worker.message_not_found', { messageId })
+      console.warn('⚠️ worker.message_not_found', { messageId })
       return
     }
 
     if (msg.status === 'completed') {
-      console.log('worker.already_completed', { messageId })
+      console.log('✅ worker.already_completed', { messageId })
       return
     }
 
@@ -42,23 +44,27 @@ const worker = new Worker<MessageJob>(
       data: { status: 'processing' },
     })
 
-    const ai = await createWiroGpt5MiniResponse({
-      prompt: messageText,
-      // Use senderId as user_id so Wiro can persist chat history per user (as documented).
-      user_id: senderId,
-      // Keep all WhatsApp interactions in the same session unless you decide to separate sessions.
-      session_id: channel,
-      systemInstructions: 'Sen bir müşteri destek temsilcisisin. Türkçe yanıt ver. Kısa ve net ol.',
-      reasoning: 'medium',
-      verbosity: 'medium',
-    })
+    console.log('🤖 Calling Wiro GPT-5-Mini API...', { messageId, prompt: messageText?.substring(0, 100) })
+    
+    try {
+      const ai = await createWiroGpt5MiniResponse({
+        prompt: messageText,
+        // Use senderId as user_id so Wiro can persist chat history per user (as documented).
+        user_id: senderId,
+        // Keep all WhatsApp interactions in the same session unless you decide to separate sessions.
+        session_id: channel,
+        systemInstructions: 'Sen bir müşteri destek temsilcisisin. Türkçe yanıt ver. Kısa ve net ol.',
+        reasoning: 'medium',
+        verbosity: 'medium',
+      })
+      console.log('✅ Wiro API response received', { messageId, textLength: ai.text?.length })
 
-    const aiText = (ai.text || '').trim()
-    if (!aiText) {
-      throw new Error('Wiro returned empty text')
-    }
+      const aiText = (ai.text || '').trim()
+      if (!aiText) {
+        throw new Error('Wiro returned empty text')
+      }
 
-    if (channel === 'whatsapp') {
+      if (channel === 'whatsapp') {
       const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
       const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
       if (!phoneNumberId) throw new Error('Missing WhatsApp phoneNumberId (connectionId/WHATSAPP_PHONE_NUMBER_ID)')
@@ -108,31 +114,54 @@ const worker = new Worker<MessageJob>(
       }).catch(() => {})
     } else {
       // TODO: add other channel send implementations
-      console.log('worker.skip_send_unsupported_channel', { channel })
-    }
+        console.log('worker.skip_send_unsupported_channel', { channel })
+      }
 
-    await db.message.update({
-      where: { id: messageId },
-      data: { status: 'completed', aiResponse: aiText },
-    })
+      await db.message.update({
+        where: { id: messageId },
+        data: { status: 'completed', aiResponse: aiText },
+      })
+      
+      console.log('✅ Job completed successfully', { messageId, jobId: job.id })
+    } catch (error: any) {
+      console.error('❌ Error processing job:', { 
+        jobId: job.id, 
+        messageId, 
+        error: error?.message ?? error,
+        stack: error?.stack 
+      })
+      throw error // Re-throw to let BullMQ handle retries
+    }
   },
   { connection: (queue as any).opts.connection, concurrency }
 )
 
 worker.on('failed', (job, err) => {
-  console.error('worker.failed', { jobId: job?.id, err: err?.message, attemptsMade: job?.attemptsMade })
+  console.error('❌ worker.failed', { 
+    jobId: job?.id, 
+    messageId: job?.data?.messageId,
+    err: err?.message, 
+    attemptsMade: job?.attemptsMade,
+    stack: err?.stack 
+  })
   if (job?.data?.messageId) {
     db.message
       .update({
         where: { id: job.data.messageId },
         data: { status: 'failed' },
       })
-      .catch(() => {})
+      .catch((dbErr) => {
+        console.error('Failed to update message status to failed:', dbErr)
+      })
   }
 })
 
 worker.on('completed', (job) => {
-  console.log('worker.done', { jobId: job.id })
+  console.log('✅ worker.completed', { jobId: job.id, messageId: job.data?.messageId })
+})
+
+worker.on('active', (job) => {
+  console.log('🔄 worker.active', { jobId: job.id, messageId: job.data?.messageId })
 })
 
 console.log('message-worker started', { concurrency })
