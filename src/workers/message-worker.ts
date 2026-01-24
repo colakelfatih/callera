@@ -3,7 +3,7 @@ import { getMessageQueue } from '../lib/queue/message-queue'
 import { db } from '../lib/db'
 import type { MessageJob } from '../types/message'
 import { createWiroGpt5MiniResponse } from '../lib/clients/wiro-chat'
-import { sendWhatsAppTextMessage } from '../lib/clients/whatsapp-client'
+import { sendWhatsAppTextMessage, sendWhatsAppTypingIndicator } from '../lib/clients/whatsapp-client'
 import { publishNewMessage } from '../lib/redis/pubsub'
 
 const concurrency = Number(process.env.QUEUE_CONCURRENCY ?? 10)
@@ -34,6 +34,16 @@ const worker = new Worker<MessageJob>(
       return
     }
 
+    // Only respond to messages from customers, not from business
+    if (msg.isFromBusiness) {
+      console.log('⏭️ Skipping business message (not responding to our own messages)', { messageId, isFromBusiness: msg.isFromBusiness })
+      await db.message.update({
+        where: { id: messageId },
+        data: { status: 'completed' },
+      })
+      return
+    }
+
     if (msg.status === 'completed') {
       console.log('✅ worker.already_completed', { messageId })
       return
@@ -43,6 +53,26 @@ const worker = new Worker<MessageJob>(
       where: { id: messageId },
       data: { status: 'processing' },
     })
+
+    // Send typing indicator to show "yazıyor..." in WhatsApp
+    if (channel === 'whatsapp') {
+      const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
+      const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
+      if (phoneNumberId && accessToken) {
+        try {
+          await sendWhatsAppTypingIndicator({
+            phoneNumberId,
+            accessToken,
+            to: senderId,
+            action: 'typing',
+          })
+          console.log('⌨️ Typing indicator sent (yazıyor...)', { messageId, senderId })
+        } catch (typingError) {
+          // Non-critical, continue processing
+          console.warn('Failed to send typing indicator:', typingError)
+        }
+      }
+    }
 
     console.log('🤖 Calling Wiro GPT-5-Mini API...', { messageId, prompt: messageText?.substring(0, 100) })
     
