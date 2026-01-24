@@ -8,6 +8,7 @@
         "insights": "Insights",
         "studio": "Studio",
         "settings": "Settings",
+        "wiroTest": "Wiro Test",
         "expandSidebar": "Expand sidebar",
         "collapseSidebar": "Collapse sidebar"
     },
@@ -215,7 +216,8 @@
         "negative": "negative",
         "high": "high",
         "medium": "medium",
-        "low": "low"
+        "low": "low",
+        "noMessages": "No messages yet"
     },
     "flows": {
         "title": "Automation Flows",

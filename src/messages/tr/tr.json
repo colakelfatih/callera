@@ -8,6 +8,7 @@
         "insights": "İçgörüler",
         "studio": "Stüdyo",
         "settings": "Ayarlar",
+        "wiroTest": "Wiro Test",
         "expandSidebar": "Kenar çubuğunu genişlet",
         "collapseSidebar": "Kenar çubuğunu daralt"
     },
@@ -215,7 +216,8 @@
         "negative": "negatif",
         "high": "yüksek",
         "medium": "orta",
-        "low": "düşük"
+        "low": "düşük",
+        "noMessages": "Henüz mesaj yok"
     },
     "flows": {
         "title": "Otomasyon Akışları",

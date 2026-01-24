@@ -11,7 +11,8 @@ import {
   BarChart3,
   Calendar,
   Settings,
-  Menu
+  Menu,
+  TestTube
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
     { name: t('flows'), href: `/${locale}/dashboard/flows`, icon: Zap },
     { name: t('insights'), href: `/${locale}/dashboard/insights`, icon: BarChart3 },
     { name: t('studio'), href: `/${locale}/dashboard/studio`, icon: Calendar },
+    { name: t('wiroTest'), href: `/${locale}/dashboard/wiro-test`, icon: TestTube },
     { name: t('settings'), href: `/${locale}/dashboard/settings`, icon: Settings },
   ]
 

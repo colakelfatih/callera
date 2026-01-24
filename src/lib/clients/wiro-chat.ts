@@ -47,11 +47,12 @@ function buildWiroAuthHeaders() {
   if (!apiKey) throw new Error('WIRO_API_KEY is not set')
   if (!apiSecret) throw new Error('WIRO_API_SECRET is not set')
 
+  // NONCE: unix time or any random integer value
   const nonce = String(Math.floor(Date.now() / 1000))
-  const hex = crypto.createHmac('sha256', apiKey).update(`${apiSecret}${nonce}`).digest('hex')
-
-  // Match OpenSSL default output format from the docs command
-  const signature = `SHA2-256(stdin)= ${hex}`
+  
+  // SIGNATURE: hmac-SHA256 (YOUR_API_SECRET+Nonce) with YOUR_API_KEY
+  // Equivalent to: echo -n "${YOUR_API_SECRET}${NONCE}" | openssl dgst -sha256 -hmac "${YOUR_API_KEY}"
+  const signature = crypto.createHmac('sha256', apiKey).update(`${apiSecret}${nonce}`).digest('hex')
 
   return {
     'x-api-key': apiKey,
@@ -82,9 +83,10 @@ export async function runWiroChatTask(params: {
 }) {
   const authHeaders = buildWiroAuthHeaders()
 
-  // Docs show: Content-Type: multipart/form-data with a JSON body (-d '{...}').
-  // We follow that format exactly (do not guess alternate encodings).
-  const body = JSON.stringify({
+  // According to docs: Content-Type: multipart/form-data with JSON body
+  // The API expects JSON body but with multipart/form-data Content-Type
+  // We'll send JSON string as body
+  const payload = {
     selectedModel: params.selectedModel ?? process.env.WIRO_SELECTED_MODEL ?? '617',
     selectedModelPrivate: params.selectedModelPrivate ?? '',
     prompt: params.prompt ?? '',
@@ -107,15 +109,21 @@ export async function runWiroChatTask(params: {
     quantization: params.quantization ?? '--quantization',
     do_sample: params.do_sample ?? '--do_sample',
     ...(params.callbackUrl ? { callbackUrl: params.callbackUrl } : {}),
+  }
+
+  // Use URLSearchParams to create form-encoded body (similar to multipart/form-data)
+  const formData = new URLSearchParams()
+  Object.entries(payload).forEach(([key, value]) => {
+    formData.append(key, String(value))
   })
 
-  const res = await fetch('https://api.wiro.ai/v1/Run/wiro/chat', {
+  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-mini', {
     method: 'POST',
     headers: {
       ...authHeaders,
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
     } as any,
-    body,
+    body: formData.toString(),
   })
 
   const json = (await res.json().catch(() => null)) as WiroRunTaskResponse | null
@@ -130,15 +138,16 @@ export async function runWiroChatTask(params: {
 
 export async function getWiroTaskDetailById(taskid: string) {
   const authHeaders = buildWiroAuthHeaders()
-  const body = JSON.stringify({ taskid })
+  const formData = new URLSearchParams()
+  formData.append('taskid', taskid)
 
   const res = await fetch('https://api.wiro.ai/v1/Task/Detail', {
     method: 'POST',
     headers: {
       ...authHeaders,
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
     } as any,
-    body,
+    body: formData.toString(),
   })
 
   const json = (await res.json().catch(() => null)) as WiroTaskDetailResponse | null
@@ -211,6 +220,100 @@ export async function createWiroChatResponse(params: {
     session_id: params.session_id,
     system_prompt: params.system_prompt,
     selectedModel: params.selectedModel,
+  })
+
+  const { detail, task } = await pollWiroTaskUntilTerminal({
+    taskid: run.taskid!,
+    pollIntervalMs: params.pollIntervalMs ?? 1000,
+    timeoutMs: params.timeoutMs ?? 60_000,
+  })
+
+  const text = await tryExtractTextFromTask(task)
+
+  return {
+    run,
+    detail,
+    task,
+    text,
+  }
+}
+
+/**
+ * Run a task using the openai/gpt-5-mini model.
+ * Based on API documentation: https://api.wiro.ai/v1/Run/openai/gpt-5-mini
+ */
+export async function runWiroGpt5MiniTask(params: {
+  prompt: string
+  inputImage?: string
+  user_id?: string
+  session_id?: string
+  systemInstructions?: string
+  reasoning?: 'none' | 'low' | 'medium' | 'high' | 'xhigh'
+  verbosity?: 'low' | 'medium' | 'high'
+  callbackUrl?: string
+}) {
+  const authHeaders = buildWiroAuthHeaders()
+
+  const payload: Record<string, string> = {
+    prompt: params.prompt,
+    ...(params.inputImage ? { inputImage: params.inputImage } : {}),
+    ...(params.user_id ? { user_id: params.user_id } : {}),
+    ...(params.session_id ? { session_id: params.session_id } : {}),
+    ...(params.systemInstructions ? { systemInstructions: params.systemInstructions } : {}),
+    reasoning: params.reasoning ?? 'medium',
+    verbosity: params.verbosity ?? 'medium',
+    ...(params.callbackUrl ? { callbackUrl: params.callbackUrl } : {}),
+  }
+
+  // Use URLSearchParams for form data
+  const formData = new URLSearchParams()
+  Object.entries(payload).forEach(([key, value]) => {
+    formData.append(key, String(value))
+  })
+
+  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-mini', {
+    method: 'POST',
+    headers: {
+      ...authHeaders,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    } as any,
+    body: formData.toString(),
+  })
+
+  const json = (await res.json().catch(() => null)) as WiroRunTaskResponse | null
+  if (!res.ok) {
+    throw new Error(`Wiro GPT-5-Mini Run failed: ${res.status} ${res.statusText} ${json ? JSON.stringify(json) : ''}`)
+  }
+  if (!json?.taskid) {
+    throw new Error(`Wiro GPT-5-Mini Run did not return taskid: ${json ? JSON.stringify(json) : 'null'}`)
+  }
+  return json
+}
+
+/**
+ * High-level helper: submit a GPT-5-Mini task and poll until terminal status, then return best-effort text.
+ */
+export async function createWiroGpt5MiniResponse(params: {
+  prompt: string
+  inputImage?: string
+  user_id?: string
+  session_id?: string
+  systemInstructions?: string
+  reasoning?: 'none' | 'low' | 'medium' | 'high' | 'xhigh'
+  verbosity?: 'low' | 'medium' | 'high'
+  callbackUrl?: string
+  pollIntervalMs?: number
+  timeoutMs?: number
+}) {
+  const run = await runWiroGpt5MiniTask({
+    prompt: params.prompt,
+    inputImage: params.inputImage,
+    user_id: params.user_id,
+    session_id: params.session_id,
+    systemInstructions: params.systemInstructions,
+    reasoning: params.reasoning,
+    verbosity: params.verbosity,
+    callbackUrl: params.callbackUrl,
   })
 
   const { detail, task } = await pollWiroTaskUntilTerminal({
