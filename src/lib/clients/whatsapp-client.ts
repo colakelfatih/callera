@@ -9,7 +9,7 @@ type WhatsAppTypingParams = {
   phoneNumberId: string
   accessToken: string
   to: string
-  action: 'typing' | 'read'
+  messageId: string // WhatsApp message ID from the webhook
 }
 
 export async function sendWhatsAppTextMessage(params: WhatsAppSendTextParams) {
@@ -58,8 +58,9 @@ export async function sendWhatsAppTypingIndicator(params: WhatsAppTypingParams) 
     body: JSON.stringify({
       messaging_product: 'whatsapp',
       to: params.to,
-      typing: {
-        action: params.action, // 'typing' to show typing indicator, 'read' to mark as read
+      message_id: params.messageId,
+      typing_indicator: {
+        type: 'text',
       },
     }),
   })

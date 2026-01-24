@@ -55,7 +55,7 @@ const worker = new Worker<MessageJob>(
     })
 
     // Send typing indicator to show "yazıyor..." in WhatsApp
-    if (channel === 'whatsapp') {
+    if (channel === 'whatsapp' && msg.channelMessageId) {
       const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
       const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
       if (phoneNumberId && accessToken) {
@@ -64,9 +64,9 @@ const worker = new Worker<MessageJob>(
             phoneNumberId,
             accessToken,
             to: senderId,
-            action: 'typing',
+            messageId: msg.channelMessageId, // WhatsApp message ID from webhook
           })
-          console.log('⌨️ Typing indicator sent (yazıyor...)', { messageId, senderId })
+          console.log('⌨️ Typing indicator sent (yazıyor...)', { messageId, senderId, channelMessageId: msg.channelMessageId })
         } catch (typingError) {
           // Non-critical, continue processing
           console.warn('Failed to send typing indicator:', typingError)
