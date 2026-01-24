@@ -35,4 +35,11 @@ export default [
             'no-undef': 'off', // TypeScript handles this
         },
     },
+    {
+        // Allow console statements in worker files (essential for debugging background jobs)
+        files: ['**/workers/**/*.ts', '**/workers/**/*.js'],
+        rules: {
+            'no-console': 'off',
+        },
+    },
 ];

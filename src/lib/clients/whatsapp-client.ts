@@ -15,6 +15,16 @@ type WhatsAppTypingParams = {
 export async function sendWhatsAppTextMessage(params: WhatsAppSendTextParams) {
   const url = `https://graph.facebook.com/v22.0/${params.phoneNumberId}/messages`
 
+  // Log message being sent to WhatsApp for debugging
+  console.log('📱 Sending to WhatsApp:', {
+    to: params.to,
+    textLength: params.text.length,
+    textPreview: params.text.substring(0, 200),
+    hasNewlines: params.text.includes('\n'),
+    hasCarriageReturns: params.text.includes('\r'),
+    rawText: params.text, // Full text to see formatting
+  })
+
   const res = await fetch(url, {
     method: 'POST',
     headers: {

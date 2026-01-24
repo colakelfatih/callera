@@ -1,3 +1,4 @@
+// Worker file - console logging is essential for debugging background jobs
 import { Worker, QueueEvents } from 'bullmq'
 import { getMessageQueue } from '../lib/queue/message-queue'
 import { db } from '../lib/db'
@@ -88,11 +89,31 @@ const worker = new Worker<MessageJob>(
         verbosity: 'medium',
       })
       console.log('✅ Wiro API response received', { messageId, textLength: ai.text?.length })
+      
+      // Log raw AI response to debug formatting issues
+      console.log('📝 AI Raw Response:', {
+        messageId,
+        rawText: ai.text,
+        rawTextLength: ai.text?.length,
+        hasNewlines: ai.text?.includes('\n'),
+        hasCarriageReturns: ai.text?.includes('\r'),
+        first100Chars: ai.text?.substring(0, 100),
+      })
 
       const aiText = (ai.text || '').trim()
       if (!aiText) {
         throw new Error('Wiro returned empty text')
       }
+
+      // Log formatted text before sending
+      console.log('📤 AI Text to Send:', {
+        messageId,
+        formattedText: aiText,
+        formattedTextLength: aiText.length,
+        hasNewlines: aiText.includes('\n'),
+        hasCarriageReturns: aiText.includes('\r'),
+        preview: aiText.substring(0, 200),
+      })
 
       if (channel === 'whatsapp') {
       const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
