@@ -6,6 +6,7 @@ import type { MessageJob } from '../types/message'
 import { createWiroGpt5MiniResponse } from '../lib/clients/wiro-chat'
 import { sendWhatsAppTextMessage, sendWhatsAppTypingIndicator } from '../lib/clients/whatsapp-client'
 import { publishNewMessage } from '../lib/redis/pubsub'
+import { indexMessage } from '../lib/typesense/messages'
 
 const concurrency = Number(process.env.QUEUE_CONCURRENCY ?? 10)
 
@@ -186,6 +187,11 @@ const worker = new Worker<MessageJob>(
         },
       })
 
+      // Index outbound message in Typesense
+      indexMessage(outbound).catch((err) => {
+        console.warn('typesense.index_failed', { messageId: outbound.id, err: String(err?.message ?? err) })
+      })
+
       publishNewMessage({
         id: outbound.id,
         channel: outbound.channel,
@@ -206,9 +212,14 @@ const worker = new Worker<MessageJob>(
         console.log('worker.skip_send_unsupported_channel', { channel })
       }
 
-      await db.message.update({
+      const updatedMessage = await db.message.update({
         where: { id: messageId },
         data: { status: 'completed', aiResponse: aiText },
+      })
+
+      // Update message in Typesense index
+      indexMessage(updatedMessage).catch((err) => {
+        console.warn('typesense.update_failed', { messageId, err: String(err?.message ?? err) })
       })
       
       console.log('✅ Job completed successfully', { messageId, jobId: job.id })

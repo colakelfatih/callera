@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth-helpers'
 import { db } from '@/lib/db'
 import { sendWhatsAppTextMessage } from '@/lib/clients/whatsapp-client'
 import { publishNewMessage } from '@/lib/redis/pubsub'
+import { indexMessage } from '@/lib/typesense/messages'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,6 +56,11 @@ export async function POST(request: NextRequest) {
         timestamp: new Date(),
         status: 'completed',
       },
+    })
+
+    // Index message in Typesense
+    indexMessage(outbound).catch((err) => {
+      console.warn('typesense.index_failed', { messageId: outbound.id, err: String(err?.message ?? err) })
     })
 
     publishNewMessage({

@@ -6,6 +6,7 @@ import { dedupeMessage } from '@/lib/redis/dedupe'
 import { getMessageQueue } from '@/lib/queue/message-queue'
 import { publishNewMessage } from '@/lib/redis/pubsub'
 import { getWhatsAppUserProfile } from '@/lib/clients/whatsapp-client'
+import { indexMessage } from '@/lib/typesense/messages'
 
 const WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
@@ -273,7 +274,12 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
             // Still continue - message is saved, can be processed manually later
         }
 
-        // 4) Realtime publish (best-effort)
+        // 4) Index in Typesense (best-effort, non-blocking)
+        indexMessage(saved).catch((err) => {
+            console.warn('typesense.index_failed', { messageId: saved.id, err: String(err?.message ?? err) })
+        })
+
+        // 5) Realtime publish (best-effort)
         publishNewMessage({
             id: saved.id,
             channel: saved.channel,
