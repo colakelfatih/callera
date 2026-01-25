@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Instagram, CheckCircle, Loader2, ExternalLink, MessageSquare, Mail, Phone, AlertCircle } from 'lucide-react'
+import { Instagram, CheckCircle, Loader2, ExternalLink, MessageSquare, AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
+import { WhatsAppEmbeddedSignup } from '@/components/whatsapp/embedded-signup'
 
 interface ConnectedAccount {
   id: string
@@ -22,19 +23,32 @@ export default function IntegrationsTab() {
     // Load connected accounts from API
     const fetchConnections = async () => {
       try {
-        const response = await fetch('/api/integrations/instagram')
-        if (response.ok) {
-          const connections = await response.json()
-          setConnectedAccounts(
-            connections.map((conn: any) => ({
-              id: conn.id,
-              platform: 'instagram' as const,
-              username: conn.instagramUsername,
-              connectedAt: new Date(conn.createdAt),
-              status: (conn.tokenExpiresAt && new Date(conn.tokenExpiresAt) > new Date() ? 'active' : 'inactive') as 'active' | 'inactive',
-            }))
-          )
-        }
+        // Fetch Instagram connections
+        const instagramResponse = await fetch('/api/integrations/instagram')
+        const instagramConnections = instagramResponse.ok ? await instagramResponse.json() : []
+
+        // Fetch WhatsApp connections
+        const whatsappResponse = await fetch('/api/integrations/whatsapp')
+        const whatsappConnections = whatsappResponse.ok ? await whatsappResponse.json() : []
+
+        const allConnections: ConnectedAccount[] = [
+          ...instagramConnections.map((conn: any) => ({
+            id: conn.id,
+            platform: 'instagram' as const,
+            username: conn.instagramUsername,
+            connectedAt: new Date(conn.createdAt),
+            status: (conn.tokenExpiresAt && new Date(conn.tokenExpiresAt) > new Date() ? 'active' : 'inactive') as 'active' | 'inactive',
+          })),
+          ...whatsappConnections.map((conn: any) => ({
+            id: conn.id,
+            platform: 'whatsapp' as const,
+            username: conn.phoneNumber || conn.phoneNumberId,
+            connectedAt: new Date(conn.createdAt),
+            status: (conn.tokenExpiresAt && new Date(conn.tokenExpiresAt) > new Date() ? 'active' : 'inactive') as 'active' | 'inactive',
+          })),
+        ]
+
+        setConnectedAccounts(allConnections)
       } catch (error) {
         console.error('Failed to fetch connections:', error)
       }
@@ -78,10 +92,14 @@ export default function IntegrationsTab() {
     }
   }
 
-  const handleDisconnect = async (accountId: string) => {
+  const handleDisconnect = async (accountId: string, platform: string) => {
     if (confirm('Bu hesabı bağlantısını kesmek istediğinizden emin misiniz?')) {
       try {
-        const response = await fetch(`/api/integrations/instagram/${accountId}`, {
+        const endpoint = platform === 'whatsapp' 
+          ? `/api/integrations/whatsapp/${accountId}`
+          : `/api/integrations/instagram/${accountId}`
+        
+        const response = await fetch(endpoint, {
           method: 'DELETE',
         })
         
@@ -95,6 +113,19 @@ export default function IntegrationsTab() {
         alert('Bağlantı kesilirken bir hata oluştu')
       }
     }
+  }
+
+  const handleWhatsAppSuccess = (data: { wabaId: string; phoneNumberId: string; phoneNumber?: string }) => {
+    console.log('WhatsApp connection successful:', data)
+    // Refresh connections list
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  }
+
+  const handleWhatsAppError = (error: string) => {
+    console.error('WhatsApp connection error:', error)
+    alert(`WhatsApp bağlantı hatası: ${error}`)
   }
 
   const integrations = [
@@ -116,29 +147,16 @@ export default function IntegrationsTab() {
       id: 'whatsapp',
       name: 'WhatsApp',
       icon: MessageSquare,
-      description: 'WhatsApp Business hesabınızı bağlayın',
+      description: 'WhatsApp Business hesabınızı bağlayın ve gelen mesajları otomatik olarak AI ile yanıtlayın',
       gradient: 'from-green-500 to-green-600',
       features: [
-        'WhatsApp mesajlarını yönet',
-        'Otomatik yanıtlar',
-        'Mesaj şablonları',
+        'WhatsApp mesajlarını birleşik gelen kutusunda görüntüle',
+        'AI destekli otomatik yanıtlar',
+        'Gerçek zamanlı mesaj bildirimleri',
+        'Mesaj şablonları ve hızlı yanıtlar',
       ],
-      connectHandler: () => alert('WhatsApp entegrasyonu yakında eklenecek'),
-      comingSoon: true,
-    },
-    {
-      id: 'email',
-      name: 'Email',
-      icon: Mail,
-      description: 'E-posta hesaplarınızı bağlayın',
-      gradient: 'from-blue-500 to-blue-600',
-      features: [
-        'Tüm e-postaları tek yerde görüntüle',
-        'AI destekli yanıt önerileri',
-        'Otomatik kategorilendirme',
-      ],
-      connectHandler: () => alert('Email entegrasyonu yakında eklenecek'),
-      comingSoon: true,
+      connectHandler: () => {}, // Handled by WhatsAppEmbeddedSignup component
+      comingSoon: false,
     },
   ]
 
@@ -211,7 +229,7 @@ export default function IntegrationsTab() {
                         Aktif
                       </span>
                       <button
-                        onClick={() => handleDisconnect(account.id)}
+                        onClick={() => handleDisconnect(account.id, account.platform)}
                         className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       >
                         Bağlantıyı Kes
@@ -223,24 +241,35 @@ export default function IntegrationsTab() {
 
               {/* Connect Button */}
               {!isConnected && (
-                <button
-                  onClick={integration.connectHandler}
-                  disabled={isLoading || integration.comingSoon}
-                  className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r ${integration.gradient} text-white font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      Bağlanıyor...
-                    </>
+                <>
+                  {integration.id === 'whatsapp' ? (
+                    <WhatsAppEmbeddedSignup
+                      configId={process.env.NEXT_PUBLIC_FACEBOOK_CONFIG_ID || '1342305214335078'}
+                      appId={process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || ''}
+                      onSuccess={handleWhatsAppSuccess}
+                      onError={handleWhatsAppError}
+                    />
                   ) : (
-                    <>
-                      <Icon size={20} />
-                      {integration.name} Hesabını Bağla
-                      <ExternalLink size={16} />
-                    </>
+                    <button
+                      onClick={integration.connectHandler}
+                      disabled={isLoading || integration.comingSoon}
+                      className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r ${integration.gradient} text-white font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          Bağlanıyor...
+                        </>
+                      ) : (
+                        <>
+                          <Icon size={20} />
+                          {integration.name} Hesabını Bağla
+                          <ExternalLink size={16} />
+                        </>
+                      )}
+                    </button>
                   )}
-                </button>
+                </>
               )}
 
               {/* Features List */}

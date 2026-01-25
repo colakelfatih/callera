@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { formatTime } from '@/lib/utils'
-import { MessageSquare, Phone, Mail, Instagram, Filter, X } from 'lucide-react'
+import { MessageSquare, Phone, Mail, Instagram, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 const channelIcons = {
@@ -14,7 +14,6 @@ const channelIcons = {
   whatsapp: MessageSquare,
   instagram: Instagram,
   phone: Phone,
-  facebook_dm: MessageSquare,
 }
 
 const channelColors = {
@@ -22,7 +21,6 @@ const channelColors = {
   whatsapp: 'bg-green-100 text-green-700',
   instagram: 'bg-pink-100 text-pink-700',
   phone: 'bg-purple-100 text-purple-700',
-  facebook_dm: 'bg-blue-100 text-blue-700',
 }
 
 type Message = {
@@ -315,7 +313,6 @@ export default function InboxClient({ initialMessages }: Props) {
   }, [])
 
   const getChannelDisplayName = (channel: string) => {
-    if (channel === 'facebook_dm') return 'Facebook'
     return channel.charAt(0).toUpperCase() + channel.slice(1)
   }
 
@@ -359,10 +356,6 @@ export default function InboxClient({ initialMessages }: Props) {
         <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl md:text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              <Filter size={16} className="mr-2" />
-              {t('filter')}
-            </Button>
           </div>
 
           {/* Small realtime indicator only (no i18n key spam) */}
@@ -371,7 +364,7 @@ export default function InboxClient({ initialMessages }: Props) {
           </div>
 
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-            {['all', 'whatsapp', 'instagram', 'facebook_dm'].map((channel) => (
+            {['all', 'whatsapp', 'instagram'].map((channel) => (
               <Button
                 key={channel}
                 variant={filter === channel ? 'primary' : 'ghost'}

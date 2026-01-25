@@ -49,6 +49,7 @@ model User {
   contacts             Contact[]
   conversations        Conversation[]
   instagramConnections InstagramConnection[]
+  whatsappConnections  WhatsAppConnection[]
   automationFlows      AutomationFlow[]
   calls                Call[]
 
@@ -258,6 +259,27 @@ model AIResponse {
   instagramMessage InstagramMessage? @relation(fields: [instagramMessageId], references: [id], onDelete: Cascade)
 
   @@map("ai_responses")
+}
+
+// WhatsApp Connection Model
+model WhatsAppConnection {
+  id                String    @id @default(cuid())
+  userId            String
+  wabaId            String    // WhatsApp Business Account ID
+  phoneNumberId     String    // Phone Number ID
+  phoneNumber       String?   // Display phone number
+  businessName      String?
+  accessToken       String    @db.Text
+  tokenExpiresAt    DateTime?
+  webhookUrl        String?
+  webhookVerifyToken String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wabaId])
+  @@map("whatsapp_connections")
 }
 
 // Call Model
