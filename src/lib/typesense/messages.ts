@@ -29,8 +29,13 @@ export async function indexMessage(message: Message) {
 
     await typesense.collections('messages').documents().upsert(document)
     console.log('✅ Message indexed in Typesense:', message.id)
-  } catch (error) {
-    console.error('Failed to index message in Typesense:', error)
+  } catch (error: any) {
+    // If collection doesn't exist, log warning but don't throw
+    if (error.httpStatus === 404) {
+      console.warn('⚠️  Typesense collection "messages" does not exist. Run: npm run typesense:create')
+    } else {
+      console.error('Failed to index message in Typesense:', error)
+    }
     // Don't throw - indexing failures shouldn't break message processing
   }
 }
@@ -142,19 +147,16 @@ export async function bulkIndexMessages(messages: Message[]) {
       errors: [] as string[],
     }
 
-    // Parse import results (newline-delimited JSON)
-    const lines = importResults.split('\n').filter((line) => line.trim())
-    for (const line of lines) {
-      try {
-        const result = JSON.parse(line)
+    // Parse import results - Typesense returns an array of ImportResponse objects
+    if (Array.isArray(importResults)) {
+      for (const result of importResults) {
         if (result.success) {
           results.success++
         } else {
           results.failed++
-          results.errors.push(result.error || 'Unknown error')
+          const errorMsg = typeof result.error === 'string' ? result.error : JSON.stringify(result.error) || 'Unknown error'
+          results.errors.push(errorMsg)
         }
-      } catch {
-        // Skip invalid JSON lines
       }
     }
 

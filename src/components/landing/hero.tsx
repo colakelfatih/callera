@@ -1,8 +1,7 @@
 'use client'
 
-import React from 'react'
 import { Button } from '@/components/ui/button'
-import { Play, MessageSquare, Phone, Mail, Instagram } from 'lucide-react'
+import { Phone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export function Hero() {

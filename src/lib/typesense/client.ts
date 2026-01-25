@@ -1,10 +1,10 @@
 // Typesense Client for Message Search
 
-import Typesense from 'typesense'
+import Typesense, { Client } from 'typesense'
 
-let client: Typesense.Client | null = null
+let client: Client | null = null
 
-export function getTypesenseClient(): Typesense.Client {
+export function getTypesenseClient(): Client {
   if (client) {
     return client
   }
@@ -37,7 +37,9 @@ export function getTypesenseClient(): Typesense.Client {
 }
 
 // Message document schema for Typesense
-export const messageSchema = {
+import type { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections'
+
+export const messageSchema: CollectionCreateSchema = {
   name: 'messages',
   fields: [
     { name: 'id', type: 'string' },
