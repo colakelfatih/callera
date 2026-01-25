@@ -89,14 +89,13 @@ export async function sendWhatsAppTypingIndicator(params: WhatsAppTypingParams) 
 
 /**
  * Get user profile information (name) from WhatsApp
- * Note: WhatsApp doesn't provide a direct API to get user profile by phone number
- * Profile information comes from webhook when user messages you (in the 'profile' field)
- * This function is a placeholder - profile should be stored from webhook data
+ * Uses the Contacts API to retrieve user profile by phone number
+ * Note: This only works if the user has messaged you before
  */
 type WhatsAppGetProfileParams = {
   phoneNumberId: string
   accessToken: string
-  phoneNumber: string // User's WhatsApp phone number (with country code, no +)
+  phoneNumber: string // User's WhatsApp phone number (with country code, no +, e.g. "905374872375")
 }
 
 export type WhatsAppUserProfile = {
@@ -107,12 +106,37 @@ export type WhatsAppUserProfile = {
 export async function getWhatsAppUserProfile(
   params: WhatsAppGetProfileParams
 ): Promise<WhatsAppUserProfile | null> {
-  // WhatsApp doesn't provide a direct API endpoint to get user profile
-  // Profile info is only available in webhook when user messages you
-  // The profile object contains: { name: "User Name" }
-  // This should be stored from webhook and retrieved from database
-  console.warn('WhatsApp profile API not available - profile should be stored from webhook')
-  return null
+  try {
+    // WhatsApp Contacts API endpoint
+    // Note: This endpoint may require the user to have messaged you first
+    const url = `https://graph.facebook.com/v22.0/${params.phoneNumberId}/contacts/${params.phoneNumber}`
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const json = await res.json().catch(() => null)
+    if (!res.ok) {
+      // If 404 or other error, profile might not be available
+      // This is normal - profile info may only be available after user messages you
+      console.warn(
+        `WhatsApp get profile failed: ${res.status} ${res.statusText} ${json ? JSON.stringify(json) : ''}`
+      )
+      return null
+    }
+
+    return {
+      name: json?.name || json?.profile?.name,
+      profile_picture_url: json?.profile_picture_url || json?.profile?.picture_url,
+    }
+  } catch (error) {
+    console.error('Error getting WhatsApp user profile:', error)
+    return null
+  }
 }
 
 /**

@@ -5,11 +5,7 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import {
   MessageSquare,
-  Phone,
   Users,
-  Zap,
-  BarChart3,
-  Calendar,
   Settings,
   Menu,
   TestTube
@@ -27,12 +23,8 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
 
   const navigation = [
     { name: t('inbox'), href: `/${locale}/dashboard/inbox`, icon: MessageSquare },
-    { name: t('dialer'), href: `/${locale}/dashboard/dialer`, icon: Phone },
     { name: t('crm'), href: `/${locale}/dashboard/crm`, icon: Users },
     { name: t('pipeline'), href: `/${locale}/dashboard/crm-pipeline`, icon: Users },
-    { name: t('flows'), href: `/${locale}/dashboard/flows`, icon: Zap },
-    { name: t('insights'), href: `/${locale}/dashboard/insights`, icon: BarChart3 },
-    { name: t('studio'), href: `/${locale}/dashboard/studio`, icon: Calendar },
     { name: t('wiroTest'), href: `/${locale}/dashboard/wiro-test`, icon: TestTube },
     { name: t('settings'), href: `/${locale}/dashboard/settings`, icon: Settings },
   ]

@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { dedupeMessage } from '@/lib/redis/dedupe'
 import { getMessageQueue } from '@/lib/queue/message-queue'
 import { publishNewMessage } from '@/lib/redis/pubsub'
+import { getWhatsAppUserProfile } from '@/lib/clients/whatsapp-client'
 
 const WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
@@ -142,7 +143,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
         const from = message.from // Phone number (e.g., "905374872375")
         const timestamp = message.timestamp
         const type = message.type
-        const profile = message.profile // User profile info (name) from WhatsApp
+        const profile = message.profile // User profile info (name) from WhatsApp webhook
 
         // Extract message text based on type
         let messageText = ''
@@ -160,13 +161,38 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
             messageText = `[${type}]`
         }
 
+        // Try to get user profile if not in webhook
+        let userName = profile?.name || null
+        if (!userName) {
+            // Try to fetch from API (may not always work)
+            const phoneNumberId = metadata?.phone_number_id || process.env.WHATSAPP_PHONE_NUMBER_ID
+            const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
+            if (phoneNumberId && accessToken) {
+                try {
+                    const userProfile = await getWhatsAppUserProfile({
+                        phoneNumberId,
+                        accessToken,
+                        phoneNumber: from,
+                    })
+                    if (userProfile?.name) {
+                        userName = userProfile.name
+                        console.log('✅ Got user profile from API:', { from, userName })
+                    }
+                } catch (error) {
+                    // Non-critical, continue without profile
+                    console.warn('Failed to get user profile from API:', error)
+                }
+            }
+        }
+
         console.log('📨 Received WhatsApp message:', {
             channelMessageId,
             from,
             messageText,
             timestamp,
             type,
-            profile: profile?.name || 'No profile',
+            profileFromWebhook: profile?.name || 'No profile in webhook',
+            profileFromAPI: userName || 'No profile from API',
             phoneNumberId: metadata?.phone_number_id,
             displayPhoneNumber: metadata?.display_phone_number,
             fullMessage: JSON.stringify(message, null, 2), // Full message for debugging
@@ -197,7 +223,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
                 channelMessageId,
                 connectionId: metadata?.phone_number_id,
                 senderId: from,
-                senderName: profile?.name || null, // Save user name from profile
+                senderName: userName || null, // Save user name (from webhook or API)
                 messageText,
                 messageType:
                     type === 'text'
