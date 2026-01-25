@@ -142,6 +142,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
         const from = message.from // Phone number (e.g., "905374872375")
         const timestamp = message.timestamp
         const type = message.type
+        const profile = message.profile // User profile info (name) from WhatsApp
 
         // Extract message text based on type
         let messageText = ''
@@ -165,6 +166,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
             messageText,
             timestamp,
             type,
+            profile: profile?.name || 'No profile',
             phoneNumberId: metadata?.phone_number_id,
             displayPhoneNumber: metadata?.display_phone_number,
             fullMessage: JSON.stringify(message, null, 2), // Full message for debugging
@@ -195,6 +197,7 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
                 channelMessageId,
                 connectionId: metadata?.phone_number_id,
                 senderId: from,
+                senderName: profile?.name || null, // Save user name from profile
                 messageText,
                 messageType:
                     type === 'text'

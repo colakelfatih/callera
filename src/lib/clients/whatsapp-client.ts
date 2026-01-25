@@ -87,3 +87,141 @@ export async function sendWhatsAppTypingIndicator(params: WhatsAppTypingParams) 
   return json
 }
 
+/**
+ * Get user profile information (name) from WhatsApp
+ * Note: WhatsApp doesn't provide a direct API to get user profile by phone number
+ * Profile information comes from webhook when user messages you (in the 'profile' field)
+ * This function is a placeholder - profile should be stored from webhook data
+ */
+type WhatsAppGetProfileParams = {
+  phoneNumberId: string
+  accessToken: string
+  phoneNumber: string // User's WhatsApp phone number (with country code, no +)
+}
+
+export type WhatsAppUserProfile = {
+  name?: string
+  profile_picture_url?: string
+}
+
+export async function getWhatsAppUserProfile(
+  params: WhatsAppGetProfileParams
+): Promise<WhatsAppUserProfile | null> {
+  // WhatsApp doesn't provide a direct API endpoint to get user profile
+  // Profile info is only available in webhook when user messages you
+  // The profile object contains: { name: "User Name" }
+  // This should be stored from webhook and retrieved from database
+  console.warn('WhatsApp profile API not available - profile should be stored from webhook')
+  return null
+}
+
+/**
+ * Get business catalogs from WhatsApp Business Account
+ * Requires: WhatsApp Business Account ID (WABA ID) and connected catalog
+ */
+type WhatsAppGetCatalogsParams = {
+  wabaId: string // WhatsApp Business Account ID
+  accessToken: string
+}
+
+export type WhatsAppCatalogProduct = {
+  id: string
+  name: string
+  description?: string
+  image_url?: string
+  price?: string
+  currency?: string
+  availability?: string
+  url?: string
+}
+
+export type WhatsAppCatalog = {
+  id: string
+  name: string
+  products?: WhatsAppCatalogProduct[]
+}
+
+export async function getWhatsAppCatalogs(
+  params: WhatsAppGetCatalogsParams
+): Promise<WhatsAppCatalog[] | null> {
+  try {
+    // Get catalogs from Graph API
+    const url = `https://graph.facebook.com/v22.0/${params.wabaId}/owned_product_catalogs?fields=id,name`
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const json = await res.json().catch(() => null)
+    if (!res.ok) {
+      console.warn(
+        `WhatsApp get catalogs failed: ${res.status} ${res.statusText} ${json ? JSON.stringify(json) : ''}`
+      )
+      return null
+    }
+
+    const catalogs = json?.data || []
+    return catalogs.map((catalog: any) => ({
+      id: catalog.id,
+      name: catalog.name || catalog.id,
+      products: [], // Products loaded separately
+    }))
+  } catch (error) {
+    console.error('Error getting WhatsApp catalogs:', error)
+    return null
+  }
+}
+
+/**
+ * Get products from a specific catalog
+ */
+type WhatsAppGetCatalogProductsParams = {
+  catalogId: string
+  accessToken: string
+  limit?: number
+}
+
+export async function getWhatsAppCatalogProducts(
+  params: WhatsAppGetCatalogProductsParams
+): Promise<WhatsAppCatalogProduct[] | null> {
+  try {
+    const limit = params.limit || 50
+    const url = `https://graph.facebook.com/v22.0/${params.catalogId}/products?fields=id,name,description,image_url,price,currency,availability,url&limit=${limit}`
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const json = await res.json().catch(() => null)
+    if (!res.ok) {
+      console.warn(
+        `WhatsApp get catalog products failed: ${res.status} ${res.statusText} ${json ? JSON.stringify(json) : ''}`
+      )
+      return null
+    }
+
+    const products = json?.data || []
+    return products.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      image_url: p.image_url,
+      price: p.price,
+      currency: p.currency,
+      availability: p.availability,
+      url: p.url,
+    }))
+  } catch (error) {
+    console.error('Error getting WhatsApp catalog products:', error)
+    return null
+  }
+}
+
