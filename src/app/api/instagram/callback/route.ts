@@ -18,25 +18,25 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=${error}`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=${error}`
       )
     }
 
     if (!code) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=no_code`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=no_code`
       )
     }
 
     if (!state) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=no_state`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=no_state`
       )
     }
 
     if (!INSTAGRAM_APP_ID || !INSTAGRAM_APP_SECRET) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=config_error`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=config_error`
       )
     }
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     if (!access_token || !user_id) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=invalid_token_response`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=invalid_token_response`
       )
     }
 
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     if (!userInfo?.username) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=user_info_failed`
+        `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=user_info_failed`
       )
     }
 
@@ -101,15 +101,15 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Redirect to settings page with success
+    // Redirect to integrations page with success
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?success=true&username=${userInfo.username}`
+      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?success=true&username=${userInfo.username}`
     )
   } catch (error: any) {
     // eslint-disable-next-line no-console
     console.error('Instagram callback error:', error)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/settings/integrations?error=callback_failed`
+      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tr/dashboard/integrations?error=callback_failed`
     )
   }
 }

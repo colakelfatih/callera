@@ -1,8 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { Bell, Moon, Sun, Menu, LogOut } from 'lucide-react'
+import { Moon, Sun, Menu, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { useTranslations } from 'next-intl'
@@ -15,12 +15,41 @@ interface TopBarProps {
   isMobileMenuOpen?: boolean
 }
 
+interface UserSession {
+  user?: {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
+}
+
 export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
   const t = useTranslations('topbar')
   const tAuth = useTranslations('auth')
+  const [user, setUser] = useState<UserSession['user'] | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Fetch user session
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/get-session')
+        const session: UserSession = await response.json()
+        if (session?.user) {
+          setUser(session.user)
+        }
+      } catch (error) {
+        console.error('Failed to fetch user session:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUser()
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -31,6 +60,13 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
       console.error('Logout error:', error)
     }
   }
+
+  const handleProfileClick = () => {
+    router.push(`/${locale}/dashboard/profile`)
+  }
+
+  const userName = user?.name || user?.email || 'User'
+  const userEmail = user?.email || ''
 
   return (
     <div className="bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
@@ -58,17 +94,34 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </Button>
 
-          <Button variant="ghost" size="sm" className="p-2 relative hidden sm:flex" aria-label={t('notifications')}>
-            <Bell size={20} />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
-          </Button>
-
           <div className="flex items-center gap-2 md:gap-3">
-            <Avatar name="John Doe" size="sm" />
-            <div className="hidden lg:block">
-              <p className="text-sm font-medium text-navy dark:text-white">John Doe</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('admin')}</p>
-            </div>
+            {loading ? (
+              <>
+                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                <div className="hidden lg:block">
+                  <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" />
+                  <div className="w-24 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleProfileClick}
+                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                  aria-label="Profile"
+                >
+                  <Avatar name={userName} size="sm" src={user?.image || undefined} />
+                </button>
+                <button
+                  onClick={handleProfileClick}
+                  className="hidden lg:block cursor-pointer hover:opacity-80 transition-opacity text-left"
+                  aria-label="Profile"
+                >
+                  <p className="text-sm font-medium text-navy dark:text-white">{userName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{userEmail || t('admin')}</p>
+                </button>
+              </>
+            )}
             <Button
               variant="ghost"
               size="sm"

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import {
   MessageSquare,
   Users,
-  Settings,
+  Plug,
   Menu,
   TestTube
 } from 'lucide-react'
@@ -26,7 +26,7 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
     { name: t('crm'), href: `/${locale}/dashboard/crm`, icon: Users },
     { name: t('pipeline'), href: `/${locale}/dashboard/crm-pipeline`, icon: Users },
     { name: t('wiroTest'), href: `/${locale}/dashboard/wiro-test`, icon: TestTube },
-    { name: t('settings'), href: `/${locale}/dashboard/settings`, icon: Settings },
+    { name: t('integrations'), href: `/${locale}/dashboard/integrations`, icon: Plug },
   ]
 
   return (

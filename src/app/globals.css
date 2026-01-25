@@ -82,3 +82,31 @@
     @apply bg-primary/10 text-primary dark:text-primary-300;
   }
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.sidebar-overlay {
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-panel {
+  animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
