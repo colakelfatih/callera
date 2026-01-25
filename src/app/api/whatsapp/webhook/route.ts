@@ -7,6 +7,7 @@ import { getMessageQueue } from '@/lib/queue/message-queue'
 import { publishNewMessage } from '@/lib/redis/pubsub'
 import { getWhatsAppUserProfile } from '@/lib/clients/whatsapp-client'
 import { indexMessage } from '@/lib/typesense/messages'
+import { findOrCreateContactFromWhatsApp } from '@/lib/contacts/contact-helpers'
 
 const WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
@@ -272,6 +273,32 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
                 channelMessageId,
             })
             // Still continue - message is saved, can be processed manually later
+        }
+
+        // 3.5) Create/update müşteri (contact) from WhatsApp message
+        if (metadata?.phone_number_id && from) {
+            const contact = await findOrCreateContactFromWhatsApp({
+                phoneNumber: from,
+                phoneNumberId: metadata.phone_number_id,
+                name: userName,
+                timestamp: timestamp ? new Date(Number(timestamp) * 1000) : new Date(),
+            }).catch((err) => {
+                console.warn('Failed to create/update müşteri:', {
+                    error: err?.message ?? err,
+                    phone: from,
+                    phoneNumberId: metadata.phone_number_id,
+                })
+                return null
+            })
+
+            if (contact) {
+                console.log('✅ Müşteri created/updated:', {
+                    contactId: contact.id,
+                    phone: from,
+                    name: userName || contact.name,
+                    status: contact.status,
+                })
+            }
         }
 
         // 4) Index in Typesense (best-effort, non-blocking)

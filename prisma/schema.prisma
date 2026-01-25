@@ -154,6 +154,7 @@ model Contact {
   calls         Call[]
   tags          ContactTag[]
 
+  @@unique([userId, phone])
   @@map("contacts")
 }
 

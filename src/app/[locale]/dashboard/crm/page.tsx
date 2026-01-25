@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { mockContacts } from '@/lib/mock-data'
 import { formatDate } from '@/lib/utils'
-import { Users, Plus, Search, Filter, Phone, Mail, MessageSquare } from 'lucide-react'
+import { Users, Plus, Search, Filter, Mail, MessageSquare } from 'lucide-react'
 import type { Contact } from '@/lib/mock-data'
 import { useTranslations } from 'next-intl'
 
@@ -20,90 +20,19 @@ const statusColors = {
 
 export default function CRMPage() {
   const [selectedContact, setSelectedContact] = useState(mockContacts[0])
-  const [view, setView] = useState<'list' | 'kanban'>('list')
   const [filter, setFilter] = useState('all')
   const [contacts, setContacts] = useState<Contact[]>(mockContacts)
-  const [draggedContact, setDraggedContact] = useState<Contact | null>(null)
-  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null)
   const t = useTranslations('crm')
 
   const filteredContacts = filter === 'all' 
     ? contacts 
     : contacts.filter(contact => contact.status === filter)
 
-  const kanbanColumns = [
-    { id: 'lead', title: t('leads'), color: 'bg-yellow-50 dark:bg-yellow-900/20' },
-    { id: 'prospect', title: t('prospects'), color: 'bg-blue-50 dark:bg-blue-900/20' },
-    { id: 'customer', title: t('customers'), color: 'bg-green-50 dark:bg-green-900/20' },
-    { id: 'closed', title: t('closed'), color: 'bg-gray-50 dark:bg-gray-900/20' }
-  ]
-
-  const handleDragStart = (e: React.DragEvent, contact: Contact) => {
-    setDraggedContact(contact)
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/html', contact.id)
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '0.5'
-    }
-  }
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '1'
-    }
-    setDraggedContact(null)
-    setDragOverColumn(null)
-  }
-
-  const handleDragOver = (e: React.DragEvent, columnId: string) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    setDragOverColumn(columnId)
-  }
-
-  const handleDragLeave = () => {
-    setDragOverColumn(null)
-  }
-
-  const handleDrop = (e: React.DragEvent, columnId: string) => {
-    e.preventDefault()
-    if (draggedContact) {
-      setContacts(prevContacts =>
-        prevContacts.map(contact =>
-          contact.id === draggedContact.id
-            ? { ...contact, status: columnId as Contact['status'] }
-            : contact
-        )
-      )
-      if (selectedContact?.id === draggedContact.id) {
-        setSelectedContact({ ...draggedContact, status: columnId as Contact['status'] })
-      }
-    }
-    setDraggedContact(null)
-    setDragOverColumn(null)
-  }
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy dark:text-white">CRM</h1>
+        <h1 className="text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
         <div className="flex items-center gap-4">
-          <div className="flex gap-2">
-            <Button
-              variant={view === 'list' ? 'primary' : 'ghost'}
-              size="sm"
-              onClick={() => setView('list')}
-            >
-              {t('list')}
-            </Button>
-            <Button
-              variant={view === 'kanban' ? 'primary' : 'ghost'}
-              size="sm"
-              onClick={() => setView('kanban')}
-            >
-              {t('kanban')}
-            </Button>
-          </div>
           <Button>
             <Plus size={16} className="mr-2" />
             {t('addContact')}
@@ -137,128 +66,58 @@ export default function CRMPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Contacts List/Kanban */}
+        {/* Contacts List */}
         <div className="lg:col-span-2">
-          {view === 'list' ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('contacts')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {filteredContacts.map((contact) => (
-                    <div
-                      key={contact.id}
-                      className={`flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
-                        selectedContact?.id === contact.id ? 'ring-2 ring-primary' : ''
-                      }`}
-                      onClick={() => setSelectedContact(contact)}
-                    >
-                      <Avatar name={contact.name} size="md" />
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-navy dark:text-white truncate">
-                          {contact.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {contact.company}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
-                          {t('lastContact')}: {formatDate(contact.lastContact)}
-                        </p>
-                      </div>
-                      
-                      <div className="flex flex-col items-end gap-2">
-                        <Badge 
-                          variant="default" 
-                          className={`text-xs ${statusColors[contact.status]}`}
-                        >
-                          {contact.status}
-                        </Badge>
-                        
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="p-2">
-                            <Phone size={16} />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="p-2">
-                            <Mail size={16} />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="p-2">
-                            <MessageSquare size={16} />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {kanbanColumns.map((column) => {
-                const columnContacts = filteredContacts.filter(contact => contact.status === column.id)
-                
-                return (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('contacts')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredContacts.map((contact) => (
                   <div
-                    key={column.id}
-                    className={`p-4 rounded-lg ${column.color} transition-all duration-300 ${
-                      dragOverColumn === column.id ? 'ring-2 ring-primary ring-offset-2 scale-105' : ''
+                    key={contact.id}
+                    className={`flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
+                      selectedContact?.id === contact.id ? 'ring-2 ring-primary' : ''
                     }`}
-                    onDragOver={(e) => handleDragOver(e, column.id)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, column.id)}
+                    onClick={() => setSelectedContact(contact)}
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-navy dark:text-white capitalize">
-                        {column.title}
+                    <Avatar name={contact.name} size="md" />
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-navy dark:text-white truncate">
+                        {contact.name}
                       </h3>
-                      <Badge variant="default" className="text-xs">
-                        {columnContacts.length}
-                      </Badge>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                        {contact.company}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        {t('lastContact')}: {formatDate(contact.lastContact)}
+                      </p>
                     </div>
                     
-                    <div className="space-y-3 min-h-[100px]">
-                      {columnContacts.map((contact) => (
-                        <div
-                          key={contact.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, contact)}
-                          onDragEnd={handleDragEnd}
-                          className="p-3 bg-white dark:bg-navy-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-move hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 animate-fade-in"
-                          onClick={() => setSelectedContact(contact)}
-                        >
-                          <div className="flex items-center gap-3 mb-2">
-                            <Avatar name={contact.name} size="sm" />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-navy dark:text-white text-sm truncate">
-                                {contact.name}
-                              </p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                                {contact.company}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-wrap gap-1">
-                            {contact.tags.slice(0, 2).map((tag) => (
-                              <Badge key={tag} variant="info" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                      {columnContacts.length === 0 && (
-                        <div className="flex items-center justify-center h-32 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-navy-700/30 transition-all duration-300">
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('dropHere')}</p>
-                        </div>
-                      )}
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge 
+                        variant="default" 
+                        className={`text-xs ${statusColors[contact.status]}`}
+                      >
+                        {contact.status}
+                      </Badge>
+                      
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="sm" className="p-2">
+                          <Mail size={16} />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="p-2">
+                          <MessageSquare size={16} />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Contact Detail */}
@@ -283,7 +142,6 @@ export default function CRMPage() {
                       <span className="text-gray-600 dark:text-gray-400">{selectedContact.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone size={16} className="text-gray-400" />
                       <span className="text-gray-600 dark:text-gray-400">{selectedContact.phone}</span>
                     </div>
                   </div>
@@ -318,10 +176,6 @@ export default function CRMPage() {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1">
-                    <Phone size={16} className="mr-2" />
-                    Call
-                  </Button>
                   <Button variant="outline" size="sm" className="flex-1">
                     <Mail size={16} className="mr-2" />
                     Email

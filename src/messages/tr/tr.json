@@ -2,8 +2,8 @@
     "navigation": {
         "inbox": "Gelen Kutusu",
         "dialer": "Arayıcı",
-        "crm": "CRM",
-        "pipeline": "Pipeline",
+        "crm": "Müşteriler",
+        "pipeline": "Kanban",
         "flows": "Akışlar",
         "insights": "İçgörüler",
         "studio": "Stüdyo",
@@ -69,13 +69,13 @@
         "today": "Bugün"
     },
     "crm": {
-        "title": "CRM & Pipeline",
+        "title": "Müşteriler",
         "searchDeals": "Anlaşmaları, kişileri ara...",
         "newDeal": "Yeni Anlaşma",
         "assignedUser": "Atanan Kullanıcı",
         "dateRange": "Tarih Aralığı",
         "tags": "Etiketler",
-        "leadIn": "Gelen Lead",
+        "leadIn": "Gelen Müşteriler",
         "contactMade": "İletişim Kuruldu",
         "meetingScheduled": "Toplantı Planlandı",
         "proposal": "Teklif",

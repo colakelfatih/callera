@@ -6,21 +6,19 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { formatTime } from '@/lib/utils'
-import { MessageSquare, Phone, Mail, Instagram, X, Search } from 'lucide-react'
+import { MessageSquare, Mail, Instagram, X, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 const channelIcons = {
   email: Mail,
   whatsapp: MessageSquare,
   instagram: Instagram,
-  phone: Phone,
 }
 
 const channelColors = {
   email: 'bg-blue-100 text-blue-700',
   whatsapp: 'bg-green-100 text-green-700',
   instagram: 'bg-pink-100 text-pink-700',
-  phone: 'bg-purple-100 text-purple-700',
 }
 
 type Message = {
@@ -706,12 +704,6 @@ export default function InboxClient({ initialMessages }: Props) {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Phone size={16} className="mr-2" />
-                    {t('call')}
-                  </Button>
-                </div>
               </div>
 
               <div ref={mobileScrollRef} className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-navy-900">
@@ -805,12 +797,6 @@ export default function InboxClient({ initialMessages }: Props) {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Phone size={16} className="mr-2" />
-                    {t('call')}
-                  </Button>
-                </div>
               </div>
             </div>
 
