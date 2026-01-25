@@ -72,10 +72,34 @@ export async function searchMessages(params: {
 
     const searchParameters: any = {
       q: params.query,
+      // Query by fields - messageText has higher priority (appears first)
       query_by: 'messageText,senderName',
+      // Field weights: messageText gets 2x weight, senderName gets 1x
+      query_by_weights: '2,1',
+      // Text match type: use max_score for best single-field match
+      text_match_type: 'max_score',
+      // Pagination
       per_page: params.limit || 20,
       page: params.page || 1,
+      // Sorting: by text match score first, then by creation date
       sort_by: '_text_match:desc,createdAt:desc',
+      // Highlighting with snippeting for messageText
+      highlight_fields: 'messageText',
+      // Number of tokens around highlighted text (default: 4)
+      highlight_affix_num_tokens: 6,
+      // Fields shorter than this will be fully highlighted (default: 30)
+      snippet_threshold: 50,
+      // Highlight tags (default: <mark> and </mark>)
+      highlight_start_tag: '<mark>',
+      highlight_end_tag: '</mark>',
+      // Prioritize exact matches
+      prioritize_exact_match: true,
+      // Prioritize documents where query appears in more fields
+      prioritize_num_matching_fields: true,
+      // Typo tolerance: allow 2 typos for better results
+      num_typos: 2,
+      // Prefix search enabled (for autocomplete-like behavior)
+      prefix: true,
     }
 
     // Add filters
@@ -101,12 +125,18 @@ export async function searchMessages(params: {
         messageText: hit.document.messageText,
         timestamp: hit.document.timestamp ? new Date(hit.document.timestamp * 1000) : null,
         createdAt: new Date(hit.document.createdAt * 1000),
-        highlights: hit.highlights,
-        textMatch: hit.text_match,
+        highlights: hit.highlights || [],
+        textMatch: hit.text_match || 0,
+        // Additional metadata from Typesense
+        matchedTokens: hit.matched_tokens || [],
+        document: hit.document,
       })) || [],
       found: searchResults.found || 0,
       page: searchResults.page || 1,
       totalPages: Math.ceil((searchResults.found || 0) / (params.limit || 20)),
+      // Additional search metadata
+      searchTimeMs: searchResults.search_time_ms || 0,
+      facetCounts: searchResults.facet_counts || [],
     }
   } catch (error) {
     console.error('Typesense search error:', error)

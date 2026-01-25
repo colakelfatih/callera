@@ -47,15 +47,15 @@ export const messageSchema: CollectionCreateSchema = {
     { name: 'channelMessageId', type: 'string' },
     { name: 'connectionId', type: 'string', optional: true },
     { name: 'senderId', type: 'string', facet: true },
-    { name: 'senderName', type: 'string', optional: true },
-    { name: 'messageText', type: 'string' }, // Main searchable field
+    { name: 'senderName', type: 'string', optional: true }, // Searchable field
+    { name: 'messageText', type: 'string' }, // Main searchable field - highest priority
     { name: 'messageType', type: 'string', facet: true },
     { name: 'isFromBusiness', type: 'bool', facet: true },
     { name: 'status', type: 'string', facet: true },
     { name: 'aiResponse', type: 'string', optional: true },
-    { name: 'timestamp', type: 'int64', optional: true }, // Unix timestamp
-    { name: 'createdAt', type: 'int64' }, // Unix timestamp
-    { name: 'updatedAt', type: 'int64' }, // Unix timestamp
+    { name: 'timestamp', type: 'int64', optional: true, sort: true }, // Unix timestamp, sortable
+    { name: 'createdAt', type: 'int64', sort: true }, // Unix timestamp, sortable (default sorting field)
+    { name: 'updatedAt', type: 'int64', sort: true }, // Unix timestamp, sortable
   ],
   default_sorting_field: 'createdAt',
 }

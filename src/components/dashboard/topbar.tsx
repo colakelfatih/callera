@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { Search, Bell, Moon, Sun, Menu, LogOut } from 'lucide-react'
+import { Bell, Moon, Sun, Menu, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { useTranslations } from 'next-intl'
@@ -16,7 +16,6 @@ interface TopBarProps {
 }
 
 export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
-  const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
   const params = useParams()
   const locale = params.locale as string
@@ -46,16 +45,6 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
             <Menu size={24} />
           </button>
 
-          <div className="relative max-w-md w-full hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder={t('searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-xl text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-            />
-          </div>
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">

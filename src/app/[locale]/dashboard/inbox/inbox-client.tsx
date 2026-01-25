@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { formatTime } from '@/lib/utils'
-import { MessageSquare, Phone, Mail, Instagram, X } from 'lucide-react'
+import { MessageSquare, Phone, Mail, Instagram, X, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 const channelIcons = {
@@ -79,6 +79,10 @@ export default function InboxClient({ initialMessages }: Props) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [composerText, setComposerText] = useState('')
   const [sending, setSending] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Message[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchMode, setSearchMode] = useState(false)
   const t = useTranslations('inbox')
 
   const seenIdsRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)))
@@ -316,6 +320,155 @@ export default function InboxClient({ initialMessages }: Props) {
     return channel.charAt(0).toUpperCase() + channel.slice(1)
   }
 
+  // Search functionality
+  const performSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchMode(false)
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const params = new URLSearchParams({ q: query.trim() })
+      if (filter !== 'all') {
+        params.append('channel', filter)
+      }
+      
+      const res = await fetch(`/api/search?${params.toString()}`)
+      if (!res.ok) throw new Error('Search failed')
+      
+      const data = await res.json()
+      // Store full hit data including highlights
+      const results = (data.hits || []).map((hit: any) => ({
+        id: hit.id,
+        channel: hit.channel,
+        channelMessageId: hit.id,
+        connectionId: null,
+        isFromBusiness: false,
+        senderId: hit.senderId,
+        senderName: hit.senderName,
+        messageText: hit.messageText,
+        messageType: 'text',
+        status: 'completed',
+        aiResponse: null,
+        timestamp: hit.timestamp,
+        createdAt: hit.createdAt,
+        highlights: hit.highlights || [],
+        textMatch: hit.textMatch || 0,
+      }))
+      
+      setSearchResults(results)
+      setSearchMode(true)
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Render highlighted text (Typesense uses <mark> tags)
+  const renderHighlightedText = (text: string, highlights: any[] = []) => {
+    if (!highlights || highlights.length === 0) {
+      // Fallback: simple word highlighting
+      const queryWords = searchQuery.toLowerCase().split(/\s+/).filter((w) => w.length > 0)
+      if (queryWords.length === 0) return <span>{text}</span>
+      
+      const words = text.split(/(\s+)/)
+      return (
+        <>
+          {words.map((word, i) => {
+            const isMatch = queryWords.some((qw) => word.toLowerCase().includes(qw))
+            return isMatch ? (
+              <mark key={i} className="bg-yellow-200 dark:bg-yellow-900 px-0.5 rounded font-semibold">
+                {word}
+              </mark>
+            ) : (
+              <span key={i}>{word}</span>
+            )
+          })}
+        </>
+      )
+    }
+
+    // Typesense highlights format: { field: 'messageText', snippets: ['...<mark>...</mark>...'] }
+    const messageHighlight = highlights.find((h: any) => h.field === 'messageText')
+    if (messageHighlight && messageHighlight.snippets && messageHighlight.snippets.length > 0) {
+      // Use the first snippet (most relevant)
+      const snippet = messageHighlight.snippets[0]
+      
+      // Parse <mark> tags
+      const parts: Array<{ text: string; highlighted: boolean }> = []
+      let lastIndex = 0
+      const regex = /<mark>(.*?)<\/mark>/g
+      let match
+
+      while ((match = regex.exec(snippet)) !== null) {
+        // Add text before the match
+        if (match.index > lastIndex) {
+          parts.push({ text: snippet.substring(lastIndex, match.index), highlighted: false })
+        }
+        // Add highlighted text
+        parts.push({ text: match[1], highlighted: true })
+        lastIndex = match.index + match[0].length
+      }
+      
+      // Add remaining text
+      if (lastIndex < snippet.length) {
+        parts.push({ text: snippet.substring(lastIndex), highlighted: false })
+      }
+
+      if (parts.length > 0) {
+        return (
+          <>
+            {parts.map((part, i) =>
+              part.highlighted ? (
+                <mark key={i} className="bg-yellow-200 dark:bg-yellow-900 px-0.5 rounded font-semibold">
+                  {part.text}
+                </mark>
+              ) : (
+                <span key={i}>{part.text}</span>
+              )
+            )}
+          </>
+        )
+      }
+    }
+
+    // Fallback to simple highlighting
+    const queryWords = searchQuery.toLowerCase().split(/\s+/).filter((w) => w.length > 0)
+    const words = text.split(/(\s+)/)
+    return (
+      <>
+        {words.map((word, i) => {
+          const isMatch = queryWords.some((qw) => word.toLowerCase().includes(qw))
+          return isMatch ? (
+            <mark key={i} className="bg-yellow-200 dark:bg-yellow-900 px-0.5 rounded font-semibold">
+              {word}
+            </mark>
+          ) : (
+            <span key={i}>{word}</span>
+          )
+        })}
+      </>
+    )
+  }
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        performSearch(searchQuery)
+      } else {
+        setSearchMode(false)
+        setSearchResults([])
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery, filter])
+
   const sendMessage = async () => {
     if (!selectedThread) return
     const text = composerText.trim()
@@ -358,6 +511,23 @@ export default function InboxClient({ initialMessages }: Props) {
             <h1 className="text-xl md:text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
           </div>
 
+          {/* Search Input */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Mesajlarda ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-lg text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+
           {/* Small realtime indicator only (no i18n key spam) */}
           <div className="flex items-center gap-2 mb-3" title={realtimeConnected ? 'Realtime connected' : 'Realtime reconnecting'}>
             <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
@@ -379,7 +549,78 @@ export default function InboxClient({ initialMessages }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {threads.length === 0 ? (
+          {searchMode ? (
+            // Search Results - Google/Algolia style
+            searchResults.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center">
+                <Search className="text-gray-400 mb-2" size={32} />
+                <p className="text-gray-600 dark:text-gray-400">
+                  {isSearching ? 'Aranıyor...' : 'Sonuç bulunamadı'}
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 space-y-4">
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  "{searchQuery}" için <strong>{searchResults.length}</strong> sonuç bulundu
+                </div>
+                {searchResults.map((message: any) => {
+                  const ChannelIcon = channelIcons[message.channel as keyof typeof channelIcons] || MessageSquare
+                  const displayName = message.senderName || message.senderId || 'Unknown'
+                  const threadId = threadIdFor(message)
+
+                  return (
+                    <div
+                      key={message.id}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-navy-800"
+                      onClick={() => {
+                        setSelectedThreadId(threadId)
+                        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                          setShowMobileDetail(true)
+                        }
+                      }}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Avatar name={displayName} size="sm" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-navy dark:text-white truncate">
+                              {displayName}
+                            </p>
+                            <div className={`p-1 rounded ${channelColors[message.channel as keyof typeof channelColors] || 'bg-gray-100 text-gray-700'}`}>
+                              <ChannelIcon size={12} />
+                            </div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                              {getChannelDisplayName(message.channel)}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          {formatTime(message.timestamp || message.createdAt)}
+                        </p>
+                      </div>
+
+                      {/* Message Text with Highlights */}
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {renderHighlightedText(message.messageText, message.highlights)}
+                        </p>
+                      </div>
+
+                      {/* Footer with match score */}
+                      {message.textMatch && (
+                        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            Eşleşme: {Math.round(message.textMatch * 100)}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          ) : threads.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
               <MessageSquare className="text-gray-400 mb-2" size={32} />
               <p className="text-gray-600 dark:text-gray-400">{t('noMessages') || 'No messages yet'}</p>
