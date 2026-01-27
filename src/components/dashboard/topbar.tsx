@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, usePathname } from 'next/navigation'
 import { Moon, Sun, Menu, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
@@ -27,11 +27,28 @@ interface UserSession {
 export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
   const router = useRouter()
   const params = useParams()
+  const pathname = usePathname()
   const locale = params.locale as string
   const t = useTranslations('topbar')
+  const tNav = useTranslations('navigation')
+  const tInbox = useTranslations('inbox')
+  const tCrm = useTranslations('crm')
   const tAuth = useTranslations('auth')
   const [user, setUser] = useState<UserSession['user'] | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // Get page title based on current path
+  const getPageTitle = () => {
+    if (pathname?.includes('/inbox')) return tInbox('title')
+    if (pathname?.includes('/crm-pipeline')) return 'Kanban Board'
+    if (pathname?.includes('/crm')) return tCrm('title')
+    if (pathname?.includes('/integrations')) return tNav('integrations')
+    if (pathname?.includes('/profile')) return 'Profil'
+    if (pathname?.includes('/settings')) return 'Ayarlar'
+    return ''
+  }
+
+  const pageTitle = getPageTitle()
 
   useEffect(() => {
     // Fetch user session
@@ -81,6 +98,12 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
             <Menu size={24} />
           </button>
 
+          {/* Page Title */}
+          {pageTitle && (
+            <h1 className="text-xl font-bold text-navy dark:text-white hidden sm:block">
+              {pageTitle}
+            </h1>
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">

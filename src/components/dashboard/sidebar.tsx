@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import {
@@ -18,8 +19,9 @@ interface SidebarProps {
   locale?: string
 }
 
-export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false, onToggle, locale = 'tr' }: SidebarProps) {
+export function Sidebar({ currentPath, isCollapsed = false, onToggle, locale = 'tr' }: SidebarProps) {
   const t = useTranslations('navigation')
+  const pathname = usePathname()
 
   const navigation = [
     { name: t('inbox'), href: `/${locale}/dashboard/inbox`, icon: MessageSquare },
@@ -57,7 +59,7 @@ export function Sidebar({ currentPath = '/dashboard/inbox', isCollapsed = false,
 
       <nav className="p-4 space-y-2">
         {navigation.map((item) => {
-          const isActive = currentPath === item.href
+          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
           return (
             <a
               key={item.name}

@@ -3,16 +3,21 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Plus, Calendar, Tag, X, MessageSquare, Phone, Mail, Clock, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type { Contact, ContactTag } from '@prisma/client'
+
+type ContactWithTags = Contact & {
+  tags: ContactTag[]
+}
 
 interface Deal {
-  id: number
-  company: string
+  id: string
+  company: string | null
   contact: string
-  phone: string
+  phone: string | null
   value: string
-  tags: string[]
+  tags: Array<{ id: string; tag: string }>
   status: 'lead' | 'prospect' | 'customer' | 'closed'
-  avatar: string
+  avatar: string | null
 }
 
 interface PipelineColumn {
@@ -38,104 +43,52 @@ export default function CRMPipelinePage() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newDealColumn, setNewDealColumn] = useState<string>('lead-in')
-  const [nextDealId, setNextDealId] = useState(6)
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
   const [contactHistory, setContactHistory] = useState<any[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [pipelineData, setPipelineData] = useState<PipelineColumn[]>([])
+  const [loading, setLoading] = useState(true)
   const t = useTranslations('crm')
 
-  const [pipelineData, setPipelineData] = useState<PipelineColumn[]>([
-    {
-      id: 'lead-in',
-      title: t('leadIn'),
-      count: 4,
-      value: '',
-      deals: [
-        {
-          id: 1,
-          company: 'Innovate Corp',
-          contact: 'Jane Doe',
-          phone: '+90 555 123 4567',
-          value: '$25,000',
-          tags: ['AI Suggestion', 'Enterprise'],
-          status: 'lead',
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCwXmbbLJ08KPqnqWO97VuHVB2hrSWrnjlKopduxPJ-5PQJxdfp_hc9axv1sIxxbm638GmIuFgrskHx9MZRhHZdi0QI_GidjYZTi3fsPXowH7Zkt7IT819kxUk4r9GTJ9OvwMfmY9uPx9tHyZ91HRemmCzPk5R9pYwom9cs2Q7Ci-UMb4szhx8LBtWSufmuWb6ak7Hox4N_r-QF8iRjqzgRGEnCeorpzIE6usSm_KZhAQILoqYQNShu0fkWu4IgjCWbnsjQUHBRTNM'
-        },
-        {
-          id: 2,
-          company: 'Quantum Solutions',
-          contact: 'John Smith',
-          phone: '+90 555 234 5678',
-          value: '$12,000',
-          tags: ['Follow-up'],
-          status: 'prospect',
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAyOgWM2A0tZoFdNz6Gsq5IyyeICi-bLYsrLFiOiRZC3TYccMwu8E5xZbp0vjTRPl0HEFJsp5J1xrdTxnXE45jkwc5we8porJSPcYskr8GOmpHWxt_IyPhq_8Bb3qQGJEpwIoI5hMmCc-bJhYJazijKdUDmA4jhZ-f-TmzB2uFTGV-XPRcHQAz2llMRrFlrS8CQAVqW8od2lcw40f2il2_CkG7acO3GD2lNEXwmh1F6lVgmwKLTLrY2cS2Agd0nNAabL7FdYTIGVX0'
-        }
-      ]
-    },
-    {
-      id: 'contact-made',
-      title: t('contactMade'),
-      count: 2,
-      value: '',
-      deals: [
-        {
-          id: 3,
-          company: 'Apex Dynamics',
-          contact: 'Emily White',
-          phone: '+90 555 345 6789',
-          value: '$30,000',
-          tags: ['High Priority'],
-          status: 'prospect',
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCazbhMZDexN9M-MxYtXNDlQMDSIev3xvZd72wbbV0WHm2157E6_R0u-dHA9MSNsjGGLaY_QOTToWKoMROETgS3VjecQUot51hUB9Gcrp3alE_dTXmuwyhLJq94sSqaBUKBRax-XuuZ2NJmMryDeHD3YD8Ce6wZ6wXSqBJTJraX1MI_SGUDx2WJykmnOJEk31lXJUwoVj1lV0yzTnND-jwmIJ5VYoHKiPmQpQqPbOJmMYFb-spzCQ6HjhbOy8U56Eq0IIX1s1HU4sw'
-        }
-      ]
-    },
-    {
-      id: 'meeting-scheduled',
-      title: t('meetingScheduled'),
-      count: 1,
-      value: '',
-      deals: [
-        {
-          id: 4,
-          company: 'Future Systems',
-          contact: 'Michael Brown',
-          phone: '+90 555 456 7890',
-          value: '$75,000',
-          tags: ['Enterprise'],
-          status: 'customer',
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbcuWZGa9pcLGJ5BfJraSfpDIp-QapwyFEzyVj1XFF0gc-la_dyv9OMsDGaOiJOQvcvIXQwiS4syyU1OPs_y9N5w_z7k9AhJBMa9eErVgK_Ik8KQPUMKpEjwVC8kuWCaJ3Z9bg-I0ykSt3KswLeQiThIbOtfZb-lLPKg4a6bxefbMJKbX0DaeJzTOrL3YbC6OEr2Vx2DE71GZCwxxvMDrwQvCCCU70T9-f97DE64CmnkjsUDTidPA60JcMnXgKHJcjL0wPHRuayhM'
-        }
-      ]
-    },
-    {
-      id: 'proposal',
-      title: t('proposal'),
-      count: 0,
-      value: '',
-      deals: []
-    },
-    {
-      id: 'won',
-      title: t('won'),
-      count: 1,
-      value: '',
-      deals: [
-        {
-          id: 5,
-          company: 'Global Tech Inc.',
-          contact: 'Sarah Johnson',
-          phone: '+90 555 567 8901',
-          value: '$150,000',
-          tags: ['Closed'],
-          status: 'closed',
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBBIrGURjR0IHdLRFI5oA5vlQk9FKCWQ2adj8jmF-kNasspJzSb7uerlMk11Z6ekjJk9nphnPyMcnpKniBVJnanB-hCgsG3eLaGw7a3iUpCBncYRntUY5y3jg0GbaSfV4V-lOLe04OlotNtx-8LHzBgirptRVrbcEf9No1Jj_-DgHbYoOs7AI87bJCO5RFVEYb2rLYZXD3CWC05fhDQWE-7txPN78biVtRL1UujOUY0iodqUr6npEsTxmsDQvf5LD7oR8w4cMBo9x8'
-        }
-      ]
+  // Fetch pipeline data from API
+  useEffect(() => {
+    const fetchPipeline = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/contacts/pipeline')
+        if (!response.ok) throw new Error('Failed to fetch pipeline')
+        
+        const data = await response.json()
+        
+        // Convert contacts to deals format
+        const convertedPipeline = data.pipeline.map((column: any) => ({
+          id: column.id,
+          title: column.title,
+          count: column.count,
+          value: '',
+          deals: column.contacts.map((contact: ContactWithTags) => ({
+            id: contact.id,
+            company: contact.company || null,
+            contact: contact.name,
+            phone: contact.phone || null,
+            value: '',
+            tags: contact.tags || [],
+            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
+            avatar: contact.avatar || null,
+          })),
+        }))
+        
+        setPipelineData(convertedPipeline)
+      } catch (error) {
+        console.error('Error fetching pipeline:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  ])
+
+    fetchPipeline()
+  }, [])
 
   const handleDragStart = (e: React.DragEvent, deal: Deal) => {
     setIsDragging(true)
@@ -180,41 +133,58 @@ export default function CRMPipelinePage() {
     }
   }
 
-  const handleDrop = (e: React.DragEvent, targetColumnId: string, targetIndex?: number) => {
+  const handleDrop = async (e: React.DragEvent, targetColumnId: string, targetIndex?: number) => {
     e.preventDefault()
     e.stopPropagation()
-    if (draggedDeal) {
-      setPipelineData(prevData => {
-        const newData = prevData.map(column => {
-          // Remove deal from source column
-          if (column.deals.some(deal => deal.id === draggedDeal.id)) {
-            return {
-              ...column,
-              deals: column.deals.filter(deal => deal.id !== draggedDeal.id),
-              count: column.count - 1,
-              value: ''
-            }
-          }
-          // Add deal to target column at specific index
-          if (column.id === targetColumnId) {
-            const deals = [...column.deals]
-            if (targetIndex !== undefined && targetIndex >= 0) {
-              deals.splice(targetIndex, 0, draggedDeal)
-            } else {
-              deals.push(draggedDeal)
-            }
-            return {
-              ...column,
-              deals,
-              count: deals.length,
-              value: ''
-            }
-          }
-          return column
-        })
-        return newData
-      })
+    if (!draggedDeal) return
+
+    // Map column ID to status
+    const statusMap: Record<string, 'lead' | 'prospect' | 'customer' | 'closed'> = {
+      'lead-in': 'lead',
+      'contact-made': 'prospect',
+      'meeting-scheduled': 'prospect',
+      'proposal': 'customer',
+      'won': 'closed',
     }
+
+    const newStatus = statusMap[targetColumnId] || 'lead'
+
+    try {
+      // Update contact status via API
+      const response = await fetch(`/api/contacts/${draggedDeal.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update contact status')
+
+      // Refresh pipeline data
+      const pipelineResponse = await fetch('/api/contacts/pipeline')
+      if (pipelineResponse.ok) {
+        const pipelineData = await pipelineResponse.json()
+        const convertedPipeline = pipelineData.pipeline.map((column: any) => ({
+          id: column.id,
+          title: column.title,
+          count: column.count,
+          value: '',
+          deals: column.contacts.map((contact: ContactWithTags) => ({
+            id: contact.id,
+            company: contact.company || null,
+            contact: contact.name,
+            phone: contact.phone || null,
+            value: '',
+            tags: contact.tags || [],
+            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
+            avatar: contact.avatar || null,
+          })),
+        }))
+        setPipelineData(convertedPipeline)
+      }
+    } catch (error) {
+      console.error('Failed to update contact status:', error)
+    }
+
     setDraggedDeal(null)
     setDragOverColumn(null)
     setDragOverIndex(null)
@@ -225,34 +195,49 @@ export default function CRMPipelinePage() {
     setNewDealColumn('lead-in') // Default to first column
   }
 
-  const handleSaveNewDeal = (dealData: { contact: string; phone: string; status: 'lead' | 'prospect' | 'customer' | 'closed' }) => {
-    const newDeal: Deal = {
-      id: nextDealId,
-      company: '',
-      contact: dealData.contact,
-      phone: dealData.phone,
-      value: '',
-      tags: [],
-      status: dealData.status,
-      avatar: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(dealData.contact) + '&background=random'
-    }
-
-    setPipelineData(prevData => {
-      return prevData.map(column => {
-        if (column.id === newDealColumn) {
-          return {
-            ...column,
-            deals: [...column.deals, newDeal],
-            count: column.count + 1,
-            value: ''
-          }
-        }
-        return column
+  const handleSaveNewDeal = async (dealData: { contact: string; phone: string; status: 'lead' | 'prospect' | 'customer' | 'closed' }) => {
+    try {
+      // Create contact via API
+      const response = await fetch('/api/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: dealData.contact,
+          phone: dealData.phone,
+          status: dealData.status,
+        }),
       })
-    })
 
-    setNextDealId(prev => prev + 1)
-    setShowAddModal(false)
+      if (!response.ok) throw new Error('Failed to create contact')
+
+      // Refresh pipeline data
+      const pipelineResponse = await fetch('/api/contacts/pipeline')
+      if (pipelineResponse.ok) {
+        const pipelineData = await pipelineResponse.json()
+        const convertedPipeline = pipelineData.pipeline.map((column: any) => ({
+          id: column.id,
+          title: column.title,
+          count: column.count,
+          value: '',
+          deals: column.contacts.map((contact: ContactWithTags) => ({
+            id: contact.id,
+            company: contact.company || null,
+            contact: contact.name,
+            phone: contact.phone || null,
+            value: '',
+            tags: contact.tags || [],
+            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
+            avatar: contact.avatar || null,
+          })),
+        }))
+        setPipelineData(convertedPipeline)
+      }
+
+      setShowAddModal(false)
+    } catch (error) {
+      console.error('Failed to create contact:', error)
+      alert('Müşteri oluşturulamadı')
+    }
   }
 
   const handleDealClick = async (deal: Deal) => {
@@ -266,10 +251,14 @@ export default function CRMPipelinePage() {
     
     try {
       // Fetch contact history from API
-      const response = await fetch(`/api/contacts/history?phone=${encodeURIComponent(deal.phone)}`)
-      if (response.ok) {
-        const data = await response.json()
-        setContactHistory(data.history || [])
+      if (deal.phone) {
+        const response = await fetch(`/api/contacts/history?phone=${encodeURIComponent(deal.phone)}`)
+        if (response.ok) {
+          const data = await response.json()
+          setContactHistory(data.history || [])
+        } else {
+          setContactHistory([])
+        }
       } else {
         setContactHistory([])
       }
@@ -297,8 +286,7 @@ export default function CRMPipelinePage() {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Top Navigation */}
       <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-8 py-4 shrink-0">
-        <h1 className="text-xl font-bold text-navy dark:text-white">Kanban Board</h1>
-        <div className="flex flex-1 items-center justify-end gap-4">
+        <div className="flex items-center gap-4 flex-1">
           <div className="w-full max-w-xs relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -309,6 +297,25 @@ export default function CRMPipelinePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
+              <Calendar size={16} />
+              <input
+                type="date"
+                className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer"
+                placeholder={t('dateRange')}
+              />
+            </div>
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
+              <Tag size={16} />
+              <p className="text-sm font-medium">{t('tags')}</p>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 10l5 5 5-5z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
           <button 
             onClick={handleAddNewDeal}
             className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors"
@@ -319,29 +326,15 @@ export default function CRMPipelinePage() {
         </div>
       </header>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3 p-6 shrink-0 bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
-          <Calendar size={16} />
-          <input
-            type="date"
-            className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer"
-            placeholder={t('dateRange')}
-          />
-        </div>
-        <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-          <Tag size={16} />
-          <p className="text-sm font-medium">{t('tags')}</p>
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M7 10l5 5 5-5z" />
-          </svg>
-        </button>
-      </div>
-
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto p-6">
-        <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-4">
-          {pipelineData.map((column) => (
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500 dark:text-gray-400">Yükleniyor...</div>
+          </div>
+        ) : (
+          <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-4">
+            {pipelineData.map((column) => (
             <div
               key={column.id}
               className="flex w-64 h-full flex-col gap-3"
@@ -383,7 +376,9 @@ export default function CRMPipelinePage() {
                         >
                           <div className="flex flex-col gap-2">
                             <p className="font-semibold text-sm text-navy dark:text-white truncate">{deal.contact}</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{deal.phone}</p>
+                            {deal.phone && (
+                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{deal.phone}</p>
+                            )}
 
                             <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                               <div className="flex gap-1 flex-wrap">
@@ -401,7 +396,13 @@ export default function CRMPipelinePage() {
                                    t('closed')}
                                 </span>
                               </div>
-                              <div className="w-5 h-5 rounded-full bg-center bg-no-repeat bg-cover shrink-0" style={{ backgroundImage: `url(${deal.avatar})` }}></div>
+                              {deal.avatar ? (
+                                <div className="w-5 h-5 rounded-full bg-center bg-no-repeat bg-cover shrink-0" style={{ backgroundImage: `url(${deal.avatar})` }}></div>
+                              ) : (
+                                <div className="w-5 h-5 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
+                                  <User size={12} className="text-primary" />
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -442,7 +443,8 @@ export default function CRMPipelinePage() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Add Deal Modal */}

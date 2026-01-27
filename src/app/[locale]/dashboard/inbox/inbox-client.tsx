@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { formatTime } from '@/lib/utils'
 import { MessageSquare, Mail, Instagram, X, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 
 const channelIcons = {
   email: Mail,
@@ -69,6 +70,7 @@ function toDateValue(v: Date | string | null | undefined) {
 }
 
 export default function InboxClient({ initialMessages }: Props) {
+  const searchParams = useSearchParams()
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
@@ -141,6 +143,39 @@ export default function InboxClient({ initialMessages }: Props) {
       setSelectedThreadId(threads[0].id)
     }
   }, [selectedThreadId, threads])
+
+  // Auto-select thread from URL query params (from CRM page)
+  useEffect(() => {
+    const phone = searchParams?.get('phone')
+    const channel = searchParams?.get('channel')
+    
+    if (phone && channel && threads.length > 0) {
+      // Find thread matching phone and channel
+      const matchingThread = threads.find(thread => 
+        thread.senderId === phone && thread.channel === channel
+      )
+      
+      if (matchingThread) {
+        setSelectedThreadId(matchingThread.id)
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+          setShowMobileDetail(true)
+        }
+        // Clean up URL
+        const url = new URL(window.location.href)
+        url.searchParams.delete('phone')
+        url.searchParams.delete('channel')
+        window.history.replaceState({}, '', url.toString())
+      } else {
+        // Thread not found - show warning
+        alert(`Bu telefon numarası (${phone}) için ${channel} mesaj geçmişi bulunamadı.`)
+        // Clean up URL
+        const url = new URL(window.location.href)
+        url.searchParams.delete('phone')
+        url.searchParams.delete('channel')
+        window.history.replaceState({}, '', url.toString())
+      }
+    }
+  }, [searchParams, threads])
 
   const selectedThread = useMemo(() => {
     const th = threads.find((x) => x.id === selectedThreadId) ?? null
@@ -502,12 +537,9 @@ export default function InboxClient({ initialMessages }: Props) {
 
   return (
     <div className="flex flex-col lg:flex-row h-full">
-      {/* Threads List */}
-      <div className={`w-full lg:w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col ${showMobileDetail ? 'hidden' : 'flex'} lg:flex`}>
-        <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl md:text-2xl font-bold text-navy dark:text-white">{t('title')}</h1>
-          </div>
+        {/* Threads List */}
+        <div className={`w-full lg:w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col ${showMobileDetail ? 'hidden' : 'flex'} lg:flex`}>
+          <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
 
           {/* Search Input */}
           <div className="relative mb-3">
@@ -796,7 +828,6 @@ export default function InboxClient({ initialMessages }: Props) {
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
 
