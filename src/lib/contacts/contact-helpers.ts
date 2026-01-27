@@ -25,22 +25,49 @@ export async function findOrCreateContactFromWhatsApp(params: {
     }
 
     // 1. Find WhatsAppConnection by phoneNumberId to get userId
+    console.log('🔍 Searching for WhatsAppConnection:', {
+      phoneNumberId,
+      phoneNumber,
+    })
+
     const connection = await db.whatsAppConnection.findFirst({
       where: {
         phoneNumberId: phoneNumberId,
       },
       select: {
         userId: true,
+        id: true,
+        phoneNumberId: true,
       },
     })
 
     if (!connection) {
-      console.warn('findOrCreateContactFromWhatsApp: WhatsAppConnection not found', {
-        phoneNumberId,
+      // Try to find by any phoneNumberId (in case of format mismatch)
+      const allConnections = await db.whatsAppConnection.findMany({
+        select: {
+          id: true,
+          phoneNumberId: true,
+          userId: true,
+        },
+        take: 5, // Just for debugging
+      })
+      
+      console.error('❌ WhatsAppConnection not found for phoneNumberId:', {
+        searchedPhoneNumberId: phoneNumberId,
         phoneNumber,
+        availableConnections: allConnections.map(c => ({
+          id: c.id,
+          phoneNumberId: c.phoneNumberId,
+        })),
       })
       return null
     }
+
+    console.log('✅ Found WhatsAppConnection:', {
+      connectionId: connection.id,
+      phoneNumberId: connection.phoneNumberId,
+      userId: connection.userId,
+    })
 
     const userId = connection.userId
 

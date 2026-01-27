@@ -276,29 +276,51 @@ async function handleIncomingMessage(message: any, metadata: any, rawPayload: an
         }
 
         // 3.5) Create/update müşteri (contact) from WhatsApp message
+        console.log('🔍 Checking müşteri creation conditions:', {
+            hasPhoneNumberId: !!metadata?.phone_number_id,
+            phoneNumberId: metadata?.phone_number_id,
+            hasFrom: !!from,
+            from: from,
+            userName: userName || 'No name',
+        })
+
         if (metadata?.phone_number_id && from) {
-            const contact = await findOrCreateContactFromWhatsApp({
-                phoneNumber: from,
-                phoneNumberId: metadata.phone_number_id,
-                name: userName,
-                timestamp: timestamp ? new Date(Number(timestamp) * 1000) : new Date(),
-            }).catch((err) => {
-                console.warn('Failed to create/update müşteri:', {
+            try {
+                const contact = await findOrCreateContactFromWhatsApp({
+                    phoneNumber: from,
+                    phoneNumberId: metadata.phone_number_id,
+                    name: userName,
+                    timestamp: timestamp ? new Date(Number(timestamp) * 1000) : new Date(),
+                })
+
+                if (contact) {
+                    console.log('✅ Müşteri created/updated:', {
+                        contactId: contact.id,
+                        phone: from,
+                        name: userName || contact.name,
+                        status: contact.status,
+                    })
+                } else {
+                    console.warn('⚠️ Müşteri creation returned null (WhatsAppConnection not found?)', {
+                        phone: from,
+                        phoneNumberId: metadata.phone_number_id,
+                    })
+                }
+            } catch (err: any) {
+                console.error('❌ Failed to create/update müşteri:', {
                     error: err?.message ?? err,
+                    stack: err?.stack,
                     phone: from,
                     phoneNumberId: metadata.phone_number_id,
                 })
-                return null
-            })
-
-            if (contact) {
-                console.log('✅ Müşteri created/updated:', {
-                    contactId: contact.id,
-                    phone: from,
-                    name: userName || contact.name,
-                    status: contact.status,
-                })
             }
+        } else {
+            console.warn('⚠️ Skipping müşteri creation - missing required data:', {
+                hasPhoneNumberId: !!metadata?.phone_number_id,
+                phoneNumberId: metadata?.phone_number_id,
+                hasFrom: !!from,
+                from: from,
+            })
         }
 
         // 4) Index in Typesense (best-effort, non-blocking)
