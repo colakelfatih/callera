@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { db } from '@/lib/db'
 import { sendWhatsAppTextMessage } from '@/lib/clients/whatsapp-client'
+import { InstagramClient } from '@/lib/instagram/client'
 import { publishNewMessage } from '@/lib/redis/pubsub'
 import { indexMessage } from '@/lib/typesense/messages'
 
@@ -24,39 +25,106 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing channel, senderId, or text' }, { status: 400 })
     }
 
-    if (channel !== 'whatsapp') {
-      return NextResponse.json({ error: 'Channel not supported yet' }, { status: 400 })
+    if (channel !== 'whatsapp' && channel !== 'instagram') {
+      return NextResponse.json({ error: 'Channel not supported. Supported: whatsapp, instagram' }, { status: 400 })
     }
 
-    const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
-    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
-    if (!phoneNumberId) return NextResponse.json({ error: 'Missing WhatsApp phoneNumberId' }, { status: 400 })
-    if (!accessToken) return NextResponse.json({ error: 'Missing WHATSAPP_ACCESS_TOKEN' }, { status: 500 })
+    let outbound
 
-    const sendResult = await sendWhatsAppTextMessage({
-      phoneNumberId,
-      accessToken,
-      to: senderId,
-      text,
-    })
+    if (channel === 'whatsapp') {
+      // WhatsApp message sending
+      const phoneNumberId = connectionId || process.env.WHATSAPP_PHONE_NUMBER_ID
+      const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
+      if (!phoneNumberId) return NextResponse.json({ error: 'Missing WhatsApp phoneNumberId' }, { status: 400 })
+      if (!accessToken) return NextResponse.json({ error: 'Missing WHATSAPP_ACCESS_TOKEN' }, { status: 500 })
 
-    const outboundChannelMessageId = sendResult?.messages?.[0]?.id ?? `out-${Date.now()}`
+      const sendResult = await sendWhatsAppTextMessage({
+        phoneNumberId,
+        accessToken,
+        to: senderId,
+        text,
+      })
 
-    const outbound = await db.message.create({
-      data: {
-        channel: 'whatsapp',
-        channelMessageId: outboundChannelMessageId,
-        connectionId: phoneNumberId,
+      const outboundChannelMessageId = sendResult?.messages?.[0]?.id ?? `out-${Date.now()}`
+
+      outbound = await db.message.create({
+        data: {
+          channel: 'whatsapp',
+          channelMessageId: outboundChannelMessageId,
+          connectionId: phoneNumberId,
+          senderId,
+          senderName: null,
+          messageText: text,
+          messageType: 'text',
+          rawPayload: sendResult ?? undefined,
+          isFromBusiness: true,
+          timestamp: new Date(),
+          status: 'completed',
+        },
+      })
+    } else if (channel === 'instagram') {
+      // Instagram message sending
+      // Find the Instagram connection to get access token and page ID
+      const instagramConnection = await db.instagramConnection.findFirst({
+        where: connectionId 
+          ? { id: connectionId, userId: user.id }
+          : { userId: user.id },
+        select: {
+          id: true,
+          accessToken: true,
+          pageId: true,
+          instagramUserId: true,
+        },
+      })
+
+      if (!instagramConnection) {
+        return NextResponse.json({ error: 'No Instagram connection found. Please connect your Instagram account first.' }, { status: 400 })
+      }
+
+      if (!instagramConnection.accessToken) {
+        return NextResponse.json({ error: 'Instagram access token not found. Please reconnect your Instagram account.' }, { status: 400 })
+      }
+
+      if (!instagramConnection.pageId) {
+        return NextResponse.json({ error: 'Instagram page ID not found. Please reconnect your Instagram account.' }, { status: 400 })
+      }
+
+      // Send message via Instagram API
+      const client = new InstagramClient(instagramConnection.accessToken)
+      const sendResult = await client.sendMessage(
+        instagramConnection.pageId,
         senderId,
-        senderName: null,
-        messageText: text,
-        messageType: 'text',
-        rawPayload: sendResult ?? undefined,
-        isFromBusiness: true,
-        timestamp: new Date(),
-        status: 'completed',
-      },
-    })
+        text
+      )
+
+      const outboundChannelMessageId = sendResult?.message_id ?? `out-ig-${Date.now()}`
+
+      outbound = await db.message.create({
+        data: {
+          channel: 'instagram',
+          channelMessageId: outboundChannelMessageId,
+          connectionId: instagramConnection.id,
+          senderId,
+          senderName: null,
+          messageText: text,
+          messageType: 'text',
+          rawPayload: sendResult ?? undefined,
+          isFromBusiness: true,
+          timestamp: new Date(),
+          status: 'completed',
+        },
+      })
+
+      console.log('✅ Instagram message sent:', {
+        messageId: outbound.id,
+        senderId,
+        connectionId: instagramConnection.id,
+      })
+    }
+
+    if (!outbound) {
+      return NextResponse.json({ error: 'Failed to create message' }, { status: 500 })
+    }
 
     // Index message in Typesense
     indexMessage(outbound).catch((err) => {
@@ -82,7 +150,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: outbound }, { status: 200 })
   } catch (error: any) {
     console.error('messages.send.error', error)
-    return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
+    return NextResponse.json({ error: error.message || 'Failed to send message' }, { status: 500 })
   }
 }
 

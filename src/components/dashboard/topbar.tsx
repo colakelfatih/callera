@@ -72,7 +72,7 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle }: To
     if (pathname?.includes('/crm')) return tCrm('title')
     if (pathname?.includes('/integrations')) return tNav('integrations')
     if (pathname?.includes('/profile')) return 'Profil'
-    if (pathname?.includes('/settings')) return 'Ayarlar'
+    if (pathname?.includes('/settings')) return tNav('settings')
     return ''
   }
 

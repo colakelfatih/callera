@@ -9,7 +9,8 @@ import {
   Users,
   Plug,
   Menu,
-  TestTube
+  TestTube,
+  Settings
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ export function Sidebar({ currentPath, isCollapsed = false, onToggle, locale = '
     { name: t('pipeline'), href: `/${locale}/dashboard/crm-pipeline`, icon: Users },
     { name: t('wiroTest'), href: `/${locale}/dashboard/wiro-test`, icon: TestTube },
     { name: t('integrations'), href: `/${locale}/dashboard/integrations`, icon: Plug },
+    { name: t('settings'), href: `/${locale}/dashboard/settings`, icon: Settings },
   ]
 
   return (
