@@ -224,22 +224,41 @@ export async function POST(request: NextRequest) {
         }
 
         // Handle changes array (alternative webhook format)
+        // This format is: { field: "messages", value: { sender, recipient, message, ... } }
         if (entry.changes && Array.isArray(entry.changes)) {
           console.log(`🔄 Processing ${entry.changes.length} Instagram change(s)`)
           for (const change of entry.changes) {
             console.log('📝 Change event:', {
               field: change.field,
               valueKeys: change.value ? Object.keys(change.value) : [],
+              value: JSON.stringify(change.value).substring(0, 200),
             })
 
-            // Handle message changes
+            // Handle message changes - value contains the message directly
             if (change.field === 'messages' && change.value) {
               const value = change.value
-              if (value.messaging && Array.isArray(value.messaging)) {
-                for (const event of value.messaging) {
-                  if (event.message && !event.message.is_echo) {
-                    await handleIncomingMessage(event, entry.id, payload)
-                  }
+              
+              // Format: { sender: {id}, recipient: {id}, timestamp, message: {mid, text} }
+              if (value.message && value.sender && value.recipient) {
+                const event = {
+                  sender: value.sender,
+                  recipient: value.recipient,
+                  timestamp: value.timestamp,
+                  message: value.message,
+                }
+                
+                console.log('📨 Message from changes array:', {
+                  senderId: event.sender?.id,
+                  recipientId: event.recipient?.id,
+                  messageId: event.message?.mid,
+                  messageText: event.message?.text?.substring(0, 50),
+                  isEcho: event.message?.is_echo,
+                })
+
+                if (!event.message.is_echo) {
+                  await handleIncomingMessage(event, entry.id, payload)
+                } else {
+                  console.log('⏭️ Skipping echo message from changes')
                 }
               }
             }
