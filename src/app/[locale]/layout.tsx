@@ -14,6 +14,21 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
 }
 
+// Script to prevent flash of wrong theme
+const themeScript = `
+  (function() {
+    try {
+      var savedTheme = localStorage.getItem('callera-theme');
+      var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  })();
+`;
+
 export default async function LocaleLayout({
   children,
   params
@@ -27,8 +42,11 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale}>
-      <body className="font-sans bg-background-light dark:bg-background-dark text-navy dark:text-gray-200">
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="font-sans antialiased bg-background-light dark:bg-background-dark text-navy dark:text-gray-200 transition-colors duration-200">
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
             {children}

@@ -5,11 +5,12 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
+// Hepsiburada style cards - clean with subtle shadows
 export function Card({ className, children, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700',
+        'bg-white dark:bg-navy-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow',
         className
       )}
       {...props}
@@ -22,7 +23,7 @@ export function Card({ className, children, ...props }: CardProps) {
 export function CardHeader({ className, children, ...props }: CardProps) {
   return (
     <div
-      className={cn('p-6 pb-4', className)}
+      className={cn('p-5 pb-3', className)}
       {...props}
     >
       {children}
@@ -33,7 +34,7 @@ export function CardHeader({ className, children, ...props }: CardProps) {
 export function CardContent({ className, children, ...props }: CardProps) {
   return (
     <div
-      className={cn('p-6 pt-0', className)}
+      className={cn('p-5 pt-0', className)}
       {...props}
     >
       {children}
@@ -44,7 +45,7 @@ export function CardContent({ className, children, ...props }: CardProps) {
 export function CardTitle({ className, children, ...props }: CardProps) {
   return (
     <h3
-      className={cn('text-lg font-bold text-navy dark:text-white', className)}
+      className={cn('text-lg font-semibold text-navy dark:text-white', className)}
       {...props}
     >
       {children}

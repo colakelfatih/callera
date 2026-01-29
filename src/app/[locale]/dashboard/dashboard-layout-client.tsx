@@ -16,12 +16,36 @@ export default function DashboardLayoutClient({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    // Check for saved theme preference
+    // Check for saved theme preference or system preference
     const savedTheme = localStorage.getItem('callera-theme')
-    if (savedTheme === 'dark') {
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    
+    // Priority: saved preference > system preference
+    const shouldBeDark = savedTheme === 'dark' || (savedTheme === null && systemPrefersDark)
+    
+    if (shouldBeDark) {
       setIsDark(true)
       document.documentElement.classList.add('dark')
+    } else {
+      setIsDark(false)
+      document.documentElement.classList.remove('dark')
     }
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      // Only apply system preference if no saved preference
+      if (!localStorage.getItem('callera-theme')) {
+        setIsDark(e.matches)
+        if (e.matches) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      }
+    }
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange)
 
     // Handle window resize
     const handleResize = () => {
@@ -31,7 +55,10 @@ export default function DashboardLayoutClient({
     }
 
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      mediaQuery.removeEventListener('change', handleSystemThemeChange)
+    }
   }, [])
 
   const toggleSidebar = () => {
@@ -87,7 +114,6 @@ export default function DashboardLayoutClient({
           onThemeToggle={toggleTheme}
           isDark={isDark}
           onMobileMenuToggle={toggleMobileMenu}
-          isMobileMenuOpen={isMobileMenuOpen}
         />
 
         <main className="flex-1 overflow-auto">

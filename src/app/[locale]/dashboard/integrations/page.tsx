@@ -163,15 +163,7 @@ export default function IntegrationsPage() {
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Entegrasyonlar</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Sosyal medya hesaplarınızı ve servislerinizi bağlayın
-          </p>
-        </div>
-      </header>
+      {/* Header - Title is shown in TopBar */}
 
       {/* Content */}
       <main className="flex-1 p-4 md:p-10">
@@ -186,41 +178,39 @@ export default function IntegrationsPage() {
             return (
               <div
                 key={integration.id}
-                className="bg-white dark:bg-gray-900/50 p-6 rounded-lg border border-gray-200 dark:border-gray-800"
+                className="bg-white dark:bg-gray-900/50 p-4 md:p-6 rounded-lg border border-gray-200 dark:border-gray-800"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${integration.gradient} rounded-lg flex items-center justify-center shadow-lg`}>
-                      <Icon size={24} className="text-white" />
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
+                  <div className={`w-12 h-12 shrink-0 bg-gradient-to-br ${integration.gradient} rounded-lg flex items-center justify-center shadow-lg`}>
+                    <Icon size={24} className="text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
+                        {integration.name}
+                      </h3>
+                      {integration.comingSoon && (
+                        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full">
+                          Yakında
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                          {integration.name}
-                        </h3>
-                        {integration.comingSoon && (
-                          <span className="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full">
-                            Yakında
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {integration.description}
-                      </p>
-                    </div>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {integration.description}
+                    </p>
                   </div>
                 </div>
 
                 {/* Connected Account Display */}
                 {isConnected && account && (
-                  <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
+                  <div className="mb-4 p-3 md:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 bg-gradient-to-br ${integration.gradient} rounded-full flex items-center justify-center`}>
+                        <div className={`w-10 h-10 shrink-0 bg-gradient-to-br ${integration.gradient} rounded-full flex items-center justify-center`}>
                           <Icon size={20} className="text-white" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-900 dark:text-white truncate">
                             @{account.username}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -228,14 +218,14 @@ export default function IntegrationsPage() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-                          <CheckCircle size={16} />
+                      <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 mt-2 sm:mt-0">
+                        <span className="flex items-center gap-1 text-xs sm:text-sm text-green-600 dark:text-green-400">
+                          <CheckCircle size={14} />
                           Aktif
                         </span>
                         <button
                           onClick={() => handleDisconnect(account.id, account.platform)}
-                          className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          className="px-3 py-1.5 text-xs sm:text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                         >
                           Bağlantıyı Kes
                         </button>
@@ -285,7 +275,7 @@ export default function IntegrationsPage() {
                   <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                     {integration.features.map((feature, index) => (
                       <li key={index} className="flex items-center gap-2">
-                        <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                        <CheckCircle size={16} className="text-green-500 shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -298,7 +288,7 @@ export default function IntegrationsPage() {
 
         {/* Info Alert */}
         <div className="max-w-4xl mx-auto mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+          <AlertCircle size={20} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800 dark:text-blue-300">
             <p className="font-semibold mb-1">Önemli Notlar:</p>
             <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">

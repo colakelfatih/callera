@@ -285,59 +285,59 @@ export default function CRMPipelinePage() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Top Navigation */}
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-8 py-4 shrink-0">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="w-full max-w-xs relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-4 md:px-6 py-3 md:py-4 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          <div className="w-full sm:w-auto sm:min-w-[180px] md:max-w-xs relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
-              className="h-10 w-full rounded-lg border-none bg-gray-50 dark:bg-navy-700 pl-10 pr-4 text-sm text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:outline-none"
+              className="h-9 md:h-10 w-full rounded-lg border-none bg-gray-50 dark:bg-navy-700 pl-9 pr-4 text-sm text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:outline-none"
               placeholder={t('searchDeals')}
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-2 md:px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
               <Calendar size={16} />
               <input
                 type="date"
-                className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer"
+                className="bg-transparent border-none outline-none text-xs md:text-sm font-medium cursor-pointer w-[110px] md:w-[130px]"
                 placeholder={t('dateRange')}
               />
             </div>
-            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-1 md:gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-2 md:px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
               <Tag size={16} />
-              <p className="text-sm font-medium">{t('tags')}</p>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <span className="text-xs md:text-sm font-medium hidden sm:inline">{t('tags')}</span>
+              <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M7 10l5 5 5-5z" />
               </svg>
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           <button 
             onClick={handleAddNewDeal}
-            className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors"
+            className="flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 md:h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors"
           >
             <Plus size={16} />
-            {t('newDeal')}
+            <span>{t('newDeal')}</span>
           </button>
         </div>
       </header>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto p-6">
+      <div className="flex-1 overflow-x-auto p-3 md:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 dark:text-gray-400">Yükleniyor...</div>
           </div>
         ) : (
-          <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-4">
+          <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-3 md:gap-4">
             {pipelineData.map((column) => (
             <div
               key={column.id}
-              className="flex w-64 h-full flex-col gap-3"
+              className="flex w-[260px] md:w-72 h-full flex-col gap-3"
             >
               <h3 className="text-navy dark:text-white text-base font-bold tracking-tight px-1 shrink-0">
                 {column.title} ({column.count})
@@ -449,9 +449,9 @@ export default function CRMPipelinePage() {
 
       {/* Add Deal Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowAddModal(false)}>
+        <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50" onClick={() => setShowAddModal(false)}>
           <div 
-            className="bg-white dark:bg-navy-800 rounded-lg p-6 w-full max-w-md shadow-xl"
+            className="bg-white dark:bg-navy-800 rounded-t-2xl md:rounded-lg p-4 md:p-6 w-full md:max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold text-navy dark:text-white mb-4">Yeni Müşteri Ekle</h2>
@@ -559,7 +559,7 @@ export default function CRMPipelinePage() {
           onClick={() => setSelectedDeal(null)}
         >
           <div 
-            className="sidebar-panel bg-white dark:bg-navy-800 w-full max-w-md h-full overflow-y-auto shadow-2xl"
+            className="sidebar-panel bg-white dark:bg-navy-800 w-full md:max-w-md h-full overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

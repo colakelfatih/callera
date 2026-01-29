@@ -9,40 +9,69 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Hepsiburada Color Palette
         primary: {
-          DEFAULT: '#2F80ED',
-          50: '#EBF4FF',
-          100: '#D6E8FF',
-          200: '#B3D1FF',
-          300: '#80B3FF',
-          400: '#4D95FF',
-          500: '#2F80ED',
-          600: '#1A5BB8',
-          700: '#0E3A7A',
-          800: '#0E1B3D',
-          900: '#0A1530',
+          DEFAULT: '#FF6000',  // Hepsiburada Orange
+          50: '#FFF7F0',
+          100: '#FFEFE0',
+          200: '#FFD4B8',
+          300: '#FFB885',
+          400: '#FF8C42',
+          500: '#FF6000',      // Main Orange
+          600: '#E55500',      // Hover Orange
+          700: '#CC4A00',
+          800: '#993800',
+          900: '#662500',
         },
         navy: {
-          DEFAULT: '#0E1B3D',
-          50: '#F0F2F7',
-          100: '#D9DEE8',
-          200: '#B3C0D1',
-          300: '#8DA2BA',
-          400: '#6784A3',
-          500: '#41668C',
-          600: '#2A4A6B',
-          700: '#1E2A4D',
-          800: '#0E1B3D',
-          900: '#0A1530',
+          DEFAULT: '#484848',  // Hepsiburada Dark Text
+          50: '#FAFAFA',
+          100: '#F5F5F5',
+          200: '#E8E8E8',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#484848',      // Main Dark
+          800: '#363636',
+          900: '#1A1A1A',
         },
         background: {
-          light: '#F6F7F8',
-          dark: '#111721',
+          light: '#F5F5F5',    // Hepsiburada Light Background
+          dark: '#121212',     // Modern dark background
+        },
+        // Dark mode specific colors
+        dark: {
+          DEFAULT: '#121212',
+          50: '#2A2A2A',
+          100: '#252525',
+          200: '#202020',
+          300: '#1A1A1A',
+          400: '#151515',
+          500: '#121212',
+          600: '#0E0E0E',
+          700: '#0A0A0A',
+          800: '#050505',
+          900: '#000000',
+        },
+        // Additional Hepsiburada colors
+        hb: {
+          orange: '#FF6000',
+          'orange-dark': '#E55500',
+          'orange-light': '#FFF4ED',
+          green: '#00C853',
+          'green-light': '#E8F9EF',
+          red: '#F44336',
+          'red-light': '#FEECEB',
+          gray: '#666666',
+          'gray-light': '#999999',
+          border: '#E0E0E0',
         }
       },
       fontFamily: {
-        display: ['Manrope', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Hepsiburada uses Inter font
+        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         'DEFAULT': '0.5rem',

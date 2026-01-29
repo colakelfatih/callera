@@ -33,31 +33,45 @@ export function Sidebar({ currentPath, isCollapsed = false, onToggle, locale = '
 
   return (
     <div className={cn(
-      'bg-white dark:bg-navy-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 h-full overflow-y-auto',
+      'bg-white dark:bg-[#1E1E1E] border-r border-gray-200 dark:border-gray-800 transition-all duration-300 h-full overflow-y-auto relative',
       isCollapsed ? 'w-16' : 'w-64'
     )}>
       <div className={cn(
-        "flex items-center border-b border-gray-200 dark:border-gray-700",
-        isCollapsed ? "justify-center p-4" : "justify-between p-4"
+        "flex items-center border-b border-gray-200 dark:border-gray-800",
+        isCollapsed ? "justify-center p-3" : "justify-between p-4"
       )}>
-        {!isCollapsed && (
-          <div className="font-display font-bold text-navy dark:text-white text-lg">
+        {!isCollapsed ? (
+          <div className="font-display font-bold text-primary text-xl">
             Callera
           </div>
+        ) : (
+          <div className="font-display font-bold text-primary text-xl">
+            C
+          </div>
         )}
+        {!isCollapsed && (
+          <button
+            onClick={onToggle}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+            aria-label={t('collapseSidebar')}
+          >
+            <Menu size={20} />
+          </button>
+        )}
+      </div>
+      
+      {/* Expand button when collapsed - at bottom */}
+      {isCollapsed && (
         <button
           onClick={onToggle}
-          className={cn(
-            "hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors",
-            isCollapsed ? "p-4" : "p-2"
-          )}
-          aria-label={isCollapsed ? t('expandSidebar') : t('collapseSidebar')}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors text-gray-500 dark:text-gray-400"
+          aria-label={t('expandSidebar')}
         >
-          <Menu size={isCollapsed ? 28 : 20} />
+          <Menu size={20} />
         </button>
-      </div>
+      )}
 
-      <nav className="p-4 space-y-2">
+      <nav className={cn("space-y-2", isCollapsed ? "p-2" : "p-4")}>
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
           return (
@@ -66,19 +80,24 @@ export function Sidebar({ currentPath, isCollapsed = false, onToggle, locale = '
               href={item.href}
               className={cn(
                 'flex items-center transition-colors group relative',
-                isCollapsed ? 'justify-center px-4 py-5 rounded-xl min-h-[48px]' : 'gap-3 px-4 py-3 rounded-xl',
+                isCollapsed 
+                  ? 'justify-center w-12 h-12 mx-auto rounded-lg' 
+                  : 'gap-3 px-4 py-3 rounded-lg',
                 isActive
-                  ? 'bg-primary/10 text-primary dark:text-primary-300'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-navy-700 hover:text-navy dark:hover:text-white'
+                  ? isCollapsed
+                    ? 'bg-primary-50 text-primary dark:bg-primary/20 dark:text-primary-400'
+                    : 'bg-primary-50 text-primary dark:bg-primary/20 dark:text-primary-400 font-semibold border-l-4 border-primary'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] hover:text-primary dark:hover:text-primary-400'
               )}
               title={isCollapsed ? item.name : undefined}
             >
-              <item.icon size={isCollapsed ? 28 : 20} />
+              <item.icon size={isCollapsed ? 24 : 20} className="shrink-0" />
               {!isCollapsed && (
                 <span className="font-medium">{item.name}</span>
               )}
+              {/* Tooltip on hover when collapsed */}
               {isCollapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute left-full ml-3 px-3 py-2 bg-navy-800 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
                   {item.name}
                 </div>
               )}

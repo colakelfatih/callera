@@ -88,9 +88,10 @@ export default function CRMPage() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Top Navigation */}
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-8 py-4 shrink-0">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="w-full max-w-xs relative">
+      <header className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-4 md:px-6 py-4 shrink-0">
+        {/* Search and Filters Row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          <div className="w-full sm:w-auto sm:min-w-[200px] lg:max-w-xs relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               className="h-10 w-full rounded-lg border-none bg-gray-50 dark:bg-navy-700 pl-10 pr-4 text-sm text-navy dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:outline-none"
@@ -100,45 +101,45 @@ export default function CRMPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 overflow-x-auto">
             <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
               <Calendar size={16} />
               <input
                 type="date"
-                className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer"
+                className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer w-[130px]"
                 placeholder={t('dateRange')}
               />
             </div>
             <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
               <Tag size={16} />
-              <p className="text-sm font-medium">{t('tags')}</p>
+              <p className="text-sm font-medium hidden sm:block">{t('tags')}</p>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M7 10l5 5 5-5z" />
               </svg>
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex gap-2">
-            {['all', 'lead', 'prospect', 'customer', 'closed'].map((status) => (
-              <Button
-                key={status}
-                variant={filter === status ? 'primary' : 'ghost'}
-                size="sm"
-                onClick={() => setFilter(status)}
-                className="capitalize"
-              >
-                {t(status as 'all' | 'lead' | 'prospect' | 'customer' | 'closed')}
-              </Button>
-            ))}
-          </div>
+        
+        {/* Status Filters */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
+          {['all', 'lead', 'prospect', 'customer', 'closed'].map((status) => (
+            <Button
+              key={status}
+              variant={filter === status ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setFilter(status)}
+              className="capitalize whitespace-nowrap text-xs sm:text-sm"
+            >
+              {t(status as 'all' | 'lead' | 'prospect' | 'customer' | 'closed')}
+            </Button>
+          ))}
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
           {/* Contacts List */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             <Card className="w-full">
             <CardHeader className="w-full">
               <div className="flex items-center justify-between gap-2 w-full min-w-0">
@@ -164,30 +165,31 @@ export default function CRMPage() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {filteredContacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className={`flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
-                        selectedContact?.id === contact.id ? 'ring-2 ring-primary' : ''
+                      className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors ${
+                        selectedContact?.id === contact.id ? 'ring-2 ring-primary bg-primary/5' : ''
                       }`}
                       onClick={() => setSelectedContact(contact)}
                     >
-                      <Avatar name={contact.name} size="md" />
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-navy dark:text-white truncate">
-                          {contact.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {contact.company || contact.phone || ''}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
-                          {t('lastContact')}: {formatDate(contact.lastContact)}
-                        </p>
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar name={contact.name} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-navy dark:text-white truncate text-sm sm:text-base">
+                            {contact.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                            {contact.company || contact.phone || ''}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
+                            {t('lastContact')}: {formatDate(contact.lastContact)}
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 ml-[52px] sm:ml-0">
                         <Badge 
                           variant="default" 
                           className={`text-xs ${statusColors[contact.status as keyof typeof statusColors] || statusColors.lead}`}
@@ -195,9 +197,9 @@ export default function CRMPage() {
                           {contact.status}
                         </Badge>
                         
-                        <div className="flex gap-1 items-start">
+                        <div className="flex gap-1 items-center">
                           {contact.email && (
-                            <Button variant="ghost" size="sm" className="p-2" onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="sm" className="p-2 h-8 w-8" onClick={(e) => e.stopPropagation()}>
                               <Mail size={16} />
                             </Button>
                           )}
@@ -205,7 +207,7 @@ export default function CRMPage() {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="p-2 flex items-start" 
+                              className="p-2 h-8 w-8" 
                               onClick={(e) => handleWhatsAppClick(contact.phone, e)}
                               title="WhatsApp"
                             >
@@ -222,8 +224,8 @@ export default function CRMPage() {
             </Card>
           </div>
 
-        {/* Contact Detail */}
-        <div>
+        {/* Contact Detail - Desktop */}
+        <div className="hidden xl:block">
           {selectedContact ? (
             <Card>
               <CardHeader>
@@ -284,7 +286,7 @@ export default function CRMPage() {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 flex items-center">
+                  <Button variant="outline" size="sm" className="flex-1 flex items-center justify-center">
                     <Mail size={16} className="mr-2" />
                     Email
                   </Button>
@@ -292,7 +294,7 @@ export default function CRMPage() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="flex-1 flex items-center"
+                      className="flex-1 flex items-center justify-center"
                       onClick={(e) => {
                         e.preventDefault()
                         router.push(`/${locale}/dashboard/inbox?phone=${encodeURIComponent(selectedContact.phone!)}&channel=whatsapp`)
@@ -319,6 +321,95 @@ export default function CRMPage() {
             </Card>
           )}
         </div>
+        
+        {/* Contact Detail - Mobile Bottom Sheet */}
+        {selectedContact && (
+          <div className="xl:hidden fixed inset-0 bg-black/50 z-50" onClick={() => setSelectedContact(null)}>
+            <div 
+              className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1E1E1E] rounded-t-2xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Handle bar */}
+              <div className="sticky top-0 bg-white dark:bg-[#1E1E1E] pt-3 pb-2 px-4">
+                <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto" />
+              </div>
+              
+              <div className="px-4 pb-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <Avatar name={selectedContact.name} size="lg" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-navy dark:text-white truncate">{selectedContact.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm truncate">{selectedContact.company}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-5">
+                  <div>
+                    <h4 className="font-semibold text-navy dark:text-white mb-2 text-sm">{t('contactInfo')}</h4>
+                    <div className="space-y-2 text-sm">
+                      {selectedContact.email && (
+                        <div className="flex items-center gap-2">
+                          <Mail size={16} className="text-gray-400 shrink-0" />
+                          <span className="text-gray-600 dark:text-gray-400 truncate">{selectedContact.email}</span>
+                        </div>
+                      )}
+                      {selectedContact.phone && (
+                        <div className="flex items-center gap-2">
+                          <WhatsAppIcon size={16} className="text-gray-400 shrink-0" />
+                          <span className="text-gray-600 dark:text-gray-400">{selectedContact.phone}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-navy dark:text-white mb-2 text-sm">Status</h4>
+                    <Badge 
+                      variant="default" 
+                      className={`text-sm ${statusColors[selectedContact.status as keyof typeof statusColors] || statusColors.lead}`}
+                    >
+                      {selectedContact.status}
+                    </Badge>
+                  </div>
+                  
+                  {selectedContact.tags && selectedContact.tags.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-navy dark:text-white mb-2 text-sm">Tags</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedContact.tags.map((tag) => (
+                          <Badge key={tag.id} variant="info" className="text-xs">
+                            {tag.tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" className="flex-1 flex items-center justify-center">
+                      <Mail size={16} className="mr-2" />
+                      Email
+                    </Button>
+                    {selectedContact.phone && (
+                      <Button 
+                        variant="primary" 
+                        size="sm" 
+                        className="flex-1 flex items-center justify-center"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          router.push(`/${locale}/dashboard/inbox?phone=${encodeURIComponent(selectedContact.phone!)}&channel=whatsapp`)
+                        }}
+                      >
+                        <WhatsAppIcon size={16} className="mr-2" />
+                        WhatsApp
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>

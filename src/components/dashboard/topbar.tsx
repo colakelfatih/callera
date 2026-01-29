@@ -1,18 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useRouter, useParams, usePathname } from 'next/navigation'
-import { Moon, Sun, Menu, LogOut } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { Moon, Sun, Menu, LogOut, Globe, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { authClient } from '@/components/auth/auth-provider'
+
+// Language options with flags
+const languages = [
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+]
 
 interface TopBarProps {
   onThemeToggle?: () => void
   isDark?: boolean
   onMobileMenuToggle?: () => void
-  isMobileMenuOpen?: boolean
 }
 
 interface UserSession {
@@ -24,18 +29,41 @@ interface UserSession {
   }
 }
 
-export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMobileMenuOpen = false }: TopBarProps) {
+export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle }: TopBarProps) {
   const router = useRouter()
-  const params = useParams()
   const pathname = usePathname()
-  const locale = params.locale as string
+  const locale = useLocale()
   const t = useTranslations('topbar')
   const tNav = useTranslations('navigation')
   const tInbox = useTranslations('inbox')
   const tCrm = useTranslations('crm')
   const tAuth = useTranslations('auth')
+  const tLang = useTranslations('language')
   const [user, setUser] = useState<UserSession['user'] | null>(null)
   const [loading, setLoading] = useState(true)
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false)
+  const langDropdownRef = useRef<HTMLDivElement>(null)
+  
+  // Current language
+  const currentLang = languages.find(l => l.code === locale) || languages[0]
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+        setLangDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Change language
+  const changeLanguage = (langCode: string) => {
+    const newPathname = pathname?.replace(`/${locale}`, `/${langCode}`) || `/${langCode}`
+    router.push(newPathname)
+    setLangDropdownOpen(false)
+  }
 
   // Get page title based on current path
   const getPageTitle = () => {
@@ -86,7 +114,7 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
   const userEmail = user?.email || ''
 
   return (
-    <div className="bg-white dark:bg-navy-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
+    <div className="bg-white dark:bg-[#1E1E1E] border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 py-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Mobile menu button */}
@@ -106,7 +134,44 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle, isMo
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+        <div className="flex items-center gap-2 md:gap-4 shrink-0">
+          {/* Language Switcher */}
+          <div className="relative" ref={langDropdownRef}>
+            <button
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-sm font-medium text-navy dark:text-white"
+              aria-label={tLang('switchToEnglish')}
+            >
+              <span className="text-base">{currentLang.flag}</span>
+              <span className="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
+              <ChevronDown size={14} className={`transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Dropdown Menu */}
+            {langDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-[#252525] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => changeLanguage(lang.code)}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary-50 dark:hover:bg-navy-700 transition-colors ${
+                      locale === lang.code
+                        ? 'text-primary font-semibold bg-primary-50 dark:bg-primary/10'
+                        : 'text-navy dark:text-white'
+                    }`}
+                  >
+                    <span className="text-lg">{lang.flag}</span>
+                    <span>{lang.name}</span>
+                    {locale === lang.code && (
+                      <span className="ml-auto text-primary">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="sm"
