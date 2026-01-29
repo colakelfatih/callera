@@ -96,71 +96,125 @@ export async function POST(request: NextRequest) {
     const bodyText = await request.text()
     const signature = request.headers.get('x-hub-signature-256') || ''
 
-    // Log webhook payload
-    console.log('instagram.webhook.received', { bytes: bodyText.length })
+    // Log full webhook payload for debugging
+    console.log('📨 instagram.webhook.received', { 
+      bytes: bodyText.length,
+      hasSignature: !!signature,
+      payload: bodyText.substring(0, 500), // First 500 chars for debugging
+    })
 
     // Verify signature
     if (!verifySignature(bodyText, signature)) {
-      console.error('❌ Invalid Instagram webhook signature')
+      console.error('❌ Invalid Instagram webhook signature', { signature })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
     }
 
     // Parse JSON payload
-    const payload: InstagramWebhookPayload = JSON.parse(bodyText)
+    let payload: any
+    try {
+      payload = JSON.parse(bodyText)
+    } catch (parseError) {
+      console.error('❌ Failed to parse webhook payload:', parseError)
+      return new NextResponse('OK', { status: 200 })
+    }
 
-    // Instagram webhook structure (similar to WhatsApp but uses 'messaging' array):
+    console.log('📋 Instagram webhook payload parsed:', {
+      object: payload.object,
+      entryCount: payload.entry?.length || 0,
+    })
+
+    // Instagram Business API webhook structure:
     // {
     //   "object": "instagram",
     //   "entry": [{
-    //     "id": "<PAGE_ID>",
+    //     "id": "<INSTAGRAM_BUSINESS_ACCOUNT_ID>",
     //     "time": 1234567890,
     //     "messaging": [{
-    //       "sender": { "id": "<SENDER_PSID>" },
-    //       "recipient": { "id": "<PAGE_ID>" },
+    //       "sender": { "id": "<IGSID>" },  // Instagram-scoped User ID
+    //       "recipient": { "id": "<INSTAGRAM_BUSINESS_ACCOUNT_ID>" },
     //       "timestamp": 1234567890,
     //       "message": {
     //         "mid": "<MESSAGE_ID>",
     //         "text": "Hello!",
-    //         "is_echo": false  // true if sent by the page
+    //         "is_echo": false
     //       }
     //     }]
     //   }]
     // }
 
-    // Process each entry
-    if (payload.object === 'instagram' && payload.entry) {
+    // Process each entry - accept both "instagram" and "page" object types
+    if ((payload.object === 'instagram' || payload.object === 'page') && payload.entry) {
       for (const entry of payload.entry) {
-        // Debug: Log entry structure
-        console.log('instagram.webhook.entry', {
+        // Debug: Log full entry structure
+        console.log('📬 instagram.webhook.entry', {
           entryId: entry.id,
           time: entry.time,
           hasMessaging: !!entry.messaging,
           messagingCount: entry.messaging?.length || 0,
+          hasChanges: !!entry.changes,
+          changesCount: entry.changes?.length || 0,
+          entryKeys: Object.keys(entry),
         })
 
+        // Handle messaging array (Instagram Direct Messages)
         if (entry.messaging && Array.isArray(entry.messaging)) {
-          console.log(`Processing ${entry.messaging.length} Instagram message(s)`)
+          console.log(`🔄 Processing ${entry.messaging.length} Instagram message(s)`)
           for (const event of entry.messaging) {
+            console.log('📝 Messaging event:', {
+              hasSender: !!event.sender,
+              senderId: event.sender?.id,
+              hasRecipient: !!event.recipient,
+              recipientId: event.recipient?.id,
+              hasMessage: !!event.message,
+              messageId: event.message?.mid,
+              isEcho: event.message?.is_echo,
+              messageText: event.message?.text?.substring(0, 50),
+            })
+
             // Only process incoming messages (not sent by us)
             if (event.message && !event.message.is_echo) {
               await handleIncomingMessage(event, entry.id, payload)
             } else if (event.message?.is_echo) {
-              console.log('Skipping echo message (sent by page):', event.message.mid)
+              console.log('⏭️ Skipping echo message (sent by page):', event.message.mid)
+            }
+          }
+        }
+
+        // Handle changes array (alternative webhook format)
+        if (entry.changes && Array.isArray(entry.changes)) {
+          console.log(`🔄 Processing ${entry.changes.length} Instagram change(s)`)
+          for (const change of entry.changes) {
+            console.log('📝 Change event:', {
+              field: change.field,
+              valueKeys: change.value ? Object.keys(change.value) : [],
+            })
+
+            // Handle message changes
+            if (change.field === 'messages' && change.value) {
+              const value = change.value
+              if (value.messaging && Array.isArray(value.messaging)) {
+                for (const event of value.messaging) {
+                  if (event.message && !event.message.is_echo) {
+                    await handleIncomingMessage(event, entry.id, payload)
+                  }
+                }
+              }
             }
           }
         }
       }
     } else {
-      console.warn('Unexpected Instagram webhook payload structure:', {
+      console.warn('⚠️ Unexpected Instagram webhook payload structure:', {
         object: payload.object,
         hasEntry: !!payload.entry,
+        payloadKeys: Object.keys(payload),
       })
     }
 
     // Always ACK quickly (Meta requires quick response)
     return new NextResponse('OK', { status: 200 })
   } catch (error: any) {
-    console.error('Instagram webhook error:', error)
+    console.error('❌ Instagram webhook error:', error?.message || error, error?.stack)
     // Still return OK to prevent Meta from retrying
     return new NextResponse('OK', { status: 200 })
   }
