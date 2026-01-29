@@ -158,9 +158,19 @@ export async function POST(request: NextRequest) {
 
         // Handle messaging array (Instagram Direct Messages)
         if (entry.messaging && Array.isArray(entry.messaging)) {
-          console.log(`🔄 Processing ${entry.messaging.length} Instagram message(s)`)
+          console.log(`🔄 Processing ${entry.messaging.length} Instagram event(s)`)
           for (const event of entry.messaging) {
+            // Determine event type
+            const eventType = event.message ? 'message' 
+              : event.read ? 'read_receipt'
+              : event.delivery ? 'delivery'
+              : event.reaction ? 'reaction'
+              : event.postback ? 'postback'
+              : 'unknown'
+
             console.log('📝 Messaging event:', {
+              eventType,
+              timestamp: event.timestamp,
               hasSender: !!event.sender,
               senderId: event.sender?.id,
               hasRecipient: !!event.recipient,
@@ -169,13 +179,46 @@ export async function POST(request: NextRequest) {
               messageId: event.message?.mid,
               isEcho: event.message?.is_echo,
               messageText: event.message?.text?.substring(0, 50),
+              // For read receipts
+              readMid: event.read?.mid,
+              // For reactions
+              reactionEmoji: event.reaction?.emoji,
             })
 
-            // Only process incoming messages (not sent by us)
+            // Handle different event types
             if (event.message && !event.message.is_echo) {
+              // New incoming message
               await handleIncomingMessage(event, entry.id, payload)
             } else if (event.message?.is_echo) {
+              // Message sent by us (echo)
               console.log('⏭️ Skipping echo message (sent by page):', event.message.mid)
+            } else if (event.read) {
+              // Read receipt - user has read our message
+              console.log('👀 Read receipt received:', {
+                mid: event.read.mid,
+                timestamp: event.timestamp,
+              })
+            } else if (event.delivery) {
+              // Delivery confirmation
+              console.log('✅ Delivery confirmation:', {
+                mids: event.delivery.mids,
+                timestamp: event.timestamp,
+              })
+            } else if (event.reaction) {
+              // Reaction to a message
+              console.log('😀 Reaction received:', {
+                mid: event.reaction.mid,
+                emoji: event.reaction.emoji,
+                action: event.reaction.action,
+              })
+            } else if (event.postback) {
+              // Button click postback
+              console.log('🔘 Postback received:', {
+                payload: event.postback.payload,
+                title: event.postback.title,
+              })
+            } else {
+              console.log('❓ Unknown event type:', Object.keys(event))
             }
           }
         }

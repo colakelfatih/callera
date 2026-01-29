@@ -106,6 +106,10 @@ export async function GET(request: NextRequest) {
 
     console.log('Instagram user info:', { id: userInfo.id, username, accountType: userInfo.account_type })
 
+    // Note: Facebook Page subscription is handled at the app level in Developer Console
+    // The Instagram token we get here is for Instagram Graph API only
+    // Webhook subscriptions are managed via the Facebook Developer Console
+
     // Step 4: Save to database
     const { db } = await import('@/lib/db')
     
