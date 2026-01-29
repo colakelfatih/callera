@@ -1,8 +1,7 @@
-// Instagram OAuth Callback Route
+// Instagram Business OAuth Callback Route
 
 import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
-import { InstagramClient } from '@/lib/instagram/client'
 
 const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID
 const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET
@@ -11,6 +10,7 @@ const REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI ||
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 const DEFAULT_LOCALE = 'tr'
+const GRAPH_API_VERSION = 'v21.0'
 
 function getRedirectUrl(path: string, params?: Record<string, string>) {
   const url = new URL(`${BASE_URL}/${DEFAULT_LOCALE}${path}`)
@@ -28,9 +28,12 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get('code')
     const state = searchParams.get('state') // User ID
     const error = searchParams.get('error')
+    const errorReason = searchParams.get('error_reason')
+    const errorDescription = searchParams.get('error_description')
 
     if (error) {
-      return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error }))
+      console.error('Instagram OAuth error:', { error, errorReason, errorDescription })
+      return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: errorDescription || error }))
     }
 
     if (!code) {
@@ -45,80 +48,101 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: 'config_error' }))
     }
 
-    // Exchange authorization code for short-lived access token
-    // Instagram API requires form-urlencoded data
-    const formData = new URLSearchParams()
-    formData.append('client_id', INSTAGRAM_APP_ID)
-    formData.append('client_secret', INSTAGRAM_APP_SECRET)
-    formData.append('grant_type', 'authorization_code')
-    formData.append('redirect_uri', REDIRECT_URI)
-    formData.append('code', code)
+    // Step 1: Exchange authorization code for short-lived access token
+    // Instagram Business API uses Graph API endpoint
+    const tokenUrl = `https://graph.instagram.com/oauth/access_token`
+    const tokenParams = new URLSearchParams({
+      client_id: INSTAGRAM_APP_ID,
+      client_secret: INSTAGRAM_APP_SECRET,
+      grant_type: 'authorization_code',
+      redirect_uri: REDIRECT_URI,
+      code,
+    })
 
-    const tokenResponse = await axios.post(
-      'https://api.instagram.com/oauth/access_token',
-      formData.toString(),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    )
+    console.log('Exchanging code for token...')
+    const tokenResponse = await axios.post(tokenUrl, tokenParams.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    })
 
-    const { access_token, user_id } = tokenResponse.data
+    const { access_token: shortLivedToken, user_id: instagramUserId } = tokenResponse.data
 
-    if (!access_token || !user_id) {
+    if (!shortLivedToken || !instagramUserId) {
+      console.error('Invalid token response:', tokenResponse.data)
       return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: 'invalid_token_response' }))
     }
 
-    // Exchange short-lived token for long-lived token
-    const client = new InstagramClient(access_token)
-    const longLivedToken = await client.exchangeToken(
-      access_token,
-      INSTAGRAM_APP_SECRET
-    )
+    console.log('Short-lived token obtained for user:', instagramUserId)
 
-    // Get user info
-    const userClient = new InstagramClient(longLivedToken)
-    const userInfo = await userClient.getUserInfo()
+    // Step 2: Exchange short-lived token for long-lived token (60 days)
+    const longLivedUrl = `https://graph.instagram.com/access_token`
+    const longLivedResponse = await axios.get(longLivedUrl, {
+      params: {
+        grant_type: 'ig_exchange_token',
+        client_secret: INSTAGRAM_APP_SECRET,
+        access_token: shortLivedToken,
+      },
+    })
 
-    if (!userInfo?.username) {
-      return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: 'user_info_failed' }))
+    const { access_token: longLivedToken, expires_in } = longLivedResponse.data
+
+    if (!longLivedToken) {
+      console.error('Failed to get long-lived token:', longLivedResponse.data)
+      return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: 'long_lived_token_failed' }))
     }
 
-    // Save to database using Prisma
+    console.log('Long-lived token obtained, expires in:', expires_in, 'seconds')
+
+    // Step 3: Get Instagram user info
+    const userInfoUrl = `https://graph.instagram.com/${GRAPH_API_VERSION}/me`
+    const userInfoResponse = await axios.get(userInfoUrl, {
+      params: {
+        fields: 'id,username,account_type,name',
+        access_token: longLivedToken,
+      },
+    })
+
+    const userInfo = userInfoResponse.data
+    const username = userInfo.username || userInfo.name || instagramUserId
+
+    console.log('Instagram user info:', { id: userInfo.id, username, accountType: userInfo.account_type })
+
+    // Step 4: Save to database
     const { db } = await import('@/lib/db')
+    
     await db.instagramConnection.upsert({
       where: {
         userId_instagramUserId: {
           userId: state,
-          instagramUserId: user_id,
+          instagramUserId: String(instagramUserId),
         },
       },
       create: {
         userId: state,
-        instagramUserId: user_id,
-        instagramUsername: userInfo.username,
+        instagramUserId: String(instagramUserId),
+        instagramUsername: username,
         accessToken: longLivedToken,
-        tokenExpiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
+        tokenExpiresAt: new Date(Date.now() + (expires_in || 5184000) * 1000), // Default 60 days
       },
       update: {
-        instagramUsername: userInfo.username,
+        instagramUsername: username,
         accessToken: longLivedToken,
-        tokenExpiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+        tokenExpiresAt: new Date(Date.now() + (expires_in || 5184000) * 1000),
         updatedAt: new Date(),
       },
     })
+
+    console.log('Instagram connection saved for user:', state, 'instagram:', username)
 
     // Redirect to settings page with success
     return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { 
       tab: 'integrations', 
       success: 'true', 
-      username: userInfo.username 
+      username,
     }))
   } catch (error: any) {
-    // eslint-disable-next-line no-console
-    console.error('Instagram callback error:', error)
-    return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: 'callback_failed' }))
+    console.error('Instagram callback error:', error.response?.data || error.message || error)
+    const errorMessage = error.response?.data?.error?.message || 'callback_failed'
+    return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { tab: 'integrations', error: errorMessage }))
   }
 }
 

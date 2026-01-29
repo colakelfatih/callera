@@ -209,15 +209,14 @@ const worker = new Worker<MessageJob>(
         createdAt: outbound.createdAt.toISOString(),
       }).catch(() => {})
     } else if (channel === 'instagram') {
-      // Send AI response via Instagram
+      // Send AI response via Instagram Business API
       try {
-        // Find the Instagram connection to get access token and page ID
+        // Find the Instagram connection to get access token and Instagram user ID
         const instagramConnection = await db.instagramConnection.findFirst({
           where: connectionId ? { id: connectionId } : undefined,
           select: {
             id: true,
             accessToken: true,
-            pageId: true,
             instagramUserId: true,
           },
         })
@@ -225,17 +224,17 @@ const worker = new Worker<MessageJob>(
         if (!instagramConnection) {
           console.warn('⚠️ No InstagramConnection found for sending response', { connectionId, senderId })
           // Continue - message is processed but response not sent
-        } else if (!instagramConnection.accessToken || !instagramConnection.pageId) {
-          console.warn('⚠️ Instagram connection missing accessToken or pageId', {
+        } else if (!instagramConnection.accessToken || !instagramConnection.instagramUserId) {
+          console.warn('⚠️ Instagram connection missing accessToken or instagramUserId', {
             connectionId: instagramConnection.id,
             hasAccessToken: !!instagramConnection.accessToken,
-            hasPageId: !!instagramConnection.pageId,
+            hasInstagramUserId: !!instagramConnection.instagramUserId,
           })
         } else {
-          // Send message via Instagram API
+          // Send message via Instagram Business API
           const client = new InstagramClient(instagramConnection.accessToken)
           const sendResult = await client.sendMessage(
-            instagramConnection.pageId,
+            instagramConnection.instagramUserId,
             senderId,
             aiText
           )
@@ -243,7 +242,7 @@ const worker = new Worker<MessageJob>(
           console.log('✅ Instagram AI response sent:', {
             messageId,
             senderId,
-            pageId: instagramConnection.pageId,
+            instagramUserId: instagramConnection.instagramUserId,
             resultMessageId: sendResult?.message_id,
           })
 

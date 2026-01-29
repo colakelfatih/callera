@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
         },
       })
     } else if (channel === 'instagram') {
-      // Instagram message sending
-      // Find the Instagram connection to get access token and page ID
+      // Instagram Business message sending
+      // Find the Instagram connection to get access token and Instagram user ID
       const instagramConnection = await db.instagramConnection.findFirst({
         where: connectionId 
           ? { id: connectionId, userId: user.id }
@@ -72,7 +72,6 @@ export async function POST(request: NextRequest) {
         select: {
           id: true,
           accessToken: true,
-          pageId: true,
           instagramUserId: true,
         },
       })
@@ -85,14 +84,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Instagram access token not found. Please reconnect your Instagram account.' }, { status: 400 })
       }
 
-      if (!instagramConnection.pageId) {
-        return NextResponse.json({ error: 'Instagram page ID not found. Please reconnect your Instagram account.' }, { status: 400 })
+      if (!instagramConnection.instagramUserId) {
+        return NextResponse.json({ error: 'Instagram user ID not found. Please reconnect your Instagram account.' }, { status: 400 })
       }
 
-      // Send message via Instagram API
+      // Send message via Instagram Business API
       const client = new InstagramClient(instagramConnection.accessToken)
       const sendResult = await client.sendMessage(
-        instagramConnection.pageId,
+        instagramConnection.instagramUserId,
         senderId,
         text
       )
