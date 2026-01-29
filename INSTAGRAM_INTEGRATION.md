@@ -177,27 +177,89 @@ CREATE TABLE ai_responses (
 );
 ```
 
-## 🚀 Uygulama Adımları
+## 🚀 Uygulama Durumu
 
-### 1. Gerekli Paketleri Yükle
+### ✅ Tamamlanan Özellikler
 
-```bash
-npm install axios openai
-# veya
-npm install axios @anthropic-ai/sdk
+1. **Instagram API Client** - `src/lib/instagram/client.ts`
+   - Mesaj gönderme
+   - Kullanıcı bilgisi alma
+   - Token doğrulama
+
+2. **Webhook Handler** - `src/app/api/instagram/webhook/route.ts`
+   - Meta webhook doğrulaması (GET)
+   - Gelen mesaj işleme (POST)
+   - Unified `Message` tablosuna kayıt
+   - Müşteri (Contact) otomatik oluşturma
+   - BullMQ queue'ya ekleme (AI işleme için)
+   - Typesense indexleme
+   - Realtime pub/sub
+
+3. **AI Response System** - `src/workers/message-worker.ts`
+   - Instagram mesajlarına Wiro GPT-5-Mini ile yanıt
+   - Otomatik yanıt gönderme
+
+4. **Müşteri Yönetimi** - `src/lib/contacts/contact-helpers.ts`
+   - `findOrCreateContactFromInstagram()` fonksiyonu
+   - Instagram kullanıcıları `ig:USER_ID` formatında kaydedilir
+
+5. **Inbox UI** - `src/app/[locale]/dashboard/inbox/inbox-client.tsx`
+   - Instagram mesajları gelen kutusunda görünür
+   - Pembe renk ve Instagram ikonu ile gösterilir
+
+### 🔧 Meta Developer Console Kurulumu
+
+1. **Meta for Developers**'a git: https://developers.facebook.com/
+2. Instagram hesabınla bağlı Facebook Page'in olduğundan emin ol
+3. Yeni bir uygulama oluştur (Business Type)
+
+4. **Products > Webhooks** kısmına git
+   - "Instagram" seçeneğini seç
+   - Callback URL: `https://YOUR_DOMAIN/api/instagram/webhook`
+   - Verify Token: `.env` dosyasındaki `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` değeri
+   - Subscribe to: `messages`
+
+5. **Products > Instagram** kısmında
+   - Instagram Test Users ekle
+   - Access token al
+
+### 🔐 Environment Variables
+
+```env
+# Instagram / Meta App
+INSTAGRAM_APP_ID=your_app_id
+INSTAGRAM_APP_SECRET=your_app_secret
+INSTAGRAM_WEBHOOK_VERIFY_TOKEN=your_random_verify_token
+
+# Alternatif olarak (WhatsApp ile aynı app kullanıyorsan)
+FACEBOOK_APP_SECRET=your_app_secret
 ```
 
-### 2. Instagram API Client Oluştur
+### 📝 Veritabanı Kurulumu
 
-`src/lib/instagram/client.ts` dosyasını oluştur.
+Instagram bağlantısı eklemek için:
 
-### 3. Webhook Handler Oluştur
-
-`src/app/api/instagram/webhook/route.ts` dosyasını oluştur.
-
-### 4. AI Response Generator
-
-`src/lib/ai/response-generator.ts` dosyasını oluştur.
+```sql
+INSERT INTO instagram_connections (
+  id, 
+  user_id, 
+  instagram_user_id, 
+  instagram_username, 
+  access_token, 
+  page_id, 
+  created_at, 
+  updated_at
+) VALUES (
+  'cuid_here',
+  'YOUR_USER_ID',  -- users tablosundaki id
+  'INSTAGRAM_BUSINESS_ACCOUNT_ID',
+  'instagram_username',
+  'ACCESS_TOKEN_FROM_META',
+  'FACEBOOK_PAGE_ID',
+  NOW(),
+  NOW()
+);
+```
 
 ### 5. Settings Sayfasına Entegrasyonlar Sekmesi Ekle
 

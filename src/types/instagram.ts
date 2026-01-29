@@ -18,18 +18,6 @@ export interface InstagramConnection {
   updatedAt: Date
 }
 
-export interface InstagramMessage {
-  id: string
-  messageId: string
-  connectionId: string
-  senderId: string
-  senderUsername?: string
-  messageText: string
-  isFromBusiness: boolean
-  timestamp: Date
-  conversationId?: string
-}
-
 export interface InstagramWebhookEntry {
   id: string
   time: number

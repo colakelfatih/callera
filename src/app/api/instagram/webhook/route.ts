@@ -1,34 +1,51 @@
-// Instagram Webhook Handler
+// Instagram Messaging Webhook Handler
 
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { generateAIResponse } from '@/lib/ai/response-generator'
-import { InstagramClient } from '@/lib/instagram/client'
-import type { InstagramWebhookPayload } from '@/types/instagram'
 import { db } from '@/lib/db'
+import { dedupeMessage } from '@/lib/redis/dedupe'
+import { getMessageQueue } from '@/lib/queue/message-queue'
+import { publishNewMessage } from '@/lib/redis/pubsub'
+import { indexMessage } from '@/lib/typesense/messages'
+import { findOrCreateContactFromInstagram } from '@/lib/contacts/contact-helpers'
+import type { InstagramWebhookPayload } from '@/types/instagram'
 
-const WEBHOOK_VERIFY_TOKEN = process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN || 'your_verify_token'
-const APP_SECRET = process.env.INSTAGRAM_APP_SECRET
+const WEBHOOK_VERIFY_TOKEN = process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN || process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
+const APP_SECRET = process.env.INSTAGRAM_APP_SECRET || process.env.FACEBOOK_APP_SECRET
 
 /**
  * Verify webhook signature (for security)
  */
 function verifySignature(payload: string, signature: string): boolean {
-  if (!APP_SECRET) return true // Skip verification if no secret configured
+  if (!APP_SECRET) {
+    console.warn('⚠️ Instagram APP_SECRET not configured, skipping signature verification')
+    return true // Skip verification if no secret configured
+  }
 
-  const expectedSignature = crypto
-    .createHmac('sha256', APP_SECRET)
-    .update(payload)
-    .digest('hex')
+  try {
+    const expectedSignature = `sha256=${crypto
+      .createHmac('sha256', APP_SECRET)
+      .update(payload)
+      .digest('hex')}`
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(`sha256=${expectedSignature}`)
-  )
+    // Use timing-safe comparison
+    if (signature.length !== expectedSignature.length) {
+      return false
+    }
+
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    )
+  } catch (error) {
+    console.error('Signature verification error:', error)
+    return false
+  }
 }
 
 /**
  * GET - Webhook verification (required by Meta)
+ * Meta expects: if mode=subscribe and verify_token matches -> respond with hub.challenge as plain text
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -36,71 +53,180 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('hub.verify_token')
   const challenge = searchParams.get('hub.challenge')
 
-  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
-    console.log('Webhook verified')
-    return new NextResponse(challenge, { status: 200 })
+  // Debug logging
+  console.log('Instagram webhook verification request:', {
+    mode,
+    receivedToken: token || 'NOT PROVIDED',
+    challenge,
+    expectedTokenSet: !!WEBHOOK_VERIFY_TOKEN,
+    tokensMatch: token === WEBHOOK_VERIFY_TOKEN,
+  })
+
+  // Check if verify token is configured
+  if (!WEBHOOK_VERIFY_TOKEN) {
+    console.error('INSTAGRAM_WEBHOOK_VERIFY_TOKEN environment variable is not set')
+    return new NextResponse('Server configuration error', { status: 500 })
   }
 
-  return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  // Meta webhook verification
+  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+    console.log('✅ Instagram webhook verified successfully')
+    return new NextResponse(challenge ?? '', {
+      status: 200,
+      headers: { 'content-type': 'text/plain' },
+    })
+  }
+
+  // Log failed verification attempt
+  console.warn('Instagram webhook verification failed:', {
+    mode,
+    tokenMatch: token === WEBHOOK_VERIFY_TOKEN,
+    hasToken: !!token,
+    hasExpectedToken: !!WEBHOOK_VERIFY_TOKEN,
+  })
+
+  return new NextResponse('Forbidden', { status: 403 })
 }
 
 /**
- * POST - Handle webhook events
+ * POST - Handle incoming webhook events
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.text()
+    const bodyText = await request.text()
     const signature = request.headers.get('x-hub-signature-256') || ''
 
+    // Log webhook payload
+    console.log('instagram.webhook.received', { bytes: bodyText.length })
+
     // Verify signature
-    if (!verifySignature(body, signature)) {
-      console.error('Invalid webhook signature')
+    if (!verifySignature(bodyText, signature)) {
+      console.error('❌ Invalid Instagram webhook signature')
       return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
     }
 
-    const payload: InstagramWebhookPayload = JSON.parse(body)
+    // Parse JSON payload
+    const payload: InstagramWebhookPayload = JSON.parse(bodyText)
+
+    // Instagram webhook structure (similar to WhatsApp but uses 'messaging' array):
+    // {
+    //   "object": "instagram",
+    //   "entry": [{
+    //     "id": "<PAGE_ID>",
+    //     "time": 1234567890,
+    //     "messaging": [{
+    //       "sender": { "id": "<SENDER_PSID>" },
+    //       "recipient": { "id": "<PAGE_ID>" },
+    //       "timestamp": 1234567890,
+    //       "message": {
+    //         "mid": "<MESSAGE_ID>",
+    //         "text": "Hello!",
+    //         "is_echo": false  // true if sent by the page
+    //       }
+    //     }]
+    //   }]
+    // }
 
     // Process each entry
-    for (const entry of payload.entry) {
-      if (entry.messaging) {
-        for (const event of entry.messaging) {
-          // Only process incoming messages (not sent by us)
-          if (event.message && !event.message.is_echo) {
-            await handleIncomingMessage(event)
+    if (payload.object === 'instagram' && payload.entry) {
+      for (const entry of payload.entry) {
+        // Debug: Log entry structure
+        console.log('instagram.webhook.entry', {
+          entryId: entry.id,
+          time: entry.time,
+          hasMessaging: !!entry.messaging,
+          messagingCount: entry.messaging?.length || 0,
+        })
+
+        if (entry.messaging && Array.isArray(entry.messaging)) {
+          console.log(`Processing ${entry.messaging.length} Instagram message(s)`)
+          for (const event of entry.messaging) {
+            // Only process incoming messages (not sent by us)
+            if (event.message && !event.message.is_echo) {
+              await handleIncomingMessage(event, entry.id, payload)
+            } else if (event.message?.is_echo) {
+              console.log('Skipping echo message (sent by page):', event.message.mid)
+            }
           }
         }
       }
+    } else {
+      console.warn('Unexpected Instagram webhook payload structure:', {
+        object: payload.object,
+        hasEntry: !!payload.entry,
+      })
     }
 
-    return NextResponse.json({ success: true }, { status: 200 })
+    // Always ACK quickly (Meta requires quick response)
+    return new NextResponse('OK', { status: 200 })
   } catch (error: any) {
-    console.error('Webhook error:', error)
-    return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
-    )
+    console.error('Instagram webhook error:', error)
+    // Still return OK to prevent Meta from retrying
+    return new NextResponse('OK', { status: 200 })
   }
 }
 
 /**
  * Handle incoming Instagram message
  */
-async function handleIncomingMessage(event: any) {
+async function handleIncomingMessage(event: any, entryId: string, rawPayload: any) {
   try {
-    const senderId = event.sender.id
-    const messageText = event.message.text
+    const senderId = event.sender.id  // Instagram-scoped user ID (IGSID)
+    const recipientId = event.recipient?.id || entryId  // Page ID
+    const messageText = event.message.text || ''
     const messageId = event.message.mid
+    const timestamp = event.timestamp
 
-    console.log('Received Instagram message:', {
-      senderId,
-      messageText,
+    // Handle attachments (images, videos, etc.)
+    let finalMessageText = messageText
+    let messageType: 'text' | 'image' | 'audio' | 'video' | 'other' = 'text'
+    
+    if (event.message.attachments && Array.isArray(event.message.attachments)) {
+      for (const attachment of event.message.attachments) {
+        if (attachment.type === 'image') {
+          finalMessageText = finalMessageText || `[Image] ${attachment.payload?.url || ''}`
+          messageType = 'image'
+        } else if (attachment.type === 'video') {
+          finalMessageText = finalMessageText || `[Video] ${attachment.payload?.url || ''}`
+          messageType = 'video'
+        } else if (attachment.type === 'audio') {
+          finalMessageText = finalMessageText || '[Audio]'
+          messageType = 'audio'
+        } else if (attachment.type === 'story_mention') {
+          finalMessageText = finalMessageText || '[Story Mention]'
+        } else if (attachment.type === 'share') {
+          // Post/Reel share
+          finalMessageText = finalMessageText || `[Shared Post] ${attachment.payload?.url || ''}`
+        } else {
+          finalMessageText = finalMessageText || `[${attachment.type}]`
+          messageType = 'other'
+        }
+      }
+    }
+
+    console.log('📨 Received Instagram message:', {
       messageId,
+      senderId,
+      recipientId,
+      messageText: finalMessageText,
+      messageType,
+      timestamp,
+      hasAttachments: !!event.message.attachments,
     })
 
-    // Get connection from database
-    // recipientId is the page ID that received the message
-    const recipientId = event.recipient?.id
-    
+    // 1) Deduplication (Redis SETNX)
+    const dedupe = await dedupeMessage({
+      channel: 'instagram',
+      channelMessageId: messageId,
+      ttlSeconds: 60 * 60,
+    })
+
+    if (!dedupe.isNew) {
+      console.log('Duplicate Instagram message skipped', { messageId, key: dedupe.key })
+      return
+    }
+
+    // 2) Get InstagramConnection for this recipient
     const connection = await db.instagramConnection.findFirst({
       where: {
         OR: [
@@ -108,60 +234,135 @@ async function handleIncomingMessage(event: any) {
           { instagramUserId: recipientId },
         ],
       },
+      select: {
+        id: true,
+        userId: true,
+        pageId: true,
+        accessToken: true,
+      },
     })
 
     if (!connection) {
-      console.error('No connection found for recipient:', recipientId)
-      return
+      console.warn('⚠️ No InstagramConnection found for recipient:', recipientId)
     }
 
-    // Generate AI response
-    const aiResponse = await generateAIResponse({
-      message: messageText,
-      context: {
-        contactInfo: {
-          name: senderId,
+    // 3) DB insert (upsert by channel+channelMessageId) to unified Message table
+    const saved = await db.message.upsert({
+      where: {
+        channel_channelMessageId: {
+          channel: 'instagram',
+          channelMessageId: messageId,
         },
       },
-    })
-
-    // Save message to database
-    const savedMessage = await db.instagramMessage.upsert({
-      where: {
-        instagramMessageId: messageId,
-      },
       create: {
-        connectionId: connection.id,
-        instagramMessageId: messageId,
+        channel: 'instagram',
+        channelMessageId: messageId,
+        connectionId: connection?.id || recipientId, // Store connection ID or recipient ID
         senderId,
-        senderUsername: undefined, // Could be fetched from Instagram API
-        messageText,
+        senderName: null, // Instagram doesn't always provide name in webhook
+        messageText: finalMessageText,
+        messageType,
+        rawPayload,
         isFromBusiness: false,
+        timestamp: timestamp ? new Date(Number(timestamp)) : null,
+        status: 'pending',
       },
       update: {},
     })
 
-    // Send response via Instagram API
-    const client = new InstagramClient(connection.accessToken)
-    const pageId = connection.pageId || process.env.INSTAGRAM_PAGE_ID || ''
-    
-    if (pageId) {
-      await client.sendMessage(pageId, senderId, aiResponse.response)
-      console.log('Sent AI response to Instagram user:', senderId)
+    console.log('✅ Instagram message saved to DB:', { id: saved.id, messageId })
+
+    // 4) Queue add(job) for AI processing
+    const messageQueue = getMessageQueue()
+    try {
+      const job = await messageQueue.add(
+        'process-message',
+        {
+          messageId: saved.id,
+          channel: 'instagram',
+          channelMessageId: messageId,
+          senderId,
+          messageText: finalMessageText,
+          connectionId: connection?.id ?? null,
+        },
+        {
+          jobId: `instagram-${messageId}`, // idempotent at queue level
+        }
+      )
+      console.log('✅ Instagram job added to queue:', { jobId: job.id, messageId: saved.id })
+    } catch (queueError: any) {
+      console.error('❌ Failed to add Instagram job to queue:', {
+        error: queueError?.message ?? queueError,
+        messageId: saved.id,
+      })
     }
 
-    // Save AI response to database
-    await db.aIResponse.create({
-      data: {
-        instagramMessageId: savedMessage.id,
-        originalMessage: messageText,
-        aiResponse: aiResponse.response,
-        modelUsed: aiResponse.model,
-        confidence: aiResponse.confidence,
-      },
+    // 6) Create/update müşteri (contact) from Instagram message
+    console.log('🔍 Checking Instagram müşteri creation conditions:', {
+      hasRecipientId: !!recipientId,
+      recipientId,
+      hasSenderId: !!senderId,
+      senderId,
     })
+
+    if (recipientId && senderId) {
+      try {
+        const contact = await findOrCreateContactFromInstagram({
+          instagramUserId: senderId,
+          recipientId,
+          username: null, // Could be fetched via Instagram API if needed
+          name: null,
+          timestamp: timestamp ? new Date(Number(timestamp)) : new Date(),
+        })
+
+        if (contact) {
+          console.log('✅ Instagram müşteri created/updated:', {
+            contactId: contact.id,
+            phone: contact.phone,
+            name: contact.name,
+            status: contact.status,
+          })
+        } else {
+          console.warn('⚠️ Instagram müşteri creation returned null (InstagramConnection not found?)', {
+            senderId,
+            recipientId,
+          })
+        }
+      } catch (err: any) {
+        console.error('❌ Failed to create/update Instagram müşteri:', {
+          error: err?.message ?? err,
+          stack: err?.stack,
+          senderId,
+          recipientId,
+        })
+      }
+    }
+
+    // 7) Index in Typesense (best-effort, non-blocking)
+    indexMessage(saved).catch((err) => {
+      console.warn('typesense.index_failed', { messageId: saved.id, err: String(err?.message ?? err) })
+    })
+
+    // 8) Realtime publish (best-effort)
+    publishNewMessage({
+      id: saved.id,
+      channel: saved.channel,
+      channelMessageId: saved.channelMessageId,
+      connectionId: saved.connectionId ?? null,
+      isFromBusiness: saved.isFromBusiness,
+      senderId: saved.senderId,
+      senderName: saved.senderName ?? null,
+      messageText: saved.messageText,
+      messageType: saved.messageType,
+      status: saved.status,
+      aiResponse: saved.aiResponse ?? null,
+      timestamp: saved.timestamp ? saved.timestamp.toISOString() : null,
+      createdAt: saved.createdAt.toISOString(),
+    }).catch((err) => {
+      console.warn('realtime.publish_failed', { messageId: saved.id, err: String(err?.message ?? err) })
+    })
+
   } catch (error: any) {
-    console.error('Error handling incoming message:', error)
+    console.error('Error handling incoming Instagram message:', error)
   }
 }
-

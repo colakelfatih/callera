@@ -5,6 +5,7 @@ import { db } from '../lib/db'
 import type { MessageJob } from '../types/message'
 import { createWiroGpt5MiniResponse } from '../lib/clients/wiro-chat'
 import { sendWhatsAppTextMessage, sendWhatsAppTypingIndicator } from '../lib/clients/whatsapp-client'
+import { InstagramClient } from '../lib/instagram/client'
 import { publishNewMessage } from '../lib/redis/pubsub'
 import { indexMessage } from '../lib/typesense/messages'
 
@@ -207,10 +208,99 @@ const worker = new Worker<MessageJob>(
         timestamp: outbound.timestamp ? outbound.timestamp.toISOString() : null,
         createdAt: outbound.createdAt.toISOString(),
       }).catch(() => {})
-    } else {
-      // TODO: add other channel send implementations
-        console.log('worker.skip_send_unsupported_channel', { channel })
+    } else if (channel === 'instagram') {
+      // Send AI response via Instagram
+      try {
+        // Find the Instagram connection to get access token and page ID
+        const instagramConnection = await db.instagramConnection.findFirst({
+          where: connectionId ? { id: connectionId } : undefined,
+          select: {
+            id: true,
+            accessToken: true,
+            pageId: true,
+            instagramUserId: true,
+          },
+        })
+
+        if (!instagramConnection) {
+          console.warn('⚠️ No InstagramConnection found for sending response', { connectionId, senderId })
+          // Continue - message is processed but response not sent
+        } else if (!instagramConnection.accessToken || !instagramConnection.pageId) {
+          console.warn('⚠️ Instagram connection missing accessToken or pageId', {
+            connectionId: instagramConnection.id,
+            hasAccessToken: !!instagramConnection.accessToken,
+            hasPageId: !!instagramConnection.pageId,
+          })
+        } else {
+          // Send message via Instagram API
+          const client = new InstagramClient(instagramConnection.accessToken)
+          const sendResult = await client.sendMessage(
+            instagramConnection.pageId,
+            senderId,
+            aiText
+          )
+
+          console.log('✅ Instagram AI response sent:', {
+            messageId,
+            senderId,
+            pageId: instagramConnection.pageId,
+            resultMessageId: sendResult?.message_id,
+          })
+
+          const outboundChannelMessageId =
+            sendResult?.message_id ?? `out-instagram-${messageId}-${Date.now()}`
+
+          // Save outbound message as its own row (so UI can render sent messages on the right)
+          const outbound = await db.message.create({
+            data: {
+              channel: 'instagram',
+              channelMessageId: outboundChannelMessageId,
+              connectionId: instagramConnection.id,
+              senderId, // keep same senderId for thread grouping
+              senderName: msg.senderName ?? null,
+              messageText: aiText,
+              messageType: 'text',
+              rawPayload: sendResult ?? undefined,
+              isFromBusiness: true,
+              timestamp: new Date(),
+              status: 'completed',
+            },
+          })
+
+          // Index outbound message in Typesense
+          indexMessage(outbound).catch((err) => {
+            console.warn('typesense.index_failed', { messageId: outbound.id, err: String(err?.message ?? err) })
+          })
+
+          publishNewMessage({
+            id: outbound.id,
+            channel: outbound.channel,
+            channelMessageId: outbound.channelMessageId,
+            connectionId: outbound.connectionId ?? null,
+            isFromBusiness: true,
+            senderId: outbound.senderId,
+            senderName: outbound.senderName ?? null,
+            messageText: outbound.messageText,
+            messageType: outbound.messageType,
+            status: outbound.status,
+            aiResponse: outbound.aiResponse ?? null,
+            timestamp: outbound.timestamp ? outbound.timestamp.toISOString() : null,
+            createdAt: outbound.createdAt.toISOString(),
+          }).catch(() => {})
+        }
+      } catch (instagramError: any) {
+        console.error('❌ Failed to send Instagram AI response:', {
+          error: instagramError?.message ?? instagramError,
+          stack: instagramError?.stack,
+          messageId,
+          senderId,
+        })
+        // Non-critical - message is still processed, just response not sent
       }
+    } else {
+      // Unsupported channel
+      console.log('worker.skip_send_unsupported_channel', { channel })
+    }
 
       const updatedMessage = await db.message.update({
         where: { id: messageId },

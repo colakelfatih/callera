@@ -219,45 +219,23 @@ model InstagramConnection {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages InstagramMessage[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, instagramUserId])
   @@map("instagram_connections")
 }
 
-// Instagram Message Model
-model InstagramMessage {
-  id                 String   @id @default(cuid())
-  connectionId       String
-  instagramMessageId String   @unique
-  senderId           String
-  senderUsername     String?
-  messageText        String   @db.Text
-  isFromBusiness     Boolean  @default(false)
-  conversationId     String?
-  timestamp          DateTime @default(now())
-  createdAt          DateTime @default(now())
-
-  connection  InstagramConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
-  aiResponses AIResponse[]
-
-  @@map("instagram_messages")
-}
-
 // AI Response Model
 model AIResponse {
-  id                 String   @id @default(cuid())
-  conversationId     String?
-  instagramMessageId String?
-  originalMessage    String   @db.Text
-  aiResponse         String   @db.Text
-  modelUsed          String?
-  confidence         Float?
-  createdAt          DateTime @default(now())
+  id              String   @id @default(cuid())
+  conversationId  String?
+  originalMessage String   @db.Text
+  aiResponse      String   @db.Text
+  modelUsed       String?
+  confidence      Float?
+  createdAt       DateTime @default(now())
 
-  conversation     Conversation?     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  instagramMessage InstagramMessage? @relation(fields: [instagramMessageId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@map("ai_responses")
 }

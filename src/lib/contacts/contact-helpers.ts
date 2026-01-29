@@ -111,3 +111,123 @@ export async function findOrCreateContactFromWhatsApp(params: {
     throw error
   }
 }
+
+/**
+ * Find or create a müşteri (contact) from Instagram message data
+ * 
+ * @param params - Instagram message parameters
+ * @returns Contact if created/updated, null if InstagramConnection not found
+ */
+export async function findOrCreateContactFromInstagram(params: {
+  instagramUserId: string
+  recipientId: string  // Page ID or Instagram Business Account ID that received the message
+  username?: string | null
+  name?: string | null
+  timestamp?: Date
+}): Promise<Contact | null> {
+  try {
+    const { instagramUserId, recipientId, username, name, timestamp } = params
+
+    // Validate Instagram user ID
+    if (!instagramUserId || !instagramUserId.trim()) {
+      console.warn('findOrCreateContactFromInstagram: Missing Instagram user ID')
+      return null
+    }
+
+    // 1. Find InstagramConnection by recipientId (pageId or instagramUserId) to get userId
+    console.log('🔍 Searching for InstagramConnection:', {
+      recipientId,
+      instagramUserId,
+    })
+
+    const connection = await db.instagramConnection.findFirst({
+      where: {
+        OR: [
+          { pageId: recipientId },
+          { instagramUserId: recipientId },
+        ],
+      },
+      select: {
+        userId: true,
+        id: true,
+        pageId: true,
+        instagramUserId: true,
+      },
+    })
+
+    if (!connection) {
+      // Try to find any connection for debugging
+      const allConnections = await db.instagramConnection.findMany({
+        select: {
+          id: true,
+          pageId: true,
+          instagramUserId: true,
+          userId: true,
+        },
+        take: 5, // Just for debugging
+      })
+      
+      console.error('❌ InstagramConnection not found for recipientId:', {
+        searchedRecipientId: recipientId,
+        instagramUserId,
+        availableConnections: allConnections.map(c => ({
+          id: c.id,
+          pageId: c.pageId,
+          instagramUserId: c.instagramUserId,
+        })),
+      })
+      return null
+    }
+
+    console.log('✅ Found InstagramConnection:', {
+      connectionId: connection.id,
+      pageId: connection.pageId,
+      instagramUserId: connection.instagramUserId,
+      userId: connection.userId,
+    })
+
+    const userId = connection.userId
+
+    // 2. Prepare contact data
+    // For Instagram, we use username or Instagram user ID as identifier
+    // Phone field will store Instagram user ID prefixed with 'ig:'
+    const contactPhone = `ig:${instagramUserId}`
+    const contactName = name?.trim() || username?.trim() || instagramUserId
+    const lastContactDate = timestamp || new Date()
+
+    // 3. Upsert Contact by userId + phone (using ig: prefix)
+    const contact = await db.contact.upsert({
+      where: {
+        userId_phone: {
+          userId,
+          phone: contactPhone,
+        },
+      },
+      create: {
+        userId,
+        name: contactName,
+        phone: contactPhone,
+        status: 'lead', // New müşteriler start as 'lead' (Gelen Müşteriler)
+        lastContact: lastContactDate,
+      },
+      update: {
+        // Update name only if we have a better name (username or actual name)
+        ...((name?.trim() || username?.trim()) && (name?.trim() || username?.trim()) !== instagramUserId
+          ? { name: name?.trim() || username?.trim() }
+          : {}),
+        // Always update lastContact to latest message time
+        lastContact: lastContactDate,
+        updatedAt: new Date(),
+      },
+    })
+
+    return contact
+  } catch (error: any) {
+    console.error('findOrCreateContactFromInstagram error:', {
+      error: error?.message ?? error,
+      instagramUserId: params.instagramUserId,
+      recipientId: params.recipientId,
+    })
+    throw error
+  }
+}
