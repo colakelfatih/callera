@@ -7,7 +7,7 @@ import axios from 'axios'
 const FACEBOOK_APP_ID = process.env.INSTAGRAM_APP_ID
 const FACEBOOK_APP_SECRET = process.env.INSTAGRAM_APP_SECRET
 const REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI || 
-  `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/facebook/callback`
+  `${process.env.NEXT_PUBLIC_APP_URL || 'https://crm.remaxarsa.tr'}/api/facebook/callback`
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 const DEFAULT_LOCALE = 'tr'

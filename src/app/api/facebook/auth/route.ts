@@ -4,9 +4,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-helpers'
 
-const FACEBOOK_APP_ID = process.env.INSTAGRAM_APP_ID // Same app
+// Use INSTAGRAM_APP_ID because it's the same Meta app for both Instagram and Facebook
+const FACEBOOK_APP_ID = process.env.INSTAGRAM_APP_ID
 const REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI || 
-  `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/facebook/callback`
+  `${process.env.NEXT_PUBLIC_APP_URL || 'https://crm.remaxarsa.tr'}/api/facebook/callback`
 
 // Facebook OAuth Scopes for Page messaging
 const FACEBOOK_SCOPES = [
