@@ -696,7 +696,7 @@ function GeneralSettingsContent() {
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1" onClick={() => setSetupStep('qr')}>Geri</Button>
                   <Button className="flex-1" onClick={verify2FA} disabled={loading2FA || verificationCode.length !== 6}>
-                    {loading2FA ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                    {loading2FA && <Loader2 size={16} className="animate-spin" />}
                     Doğrula
                   </Button>
                 </div>
@@ -742,7 +742,7 @@ function GeneralSettingsContent() {
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={() => setShow2FADisableModal(false)}>İptal</Button>
               <Button className="flex-1 bg-red-600 hover:bg-red-700" onClick={disable2FA} disabled={loading2FA || verificationCode.length !== 6}>
-                {loading2FA ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                {loading2FA && <Loader2 size={16} className="animate-spin" />}
                 Devre Dışı Bırak
               </Button>
             </div>
@@ -950,7 +950,7 @@ function SessionsSettingsContent() {
         </div>
         <div className="flex gap-3">
           <Button variant="outline" size="sm" onClick={fetchSessions} disabled={loading}>
-            <RefreshCw size={16} className={loading ? 'animate-spin mr-2' : 'mr-2'} />
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Yenile
           </Button>
           {otherSessions.length > 0 && (
@@ -960,7 +960,7 @@ function SessionsSettingsContent() {
               disabled={revokingAll}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              {revokingAll ? <Loader2 size={16} className="animate-spin mr-2" /> : <LogOut size={16} className="mr-2" />}
+              {revokingAll ? <Loader2 size={16} className="animate-spin" /> : <LogOut size={16} />}
               Tümünü Kapat
             </Button>
           )}

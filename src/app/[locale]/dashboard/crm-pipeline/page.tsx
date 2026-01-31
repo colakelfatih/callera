@@ -327,24 +327,29 @@ export default function CRMPipelinePage() {
       </header>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden md:overflow-x-auto p-2 md:p-6 max-w-full">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 dark:text-gray-400">Yükleniyor...</div>
           </div>
         ) : (
-          <div className="flex flex-col md:inline-grid md:min-w-full md:auto-cols-min md:grid-flow-col gap-2 md:gap-4 max-w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4 h-full">
             {pipelineData.map((column) => (
             <div
               key={column.id}
-              className="flex max-w-full md:w-72 h-auto md:h-full flex-col gap-2 md:gap-3"
+              className="flex flex-col gap-2 md:gap-3 min-h-0"
             >
-              <h3 className="text-navy dark:text-white text-sm md:text-base font-bold tracking-tight px-1 shrink-0">
-                {column.title} ({column.count})
-              </h3>
+              <div className="flex items-center justify-between px-1 shrink-0">
+                <h3 className="text-navy dark:text-white text-sm md:text-base font-bold tracking-tight">
+                  {column.title}
+                </h3>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                  {column.count}
+                </span>
+              </div>
 
               <div 
-                className="flex flex-col flex-1 overflow-y-auto min-h-0"
+                className="flex flex-col flex-1 overflow-y-auto min-h-0 rounded-lg"
                 onDragOver={(e) => handleDragOver(e, column.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, column.id)}
@@ -372,7 +377,7 @@ export default function CRMPipelinePage() {
                           onDragStart={(e) => handleDragStart(e, deal)}
                           onDragEnd={handleDragEnd}
                           onClick={() => handleDealClick(deal)}
-                          className="rounded-lg bg-white dark:bg-navy-800 p-2.5 md:p-3 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow duration-200 mb-2 md:mb-3 w-full max-w-full box-border"
+                          className="rounded-lg bg-white dark:bg-navy-800 p-3 md:p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 mb-2 md:mb-3"
                         >
                           <div className="flex flex-col gap-1.5 md:gap-2">
                             <p className="font-semibold text-xs md:text-sm text-navy dark:text-white truncate">{deal.contact}</p>
@@ -425,16 +430,16 @@ export default function CRMPipelinePage() {
                     ))}
                   </>
                 ) : (
-                  <div className={`rounded-lg bg-white dark:bg-navy-800 border-2 border-dashed transition-all duration-300 w-full max-w-full box-border ${
+                  <div className={`rounded-lg border-2 border-dashed transition-all duration-300 flex-1 ${
                     dragOverColumn === column.id
-                      ? 'border-primary bg-primary/5 scale-105'
-                      : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-navy-700/50'
-                  } p-2.5 md:p-3`}>
-                    <div className="flex flex-col items-center justify-center min-h-[60px] md:min-h-[80px]">
-                      <p className={`text-xs transition-colors duration-300 text-center ${
+                      ? 'border-primary bg-primary/5'
+                      : 'border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-navy-800/50'
+                  } p-4`}>
+                    <div className="flex flex-col items-center justify-center h-full min-h-[120px]">
+                      <p className={`text-sm transition-colors duration-300 text-center ${
                         dragOverColumn === column.id
                           ? 'text-primary font-semibold'
-                          : 'text-gray-500 dark:text-gray-400'
+                          : 'text-gray-400 dark:text-gray-500'
                       }`}>
                         {t('dragDealsHere')}
                       </p>

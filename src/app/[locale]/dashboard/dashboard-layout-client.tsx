@@ -116,7 +116,7 @@ export default function DashboardLayoutClient({
           onMobileMenuToggle={toggleMobileMenu}
         />
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-900">
           {children}
         </main>
       </div>

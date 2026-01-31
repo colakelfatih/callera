@@ -62,16 +62,16 @@ export default function RegisterPage() {
         setLoading(false)
       } else if (result.data) {
         setSuccess(true)
-        // Redirect to dashboard after 1 second
+        // Redirect to onboarding after 1 second
         setTimeout(() => {
-          router.push(`/${locale}/dashboard`)
+          router.push(`/${locale}/onboarding`)
           router.refresh()
         }, 1000)
       } else {
         // No error but no data - might be successful
         setSuccess(true)
         setTimeout(() => {
-          router.push(`/${locale}/dashboard`)
+          router.push(`/${locale}/onboarding`)
           router.refresh()
         }, 1000)
       }

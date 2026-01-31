@@ -45,6 +45,18 @@ model User {
   twoFactorEnabled Boolean  @default(false)
   twoFactorSecret  String?  // Encrypted TOTP secret
   
+  // Onboarding
+  onboardingCompleted Boolean  @default(false)
+  onboardingStep      Int      @default(0) // 0: not started, 1: profile, 2: integration, 3: test, 4: completed
+  
+  // Business Profile
+  businessName     String?
+  businessPhone    String?
+  businessEmail    String?
+  businessAddress  String?  @db.Text
+  businessWebsite  String?
+  businessIndustry String?
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

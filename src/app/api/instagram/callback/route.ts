@@ -5,7 +5,7 @@ import axios from 'axios'
 
 const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID
 const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET
-const REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI || 
+const REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI ||
   `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/instagram/callback`
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     // Step 4: Save to database
     const { db } = await import('@/lib/db')
-    
+
     await db.instagramConnection.upsert({
       where: {
         userId_instagramUserId: {
@@ -138,9 +138,9 @@ export async function GET(request: NextRequest) {
     console.log('Instagram connection saved for user:', state, 'instagram:', username)
 
     // Redirect to settings page with success
-    return NextResponse.redirect(getRedirectUrl('/dashboard/settings', { 
-      tab: 'integrations', 
-      success: 'true', 
+    return NextResponse.redirect(getRedirectUrl('/dashboard/settings', {
+      tab: 'integrations',
+      success: 'true',
       username,
     }))
   } catch (error: any) {
