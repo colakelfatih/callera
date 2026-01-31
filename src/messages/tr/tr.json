@@ -2,8 +2,8 @@
     "navigation": {
         "inbox": "Gelen Kutusu",
         "dialer": "Arayıcı",
-        "crm": "Müşteriler",
-        "pipeline": "Kanban",
+        "crm": "Kişiler",
+        "pipeline": "Müşteriler",
         "flows": "Akışlar",
         "insights": "İçgörüler",
         "studio": "Stüdyo",
@@ -70,7 +70,7 @@
         "today": "Bugün"
     },
     "crm": {
-        "title": "Müşteriler",
+        "title": "Kişiler",
         "searchDeals": "Anlaşmaları, kişileri ara...",
         "newDeal": "Yeni Görev",
         "assignedUser": "Atanan Kullanıcı",
@@ -99,7 +99,15 @@
         "lastContact": "Son İletişim",
         "selectContact": "Bir kişi seçin",
         "selectContactDesc": "Detayları görmek için bir kişi seçin",
-        "dropHere": "Buraya bırak"
+        "dropHere": "Buraya bırak",
+        "contactAdded": "Kişi başarıyla eklendi",
+        "contactAddError": "Kişi oluşturulamadı",
+        "tagAdded": "Etiket başarıyla eklendi",
+        "tagAddError": "Etiket eklenemedi",
+        "tagRemoved": "Etiket silindi",
+        "tagRemoveError": "Etiket silinemedi",
+        "allTags": "Tüm Etiketler",
+        "noTags": "Henüz etiket yok"
     },
     "settings": {
         "title": "Ayarlar",

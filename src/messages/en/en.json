@@ -2,8 +2,8 @@
     "navigation": {
         "inbox": "Inbox",
         "dialer": "Dialer",
-        "crm": "CRM",
-        "pipeline": "Pipeline",
+        "crm": "Contacts",
+        "pipeline": "Customers",
         "flows": "Flows",
         "insights": "Insights",
         "studio": "Studio",
@@ -70,7 +70,7 @@
         "today": "Today"
     },
     "crm": {
-        "title": "CRM & Pipeline",
+        "title": "Contacts",
         "searchDeals": "Search deals, contacts...",
         "newDeal": "New Task",
         "assignedUser": "Assigned User",
@@ -99,7 +99,15 @@
         "lastContact": "Last Contact",
         "selectContact": "Select a contact",
         "selectContactDesc": "Choose a contact to view details",
-        "dropHere": "Drop here"
+        "dropHere": "Drop here",
+        "contactAdded": "Contact added successfully",
+        "contactAddError": "Failed to create contact",
+        "tagAdded": "Tag added successfully",
+        "tagAddError": "Failed to add tag",
+        "tagRemoved": "Tag removed",
+        "tagRemoveError": "Failed to remove tag",
+        "allTags": "All Tags",
+        "noTags": "No tags yet"
     },
     "settings": {
         "title": "Settings",

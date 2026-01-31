@@ -117,7 +117,7 @@ export async function runWiroChatTask(params: {
     formData.append(key, String(value))
   })
 
-  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-mini', {
+  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-2', {
     method: 'POST',
     headers: {
       ...authHeaders,
@@ -240,7 +240,7 @@ export async function createWiroChatResponse(params: {
 
 /**
  * Run a task using the openai/gpt-5-mini model.
- * Based on API documentation: https://api.wiro.ai/v1/Run/openai/gpt-5-mini
+ * Based on API documentation: https://api.wiro.ai/v1/Run/openai/gpt-5-2
  */
 export async function runWiroGpt5MiniTask(params: {
   prompt: string
@@ -271,7 +271,7 @@ export async function runWiroGpt5MiniTask(params: {
     formData.append(key, String(value))
   })
 
-  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-mini', {
+  const res = await fetch('https://api.wiro.ai/v1/Run/openai/gpt-5-2', {
     method: 'POST',
     headers: {
       ...authHeaders,

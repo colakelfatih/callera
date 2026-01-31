@@ -15,7 +15,7 @@ interface Deal {
   contact: string
   phone: string | null
   value: string
-  tags: Array<{ id: string; tag: string }>
+  tags: Array<{ id: string; tag: string; color?: string }>
   status: 'lead' | 'prospect' | 'customer' | 'closed'
   avatar: string | null
 }
@@ -49,45 +49,147 @@ export default function CRMPipelinePage() {
   const [isDragging, setIsDragging] = useState(false)
   const [pipelineData, setPipelineData] = useState<PipelineColumn[]>([])
   const [loading, setLoading] = useState(true)
+  const [showTagDropdown, setShowTagDropdown] = useState(false)
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null)
   const t = useTranslations('crm')
 
-  // Fetch pipeline data from API
+  // Get all unique tags from pipeline data
+  const allTags = React.useMemo(() => {
+    const tagMap = new Map<string, { tag: string; color: string; count: number }>()
+    pipelineData.forEach(column => {
+      column.deals.forEach(deal => {
+        deal.tags?.forEach(tag => {
+          if (tagMap.has(tag.tag)) {
+            tagMap.get(tag.tag)!.count++
+          } else {
+            tagMap.set(tag.tag, { tag: tag.tag, color: tag.color || '#6366f1', count: 1 })
+          }
+        })
+      })
+    })
+    return Array.from(tagMap.values()).sort((a, b) => b.count - a.count)
+  }, [pipelineData])
+
+  // Filter pipeline data by selected tag
+  const filteredPipelineData = React.useMemo(() => {
+    if (!selectedTagFilter) return pipelineData
+    return pipelineData.map(column => ({
+      ...column,
+      deals: column.deals.filter(deal => 
+        deal.tags?.some(tag => tag.tag === selectedTagFilter)
+      ),
+      count: column.deals.filter(deal => 
+        deal.tags?.some(tag => tag.tag === selectedTagFilter)
+      ).length
+    }))
+  }, [pipelineData, selectedTagFilter])
+
+  // Helper function to convert contacts to pipeline format
+  const convertContactsToPipeline = (contacts: ContactWithTags[]): PipelineColumn[] => {
+    // Group contacts by status
+    const statusGroups: Record<string, ContactWithTags[]> = {
+      'lead': [],
+      'prospect': [],
+      'customer': [],
+      'closed': [],
+    }
+
+    contacts.forEach((contact) => {
+      const status = contact.status || 'lead'
+      if (statusGroups[status]) {
+        statusGroups[status].push(contact)
+      } else {
+        statusGroups['lead'].push(contact)
+      }
+    })
+
+    return [
+      {
+        id: 'lead-in',
+        title: 'Gelen Müşteriler',
+        count: statusGroups['lead'].length,
+        value: '',
+        deals: statusGroups['lead'].map((contact) => ({
+          id: contact.id,
+          company: contact.company || null,
+          contact: contact.name,
+          phone: contact.phone || null,
+          value: '',
+          tags: contact.tags || [],
+          status: 'lead' as const,
+          avatar: contact.avatar || null,
+        })),
+      },
+      {
+        id: 'contact-made',
+        title: 'İletişim Kuruldu',
+        count: statusGroups['prospect'].length,
+        value: '',
+        deals: statusGroups['prospect'].map((contact) => ({
+          id: contact.id,
+          company: contact.company || null,
+          contact: contact.name,
+          phone: contact.phone || null,
+          value: '',
+          tags: contact.tags || [],
+          status: 'prospect' as const,
+          avatar: contact.avatar || null,
+        })),
+      },
+      {
+        id: 'customer',
+        title: 'Müşteri',
+        count: statusGroups['customer'].length,
+        value: '',
+        deals: statusGroups['customer'].map((contact) => ({
+          id: contact.id,
+          company: contact.company || null,
+          contact: contact.name,
+          phone: contact.phone || null,
+          value: '',
+          tags: contact.tags || [],
+          status: 'customer' as const,
+          avatar: contact.avatar || null,
+        })),
+      },
+      {
+        id: 'won',
+        title: 'Kazanıldı',
+        count: statusGroups['closed'].length,
+        value: '',
+        deals: statusGroups['closed'].map((contact) => ({
+          id: contact.id,
+          company: contact.company || null,
+          contact: contact.name,
+          phone: contact.phone || null,
+          value: '',
+          tags: contact.tags || [],
+          status: 'closed' as const,
+          avatar: contact.avatar || null,
+        })),
+      },
+    ]
+  }
+
+  // Fetch contacts from API
   useEffect(() => {
-    const fetchPipeline = async () => {
+    const fetchContacts = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/contacts/pipeline')
-        if (!response.ok) throw new Error('Failed to fetch pipeline')
+        const response = await fetch('/api/contacts')
+        if (!response.ok) throw new Error('Failed to fetch contacts')
         
         const data = await response.json()
-        
-        // Convert contacts to deals format
-        const convertedPipeline = data.pipeline.map((column: any) => ({
-          id: column.id,
-          title: column.title,
-          count: column.count,
-          value: '',
-          deals: column.contacts.map((contact: ContactWithTags) => ({
-            id: contact.id,
-            company: contact.company || null,
-            contact: contact.name,
-            phone: contact.phone || null,
-            value: '',
-            tags: contact.tags || [],
-            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
-            avatar: contact.avatar || null,
-          })),
-        }))
-        
+        const convertedPipeline = convertContactsToPipeline(data.contacts || [])
         setPipelineData(convertedPipeline)
       } catch (error) {
-        console.error('Error fetching pipeline:', error)
+        console.error('Error fetching contacts:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchPipeline()
+    fetchContacts()
   }, [])
 
   const handleDragStart = (e: React.DragEvent, deal: Deal) => {
@@ -159,26 +261,11 @@ export default function CRMPipelinePage() {
 
       if (!response.ok) throw new Error('Failed to update contact status')
 
-      // Refresh pipeline data
-      const pipelineResponse = await fetch('/api/contacts/pipeline')
-      if (pipelineResponse.ok) {
-        const pipelineData = await pipelineResponse.json()
-        const convertedPipeline = pipelineData.pipeline.map((column: any) => ({
-          id: column.id,
-          title: column.title,
-          count: column.count,
-          value: '',
-          deals: column.contacts.map((contact: ContactWithTags) => ({
-            id: contact.id,
-            company: contact.company || null,
-            contact: contact.name,
-            phone: contact.phone || null,
-            value: '',
-            tags: contact.tags || [],
-            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
-            avatar: contact.avatar || null,
-          })),
-        }))
+      // Refresh contacts data
+      const contactsResponse = await fetch('/api/contacts')
+      if (contactsResponse.ok) {
+        const data = await contactsResponse.json()
+        const convertedPipeline = convertContactsToPipeline(data.contacts || [])
         setPipelineData(convertedPipeline)
       }
     } catch (error) {
@@ -210,26 +297,11 @@ export default function CRMPipelinePage() {
 
       if (!response.ok) throw new Error('Failed to create contact')
 
-      // Refresh pipeline data
-      const pipelineResponse = await fetch('/api/contacts/pipeline')
-      if (pipelineResponse.ok) {
-        const pipelineData = await pipelineResponse.json()
-        const convertedPipeline = pipelineData.pipeline.map((column: any) => ({
-          id: column.id,
-          title: column.title,
-          count: column.count,
-          value: '',
-          deals: column.contacts.map((contact: ContactWithTags) => ({
-            id: contact.id,
-            company: contact.company || null,
-            contact: contact.name,
-            phone: contact.phone || null,
-            value: '',
-            tags: contact.tags || [],
-            status: (contact.status || 'lead') as 'lead' | 'prospect' | 'customer' | 'closed',
-            avatar: contact.avatar || null,
-          })),
-        }))
+      // Refresh contacts data
+      const contactsResponse = await fetch('/api/contacts')
+      if (contactsResponse.ok) {
+        const data = await contactsResponse.json()
+        const convertedPipeline = convertContactsToPipeline(data.contacts || [])
         setPipelineData(convertedPipeline)
       }
 
@@ -297,7 +369,7 @@ export default function CRMPipelinePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto">
+          <div className="flex items-center gap-2">
             <div className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-2 md:px-3 text-navy dark:text-white border border-gray-200 dark:border-gray-600">
               <Calendar size={16} />
               <input
@@ -306,13 +378,78 @@ export default function CRMPipelinePage() {
                 placeholder={t('dateRange')}
               />
             </div>
-            <button className="flex h-9 shrink-0 items-center justify-center gap-x-1 md:gap-x-2 rounded-lg bg-gray-50 dark:bg-navy-700 px-2 md:px-3 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-              <Tag size={16} />
-              <span className="text-xs md:text-sm font-medium hidden sm:inline">{t('tags')}</span>
-              <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5z" />
-              </svg>
-            </button>
+            <div className="relative z-50">
+              <button 
+                onClick={() => setShowTagDropdown(!showTagDropdown)}
+                className={`flex h-9 shrink-0 items-center justify-center gap-x-1 md:gap-x-2 rounded-lg px-2 md:px-3 transition-colors ${
+                  selectedTagFilter 
+                    ? 'bg-primary text-white' 
+                    : 'bg-gray-50 dark:bg-navy-700 text-navy dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                <Tag size={16} />
+                <span className="text-xs md:text-sm font-medium hidden sm:inline">
+                  {selectedTagFilter || t('tags')}
+                </span>
+                <svg className={`w-3 h-3 md:w-4 md:h-4 transition-transform ${showTagDropdown ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z" />
+                </svg>
+              </button>
+              
+              {/* Tag Dropdown */}
+              {showTagDropdown && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowTagDropdown(false)} 
+                  />
+                  <div className="absolute top-full left-0 mt-1 bg-white dark:bg-navy-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[200px] z-50 animate-modal-pop">
+                    {/* Clear filter option */}
+                    <button
+                      onClick={() => {
+                        setSelectedTagFilter(null)
+                        setShowTagDropdown(false)
+                      }}
+                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-navy-700 flex items-center gap-2 ${
+                        !selectedTagFilter ? 'bg-gray-100 dark:bg-navy-700' : ''
+                      }`}
+                    >
+                      <span className="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600" />
+                      <span className="text-gray-700 dark:text-gray-300">{t('allTags') || 'Tüm Etiketler'}</span>
+                    </button>
+                    
+                    {allTags.length > 0 ? (
+                      <>
+                        <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+                        {allTags.map((tag) => (
+                          <button
+                            key={tag.tag}
+                            onClick={() => {
+                              setSelectedTagFilter(tag.tag)
+                              setShowTagDropdown(false)
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-navy-700 flex items-center gap-2 ${
+                              selectedTagFilter === tag.tag ? 'bg-gray-100 dark:bg-navy-700' : ''
+                            }`}
+                          >
+                            <span 
+                              className="w-3 h-3 rounded-full shrink-0" 
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <span className="flex-1 text-gray-700 dark:text-gray-300 truncate">{tag.tag}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">({tag.count})</span>
+                          </button>
+                        ))}
+                      </>
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                        {t('noTags') || 'Henüz etiket yok'}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center">
@@ -326,7 +463,7 @@ export default function CRMPipelinePage() {
         </div>
       </header>
 
-      {/* Kanban Board */}
+      {/* Müşteriler Board */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
@@ -334,7 +471,7 @@ export default function CRMPipelinePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4 h-full">
-            {pipelineData.map((column) => (
+            {filteredPipelineData.map((column) => (
             <div
               key={column.id}
               className="flex flex-col gap-2 md:gap-3 min-h-0"
@@ -383,6 +520,30 @@ export default function CRMPipelinePage() {
                             <p className="font-semibold text-xs md:text-sm text-navy dark:text-white truncate">{deal.contact}</p>
                             {deal.phone && (
                               <p className="text-[11px] md:text-xs text-gray-600 dark:text-gray-400 truncate">{deal.phone}</p>
+                            )}
+                            
+                            {/* Deal Tags */}
+                            {deal.tags && deal.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {deal.tags.slice(0, 2).map((tag) => (
+                                  <button
+                                    key={tag.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setSelectedTagFilter(tag.tag)
+                                    }}
+                                    className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-medium text-white hover:opacity-80 transition-opacity"
+                                    style={{ backgroundColor: tag.color || '#6366f1' }}
+                                  >
+                                    {tag.tag}
+                                  </button>
+                                ))}
+                                {deal.tags.length > 2 && (
+                                  <span className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">
+                                    +{deal.tags.length - 2}
+                                  </span>
+                                )}
+                              </div>
                             )}
 
                             <div className="flex items-center justify-between pt-1.5 md:pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -455,101 +616,125 @@ export default function CRMPipelinePage() {
 
       {/* Add Deal Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50" onClick={() => setShowAddModal(false)}>
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowAddModal(false)}
+        >
           <div 
-            className="bg-white dark:bg-navy-800 rounded-t-2xl md:rounded-lg p-4 md:p-6 w-full md:max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-modal-pop"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold text-navy dark:text-white mb-4">Yeni Müşteri Ekle</h2>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              const formData = new FormData(e.currentTarget)
-              const contact = formData.get('contact') as string
-              const phone = formData.get('phone') as string
-              const status = formData.get('status') as 'lead' | 'prospect' | 'customer' | 'closed'
-              const column = formData.get('column') as string
-              
-              if (contact && phone) {
-                setNewDealColumn(column)
-                handleSaveNewDeal({ contact, phone, status })
-              }
-            }}>
+            {/* Header */}
+            <div className="bg-slate-50 dark:bg-navy-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-navy dark:text-white">Yeni Müşteri</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Müşteriler'e yeni kişi ekle</p>
+              </div>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-navy-700 rounded-lg transition-colors"
+              >
+                <X size={18} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form 
+              className="p-6"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const formData = new FormData(e.currentTarget)
+                const contact = formData.get('contact') as string
+                const phone = formData.get('phone') as string
+                const status = formData.get('status') as 'lead' | 'prospect' | 'customer' | 'closed'
+                const column = formData.get('column') as string
+                
+                if (contact && phone) {
+                  setNewDealColumn(column)
+                  handleSaveNewDeal({ contact, phone, status })
+                }
+              }}
+            >
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Ad Soyad
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Ad Soyad <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="contact"
                     required
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"
+                    autoFocus
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2.5 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-colors"
                     placeholder="Müşteri adı"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Telefon
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Telefon <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
                     name="phone"
                     required
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2.5 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-colors"
                     placeholder="+90 555 123 4567"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Durum
-                  </label>
-                  <select
-                    name="status"
-                    required
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"
-                    defaultValue="lead"
-                  >
-                    <option value="lead">{t('lead')}</option>
-                    <option value="prospect">{t('prospect')}</option>
-                    <option value="customer">{t('customer')}</option>
-                    <option value="closed">{t('closed')}</option>
-                  </select>
-                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      Durum
+                    </label>
+                    <select
+                      name="status"
+                      required
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2.5 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-colors"
+                      defaultValue="lead"
+                    >
+                      <option value="lead">{t('lead')}</option>
+                      <option value="prospect">{t('prospect')}</option>
+                      <option value="customer">{t('customer')}</option>
+                      <option value="closed">{t('closed')}</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Kolon
-                  </label>
-                  <select
-                    name="column"
-                    required
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"
-                    defaultValue="lead-in"
-                  >
-                    {pipelineData.map((column) => (
-                      <option key={column.id} value={column.id}>
-                        {column.title}
-                      </option>
-                    ))}
-                  </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      Kolon
+                    </label>
+                    <select
+                      name="column"
+                      required
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 px-3 py-2.5 text-sm text-navy dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-colors"
+                      defaultValue="lead-in"
+                    >
+                      {pipelineData.map((column) => (
+                        <option key={column.id} value={column.id}>
+                          {column.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
+              {/* Footer Actions */}
               <div className="flex gap-3 mt-6">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-600 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-navy-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-navy-600 transition-colors"
                 >
                   İptal
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2"
                 >
+                  <Plus size={16} />
                   Ekle
                 </button>
               </div>

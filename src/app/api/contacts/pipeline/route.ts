@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             tag: true,
+            color: true,
             createdAt: true,
             contactId: true,
           },

@@ -184,6 +184,7 @@ model ContactTag {
   id        String   @id @default(cuid())
   contactId String
   tag       String
+  color     String   @default("#6366f1") // Default indigo color
   createdAt DateTime @default(now())
 
   contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)

@@ -68,7 +68,7 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle }: To
   // Get page title based on current path
   const getPageTitle = () => {
     if (pathname?.includes('/inbox')) return tInbox('title')
-    if (pathname?.includes('/crm-pipeline')) return 'Kanban Board'
+    if (pathname?.includes('/crm-pipeline')) return tNav('pipeline')
     if (pathname?.includes('/crm')) return tCrm('title')
     if (pathname?.includes('/integrations')) return tNav('integrations')
     if (pathname?.includes('/profile')) return 'Profil'

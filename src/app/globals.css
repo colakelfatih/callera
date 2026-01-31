@@ -240,7 +240,8 @@
   animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-panel {
+.sidebar-panel,
+.animate-slide-in-right {
   animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -254,6 +255,22 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* Modal pop animation */
+@keyframes modalPop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-modal-pop {
+  animation: modalPop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive utilities */
