@@ -113,17 +113,21 @@ model Account {
 
 // BetterAuth Session Model
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  expiresAt DateTime
-  token     String   @unique
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(cuid())
+  userId       String
+  expiresAt    DateTime
+  token        String    @unique
+  ipAddress    String?
+  userAgent    String?
+  deviceName   String?   // Parsed device name (e.g., "Chrome on Windows")
+  location     String?   // Approximate location from IP
+  lastActiveAt DateTime  @default(now()) // Last activity timestamp
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, lastActiveAt])
   @@map("sessions")
 }
 

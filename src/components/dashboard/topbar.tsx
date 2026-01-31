@@ -114,8 +114,8 @@ export function TopBar({ onThemeToggle, isDark = false, onMobileMenuToggle }: To
   const userEmail = user?.email || ''
 
   return (
-    <div className="bg-white dark:bg-[#1E1E1E] border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 py-4">
-      <div className="flex items-center justify-between gap-4">
+    <div className="bg-white dark:bg-[#1E1E1E] border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 h-[65px] flex items-center">
+      <div className="flex items-center justify-between gap-4 w-full">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Mobile menu button */}
           <button

@@ -283,10 +283,10 @@ export default function CRMPipelinePage() {
 
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-hidden max-w-full">
       {/* Top Navigation */}
-      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-4 md:px-6 py-3 md:py-4 shrink-0">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-navy-800 px-3 md:px-6 py-3 md:py-4 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 flex-1 min-w-0">
           <div className="w-full sm:w-auto sm:min-w-[180px] md:max-w-xs relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
@@ -302,7 +302,7 @@ export default function CRMPipelinePage() {
               <Calendar size={16} />
               <input
                 type="date"
-                className="bg-transparent border-none outline-none text-xs md:text-sm font-medium cursor-pointer w-[110px] md:w-[130px]"
+                className="bg-transparent border-none outline-none text-xs md:text-sm font-medium cursor-pointer w-[100px] md:w-[130px]"
                 placeholder={t('dateRange')}
               />
             </div>
@@ -327,19 +327,19 @@ export default function CRMPipelinePage() {
       </header>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto p-3 md:p-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden md:overflow-x-auto p-2 md:p-6 max-w-full">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 dark:text-gray-400">Yükleniyor...</div>
           </div>
         ) : (
-          <div className="inline-grid h-full min-w-full auto-cols-min grid-flow-col gap-3 md:gap-4">
+          <div className="flex flex-col md:inline-grid md:min-w-full md:auto-cols-min md:grid-flow-col gap-2 md:gap-4 max-w-full">
             {pipelineData.map((column) => (
             <div
               key={column.id}
-              className="flex w-[260px] md:w-72 h-full flex-col gap-3"
+              className="flex max-w-full md:w-72 h-auto md:h-full flex-col gap-2 md:gap-3"
             >
-              <h3 className="text-navy dark:text-white text-base font-bold tracking-tight px-1 shrink-0">
+              <h3 className="text-navy dark:text-white text-sm md:text-base font-bold tracking-tight px-1 shrink-0">
                 {column.title} ({column.count})
               </h3>
 
@@ -372,18 +372,18 @@ export default function CRMPipelinePage() {
                           onDragStart={(e) => handleDragStart(e, deal)}
                           onDragEnd={handleDragEnd}
                           onClick={() => handleDealClick(deal)}
-                          className="rounded-lg bg-white dark:bg-navy-800 p-3 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow duration-200 mb-3"
+                          className="rounded-lg bg-white dark:bg-navy-800 p-2.5 md:p-3 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow duration-200 mb-2 md:mb-3 w-full max-w-full box-border"
                         >
-                          <div className="flex flex-col gap-2">
-                            <p className="font-semibold text-sm text-navy dark:text-white truncate">{deal.contact}</p>
+                          <div className="flex flex-col gap-1.5 md:gap-2">
+                            <p className="font-semibold text-xs md:text-sm text-navy dark:text-white truncate">{deal.contact}</p>
                             {deal.phone && (
-                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{deal.phone}</p>
+                              <p className="text-[11px] md:text-xs text-gray-600 dark:text-gray-400 truncate">{deal.phone}</p>
                             )}
 
-                            <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between pt-1.5 md:pt-2 border-t border-gray-200 dark:border-gray-700">
                               <div className="flex gap-1 flex-wrap">
                                 <span
-                                  className={`text-xs font-medium rounded-full px-1.5 py-0.5 ${
+                                  className={`text-[10px] md:text-xs font-medium rounded-full px-1.5 py-0.5 ${
                                     deal.status === 'lead' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-200' :
                                     deal.status === 'prospect' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200' :
                                     deal.status === 'customer' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-200' :
@@ -397,10 +397,11 @@ export default function CRMPipelinePage() {
                                 </span>
                               </div>
                               {deal.avatar ? (
-                                <div className="w-5 h-5 rounded-full bg-center bg-no-repeat bg-cover shrink-0" style={{ backgroundImage: `url(${deal.avatar})` }}></div>
+                                <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-center bg-no-repeat bg-cover shrink-0" style={{ backgroundImage: `url(${deal.avatar})` }}></div>
                               ) : (
-                                <div className="w-5 h-5 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
-                                  <User size={12} className="text-primary" />
+                                <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
+                                  <User size={10} className="text-primary md:hidden" />
+                                  <User size={12} className="text-primary hidden md:block" />
                                 </div>
                               )}
                             </div>
@@ -424,12 +425,12 @@ export default function CRMPipelinePage() {
                     ))}
                   </>
                 ) : (
-                  <div className={`rounded-lg bg-white dark:bg-navy-800 border-2 border-dashed transition-all duration-300 ${
+                  <div className={`rounded-lg bg-white dark:bg-navy-800 border-2 border-dashed transition-all duration-300 w-full max-w-full box-border ${
                     dragOverColumn === column.id
                       ? 'border-primary bg-primary/5 scale-105'
                       : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-navy-700/50'
-                  } p-3`}>
-                    <div className="flex flex-col items-center justify-center min-h-[80px]">
+                  } p-2.5 md:p-3`}>
+                    <div className="flex flex-col items-center justify-center min-h-[60px] md:min-h-[80px]">
                       <p className={`text-xs transition-colors duration-300 text-center ${
                         dragOverColumn === column.id
                           ? 'text-primary font-semibold'

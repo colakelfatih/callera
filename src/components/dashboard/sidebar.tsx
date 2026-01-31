@@ -39,8 +39,8 @@ export function Sidebar({ currentPath, isCollapsed = false, onToggle, locale = '
       isCollapsed ? 'w-16' : 'w-64'
     )}>
       <div className={cn(
-        "flex items-center border-b border-gray-200 dark:border-gray-800",
-        isCollapsed ? "justify-center p-3" : "justify-between p-4"
+        "flex items-center border-b border-gray-200 dark:border-gray-800 h-[65px]",
+        isCollapsed ? "justify-center px-3" : "justify-between px-4"
       )}>
         {!isCollapsed ? (
           <div className="font-display font-bold text-primary text-xl">
