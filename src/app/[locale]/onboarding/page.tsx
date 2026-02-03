@@ -7,6 +7,8 @@ import { StepBusinessProfile } from './components/step-business-profile'
 import { StepIntegration } from './components/step-integration'
 import { StepTestMessage } from './components/step-test-message'
 
+export const dynamic = 'force-dynamic'
+
 const ONBOARDING_STEPS = [
   {
     id: 1,

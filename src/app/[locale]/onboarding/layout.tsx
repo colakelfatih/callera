@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { OnboardingRepository } from '@/repositories/onboarding.repository'
 
+export const dynamic = 'force-dynamic'
+
 export default async function OnboardingLayout({
   children,
   params,

@@ -86,13 +86,6 @@ export async function POST(request: NextRequest) {
       })
 
       if (instagramConnection) {
-        // Delete Instagram messages associated with this connection
-        await db.instagramMessage.deleteMany({
-          where: {
-            instagramConnectionId: instagramConnection.id,
-          },
-        })
-
         // Delete the Instagram connection
         await db.instagramConnection.delete({
           where: {

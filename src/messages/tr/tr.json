@@ -302,8 +302,11 @@
         }
     },
     "language": {
-        "switchToEnglish": "İngilizce'ye geç",
-        "switchToTurkish": "Türkçe'ye geç"
+        "switchTo": "Dil değiştir",
+        "turkish": "Türkçe",
+        "english": "İngilizce",
+        "german": "Almanca",
+        "spanish": "İspanyolca"
     },
     "inbox": {
         "title": "Gelen Kutusu",

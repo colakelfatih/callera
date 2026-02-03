@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, setRequestLocale } from 'next-intl/server'
 import { AuthProvider } from '@/components/auth/auth-provider'
-
-const locales = ['tr', 'en', 'de', 'es']
+import { routing } from '@/i18n/routing'
 
 export const metadata: Metadata = {
   title: 'Cevaplıyoruz - AI Müşteri İletişim Platformu',
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }))
+  return routing.locales.map((locale) => ({ locale }))
 }
 
 // Script to prevent flash of wrong theme
@@ -38,7 +37,10 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params
 
-  // Load messages using next-intl's built-in method
+  // Enable static rendering
+  setRequestLocale(locale)
+
+  // Load messages for the current locale
   const messages = await getMessages()
 
   return (

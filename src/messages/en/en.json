@@ -302,8 +302,11 @@
         }
     },
     "language": {
-        "switchToEnglish": "Switch to English",
-        "switchToTurkish": "Switch to Turkish"
+        "switchTo": "Switch language",
+        "turkish": "Turkish",
+        "english": "English",
+        "german": "German",
+        "spanish": "Spanish"
     },
     "inbox": {
         "title": "Inbox",

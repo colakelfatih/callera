@@ -1,0 +1,795 @@
+{
+    "navigation": {
+        "inbox": "Bandeja de entrada",
+        "dialer": "Marcador",
+        "crm": "Contactos",
+        "pipeline": "Clientes",
+        "flows": "Flujos",
+        "insights": "Insights",
+        "studio": "Estudio",
+        "integrations": "Integraciones",
+        "settings": "Configuración",
+        "wiroTest": "Wiro Test",
+        "expandSidebar": "Expandir barra lateral",
+        "collapseSidebar": "Contraer barra lateral"
+    },
+    "topbar": {
+        "searchPlaceholder": "Buscar conversaciones, contactos o llamadas...",
+        "switchToLight": "Cambiar a tema claro",
+        "switchToDark": "Cambiar a tema oscuro",
+        "notifications": "Notificaciones",
+        "admin": "Admin"
+    },
+    "common": {
+        "search": "Buscar",
+        "add": "Añadir",
+        "new": "Nuevo",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "close": "Cerrar",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "previous": "Anterior",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito",
+        "warning": "Advertencia",
+        "info": "Info"
+    },
+    "dialer": {
+        "title": "Marcador IA",
+        "status": "ESTADO DEL MARCADOR",
+        "active": "Marcador activo",
+        "paused": "Marcador en pausa",
+        "callQueue": "Cola de llamadas",
+        "recentActivity": "Actividad reciente",
+        "campaignProgress": "Progreso de campaña",
+        "callsCompleted": "Llamadas completadas",
+        "connectionRate": "Tasa de conexión",
+        "callbacksScheduled": "Devoluciones programadas",
+        "nextCall": "Próxima llamada:",
+        "activeCampaign": "Campaña activa:",
+        "addContact": "Añadir contacto",
+        "pauseDialer": "Pausar marcador",
+        "newCampaign": "Nueva campaña",
+        "searchContacts": "Buscar contactos...",
+        "connected": "Conectado",
+        "voicemailLeft": "Mensaje de voz dejado",
+        "noAnswer": "Sin respuesta",
+        "viewLog": "Ver registro",
+        "queueDescription": "Próximas llamadas para la campaña de seguimiento Q4",
+        "statusActive": "Activo",
+        "nextCallAt": "a las",
+        "nextCallIn": "Próxima llamada en:",
+        "contact": "Contacto",
+        "time": "Hora",
+        "outcome": "Resultado",
+        "actions": "Acciones",
+        "today": "Hoy"
+    },
+    "crm": {
+        "title": "Contactos",
+        "searchDeals": "Buscar ofertas, contactos...",
+        "newDeal": "Nueva tarea",
+        "assignedUser": "Usuario asignado",
+        "dateRange": "Rango de fechas",
+        "tags": "Etiquetas",
+        "leadIn": "Leads entrantes",
+        "contactMade": "Contacto realizado",
+        "meetingScheduled": "Reunión programada",
+        "proposal": "Propuesta",
+        "won": "Ganado",
+        "dragDealsHere": "Arrastra ofertas aquí",
+        "contacts": "Contactos",
+        "list": "Lista",
+        "kanban": "Kanban",
+        "addContact": "Añadir contacto",
+        "searchContacts": "Buscar contactos...",
+        "all": "Todos",
+        "lead": "Lead",
+        "prospect": "Prospecto",
+        "customer": "Cliente",
+        "closed": "Cerrado",
+        "leads": "Leads",
+        "prospects": "Prospectos",
+        "customers": "Clientes",
+        "contactInfo": "Info de contacto",
+        "lastContact": "Último contacto",
+        "selectContact": "Seleccionar contacto",
+        "selectContactDesc": "Elige un contacto para ver detalles",
+        "dropHere": "Soltar aquí",
+        "contactAdded": "Contacto añadido correctamente",
+        "contactAddError": "Error al crear contacto",
+        "tagAdded": "Etiqueta añadida correctamente",
+        "tagAddError": "Error al añadir etiqueta",
+        "tagRemoved": "Etiqueta eliminada",
+        "tagRemoveError": "Error al eliminar etiqueta",
+        "allTags": "Todas las etiquetas",
+        "noTags": "Sin etiquetas aún"
+    },
+    "settings": {
+        "title": "Configuración",
+        "description": "Gestiona tu perfil, preferencias y configuración del espacio de trabajo.",
+        "myProfile": "Mi perfil",
+        "preferences": "Preferencias",
+        "notifications": "Notificaciones",
+        "integrations": "Integraciones",
+        "billing": "Facturación",
+        "personalInfo": "Información personal",
+        "personalInfoDesc": "Actualiza tus datos personales aquí.",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "role": "Rol",
+        "password": "Contraseña",
+        "passwordDesc": "Gestiona la configuración de tu contraseña.",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "uploadNewPicture": "Subir nueva imagen",
+        "saveChanges": "Guardar cambios",
+        "cancel": "Cancelar"
+    },
+    "landing": {
+        "header": {
+            "features": "Características",
+            "pricing": "Precios",
+            "about": "Nosotros",
+            "requestDemo": "Solicitar demo",
+            "menu": "Menú"
+        },
+        "hero": {
+            "title": "Un asistente de IA que llama a tus clientes por ti.",
+            "subtitle": "Mensajes sociales, llamadas y CRM en un solo flujo. Sube, entrena y deja que hable.",
+            "requestDemo": "Solicitar demo",
+            "tryFree": "Probar gratis",
+            "trustedBy": "CON LA CONFIANZA DE LOS EQUIPOS MÁS INNOVADORES DEL MUNDO"
+        },
+        "features": {
+            "title": "Todo lo que necesitas para gestionar las relaciones con clientes",
+            "subtitle": "Desde llamadas impulsadas por IA hasta gestión unificada de bandeja de entrada, Cevaplıyoruz une todos tus puntos de contacto con clientes.",
+            "unifiedInbox": {
+                "title": "Todos los canales, una bandeja de entrada",
+                "description": "WhatsApp, Telegram, Instagram, Email y Teléfono - todos los mensajes de clientes unificados en una plataforma.",
+                "stats": "3× más rápido el primer contacto"
+            },
+            "aiCalling": {
+                "title": "Llamadas y devoluciones con IA",
+                "description": "La IA realiza llamadas salientes, gestiona conversaciones y programa devoluciones automáticamente.",
+                "stats": "70% menos trabajo manual"
+            },
+            "autoLabeling": {
+                "title": "Etiquetado automático",
+                "description": "La IA etiqueta conversaciones automáticamente por intención, sentimiento y prioridad.",
+                "stats": "70% menos etiquetado manual"
+            },
+            "crm": {
+                "title": "CRM y Pipeline",
+                "description": "Integración CRM perfecta con gestión de pipeline y seguimiento de contactos.",
+                "stats": "Vista completa del cliente"
+            },
+            "automation": {
+                "title": "Flujos de automatización",
+                "description": "Constructor de automatización sin código para flujos de trabajo complejos y viajes del cliente.",
+                "stats": "Posibilidades ilimitadas"
+            },
+            "reports": {
+                "title": "Informes",
+                "description": "Análisis completos e insights sobre las interacciones con clientes.",
+                "stats": "Decisiones basadas en datos"
+            }
+        },
+        "footer": {
+            "tagline": "Un asistente de IA que llama a tus clientes por ti. Gestiona WhatsApp, Instagram, Telegram y más desde una sola plataforma.",
+            "newsletter": "Suscríbete a nuestro boletín",
+            "emailPlaceholder": "Tu dirección de email",
+            "product": "Producto",
+            "features": "Características",
+            "pricing": "Precios",
+            "integrations": "Integraciones",
+            "api": "Documentación API",
+            "changelog": "Registro de cambios",
+            "company": "Empresa",
+            "about": "Nosotros",
+            "blog": "Blog",
+            "careers": "Carreras",
+            "press": "Prensa",
+            "partners": "Socios",
+            "contact": "Contacto",
+            "supportHours": "Horario de soporte",
+            "supportTime": "Lunes - Viernes, 09:00 - 18:00",
+            "allRightsReserved": "Todos los derechos reservados.",
+            "privacy": "Política de privacidad",
+            "terms": "Términos de servicio",
+            "dataDeletion": "Eliminación de datos",
+            "cookies": "Política de cookies"
+        },
+        "stats": {
+            "title": "Cevaplıyoruz en números",
+            "subtitle": "Transformamos la comunicación con clientes para cientos de empresas",
+            "customers": "Clientes satisfechos",
+            "messages": "Mensajes procesados",
+            "calls": "Llamadas IA",
+            "timeSaved": "Tiempo ahorrado",
+            "uptime": "Tiempo de actividad",
+            "rating": "Valoración de clientes"
+        },
+        "pricing": {
+            "title": "Precios transparentes",
+            "subtitle": "Sin tarifas ocultas, sin sorpresas. Elige el plan que se adapte a tu negocio.",
+            "monthly": "Mensual",
+            "annual": "Anual",
+            "save": "Ahorra 17%",
+            "month": "mes",
+            "popular": "Más popular",
+            "cta": "Empezar gratis",
+            "viewAll": "Comparar todos los planes",
+            "starter": {
+                "name": "Inicial",
+                "feature1": "2 usuarios",
+                "feature2": "1.000 mensajes/mes",
+                "feature3": "2 integraciones de canal",
+                "feature4": "Sugerencias de respuesta IA",
+                "feature5": "Flujos de automatización"
+            },
+            "professional": {
+                "name": "Profesional",
+                "feature1": "10 usuarios",
+                "feature2": "10.000 mensajes/mes",
+                "feature3": "Todas las integraciones",
+                "feature4": "Respuestas IA + Llamadas IA",
+                "feature5": "Automatización avanzada"
+            },
+            "enterprise": {
+                "name": "Empresarial",
+                "feature1": "Usuarios ilimitados",
+                "feature2": "Mensajes ilimitados",
+                "feature3": "Integraciones personalizadas",
+                "feature4": "Paquete IA completo",
+                "feature5": "Soporte prioritario 24/7"
+            }
+        },
+        "comparison": {
+            "title": "¿Por qué Cevaplıyoruz?",
+            "subtitle": "Compara con otras plataformas y ve la diferencia",
+            "feature": "Característica",
+            "startingFrom": "Desde",
+            "month": "mes",
+            "paidAddon": "Complemento de pago",
+            "disclaimer": "* Los precios y características pueden cambiar. Consulta los sitios web de las empresas para la información más reciente.",
+            "features": {
+                "unifiedInbox": "Bandeja de entrada unificada",
+                "aiCalling": "Llamadas IA",
+                "whatsappIntegration": "Integración WhatsApp",
+                "instagramIntegration": "Integración Instagram",
+                "aiResponses": "Sugerencias de respuesta IA",
+                "automationFlows": "Flujos de automatización",
+                "crm": "Integración CRM",
+                "turkishSupport": "Soporte en turco",
+                "localPricing": "Precios en moneda local",
+                "freeSetup": "Soporte de configuración gratuito"
+            }
+        },
+        "testimonials": {
+            "title": "Lo que dicen nuestros clientes",
+            "subtitle": "Descubre las experiencias de empresas que usan Cevaplıyoruz",
+            "testimonial1": {
+                "name": "Ahmet Kaya",
+                "role": "Fundador",
+                "company": "TechStore",
+                "content": "Gracias a Cevaplıyoruz, redujimos el tiempo de respuesta al cliente en un 80%. Las sugerencias de IA son increíblemente precisas y duplicaron la eficiencia de nuestro equipo."
+            },
+            "testimonial2": {
+                "name": "Merve Özdemir",
+                "role": "Gerente de Servicio al Cliente",
+                "company": "ModaHouse",
+                "content": "Gestionar mensajes de WhatsApp e Instagram desde un solo lugar cambió nuestras vidas. Ya no perdemos ningún mensaje de cliente."
+            },
+            "testimonial3": {
+                "name": "Serkan Yılmaz",
+                "role": "Director General",
+                "company": "AutoParts TR",
+                "content": "El soporte en turco y los precios en moneda local son una gran ventaja. Mucho más asequible que la competencia y las características se adaptan exactamente a nuestras necesidades."
+            }
+        },
+        "cta": {
+            "badge": "14 días de prueba gratis",
+            "title": "¿Listo para transformar tu comunicación con clientes?",
+            "subtitle": "Únete a miles de empresas que usan Cevaplıyoruz para responder a los clientes más rápido y eficazmente.",
+            "tryFree": "Probar gratis",
+            "requestDemo": "Solicitar demo",
+            "noCreditCard": "Sin tarjeta de crédito • 14 días gratis • Cancela cuando quieras"
+        }
+    },
+    "language": {
+        "switchTo": "Cambiar a",
+        "turkish": "Turco",
+        "english": "Inglés",
+        "german": "Alemán",
+        "spanish": "Español"
+    },
+    "inbox": {
+        "title": "Bandeja de entrada",
+        "filter": "Filtrar",
+        "all": "Todos",
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "phone": "Teléfono",
+        "call": "Llamar",
+        "reply": "Responder",
+        "conversation": "Conversación",
+        "priority": "prioridad",
+        "autoLabels": "Etiquetas auto",
+        "aiSummary": "Resumen IA",
+        "aiSummaryText": "El cliente está interesado en programar una demo y discutir opciones de precios.",
+        "selectConversation": "Selecciona una conversación",
+        "selectConversationDesc": "Elige una conversación de la lista para ver detalles",
+        "positive": "positivo",
+        "neutral": "neutral",
+        "negative": "negativo",
+        "high": "alta",
+        "medium": "media",
+        "low": "baja",
+        "noMessages": "Sin mensajes aún"
+    },
+    "flows": {
+        "title": "Flujos de automatización",
+        "createFlow": "Crear flujo",
+        "activeFlows": "Flujos activos",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "lastRun": "Última ejecución:",
+        "never": "Nunca",
+        "pause": "Pausar",
+        "activate": "Activar",
+        "edit": "Editar",
+        "trigger": "Disparador",
+        "conditions": "Condiciones",
+        "actions": "Acciones",
+        "status": "Estado",
+        "pauseFlow": "Pausar flujo",
+        "activateFlow": "Activar flujo",
+        "selectFlow": "Seleccionar flujo",
+        "selectFlowDesc": "Elige un flujo para ver detalles y gestionar",
+        "flowBuilder": "Constructor de flujos",
+        "condition": "Condición",
+        "action": "Acción",
+        "newContactAdded": "Nuevo contacto añadido",
+        "sourceWebsite": "Fuente = sitio web",
+        "sendWelcomeEmail": "Enviar email de bienvenida"
+    },
+    "insights": {
+        "title": "Insights",
+        "last30Days": "Últimos 30 días",
+        "exportReport": "Exportar informe",
+        "totalCalls": "Llamadas totales",
+        "responseTime": "Tiempo de respuesta",
+        "activeContacts": "Contactos activos",
+        "messages": "Mensajes",
+        "vsLastMonth": "vs mes anterior",
+        "callVolume": "Volumen de llamadas",
+        "channelDistribution": "Distribución de canales",
+        "responseTimeTrend": "Tendencia de tiempo de respuesta",
+        "responseTimeMin": "Tiempo de respuesta (min)",
+        "sentimentAnalysis": "Análisis de sentimiento",
+        "recentActivity": "Actividad reciente",
+        "aiCallCompleted": "Llamada IA completada",
+        "newLeadAdded": "Nuevo lead añadido",
+        "emailSent": "Email enviado",
+        "whatsappMessageReceived": "Mensaje WhatsApp recibido",
+        "minAgo": "min atrás",
+        "hourAgo": "hora atrás",
+        "hoursAgo": "horas atrás",
+        "scheduled": "Programado",
+        "completed": "Completado"
+    },
+    "studio": {
+        "title": "Estudio Social",
+        "calendar": "Calendario",
+        "list": "Lista",
+        "createPost": "Crear publicación",
+        "all": "Todos",
+        "draft": "Borrador",
+        "scheduled": "Programado",
+        "published": "Publicado",
+        "posts": "Publicaciones",
+        "contentCalendar": "Calendario de contenido",
+        "content": "Contenido",
+        "platforms": "Plataformas",
+        "schedule": "Programar",
+        "engagement": "Engagement",
+        "likes": "Likes",
+        "comments": "Comentarios",
+        "shares": "Compartidos",
+        "publish": "Publicar",
+        "edit": "Editar",
+        "selectPost": "Seleccionar publicación",
+        "selectPostDesc": "Elige una publicación para ver detalles y gestionar"
+    },
+    "auth": {
+        "loginTitle": "Bienvenido de nuevo",
+        "loginSubtitle": "Inicia sesión en tu cuenta para continuar",
+        "login": "Iniciar sesión",
+        "loggingIn": "Iniciando sesión...",
+        "loginError": "Email o contraseña inválidos",
+        "registerTitle": "Crear cuenta",
+        "registerSubtitle": "Regístrate para empezar con Cevaplıyoruz",
+        "register": "Registrarse",
+        "registering": "Creando cuenta...",
+        "registerError": "Error al crear la cuenta",
+        "registerSuccess": "¡Cuenta creada exitosamente!",
+        "redirecting": "Redirigiendo al panel...",
+        "email": "Email",
+        "emailPlaceholder": "Introduce tu email",
+        "password": "Contraseña",
+        "passwordPlaceholder": "Introduce tu contraseña",
+        "passwordHint": "Debe tener al menos 6 caracteres",
+        "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "confirmPassword": "Confirmar contraseña",
+        "confirmPasswordPlaceholder": "Confirma tu contraseña",
+        "name": "Nombre",
+        "namePlaceholder": "Introduce tu nombre",
+        "noAccount": "¿No tienes cuenta?",
+        "hasAccount": "¿Ya tienes cuenta?",
+        "logout": "Cerrar sesión"
+    },
+    "legal": {
+        "terms": {
+            "title": "Términos de servicio",
+            "lastUpdated": "Última actualización",
+            "sections": {
+                "introduction": {
+                    "title": "Introducción",
+                    "content": "Bienvenido a Cevaplıyoruz. Estos Términos de Servicio rigen tu uso del sitio web cevapliyoruz.com y nuestros servicios relacionados. Al acceder o usar nuestros servicios, aceptas estos términos."
+                },
+                "acceptance": {
+                    "title": "Aceptación de términos",
+                    "content": "Al usar los servicios de Cevaplıyoruz, confirmas que has leído, entendido y aceptas estos Términos de Servicio y nuestra Política de Privacidad."
+                },
+                "services": {
+                    "title": "Nuestros servicios",
+                    "content": "Cevaplıyoruz proporciona una plataforma de comunicación con clientes impulsada por IA que ayuda a las empresas a gestionar sus interacciones con clientes.",
+                    "items": {
+                        "unified": "Gestión unificada de bandeja de entrada desde Instagram, WhatsApp, Email y Teléfono",
+                        "ai": "Servicios de llamadas y devoluciones impulsados por IA",
+                        "crm": "Herramientas de gestión de CRM y pipeline",
+                        "automation": "Flujos de automatización para procesos empresariales"
+                    }
+                },
+                "account": {
+                    "title": "Responsabilidades de la cuenta",
+                    "content": "Cuando creas una cuenta, eres responsable de:",
+                    "items": {
+                        "accurate": "Proporcionar información precisa y actualizada",
+                        "security": "Mantener la seguridad de tu cuenta y mantener tu contraseña confidencial",
+                        "notify": "Notificarnos inmediatamente de cualquier acceso no autorizado",
+                        "responsible": "Ser responsable de todas las actividades que ocurran bajo tu cuenta"
+                    }
+                },
+                "acceptableUse": {
+                    "title": "Uso aceptable",
+                    "content": "Aceptas no participar en las siguientes actividades al usar nuestros servicios:",
+                    "items": {
+                        "laws": "Violar leyes y regulaciones aplicables",
+                        "spam": "Enviar mensajes no solicitados o spam",
+                        "harmful": "Distribuir contenido dañino o malicioso",
+                        "rights": "Infringir los derechos de propiedad intelectual de otros",
+                        "interfere": "Interrumpir o intentar interferir con el funcionamiento normal de nuestros servicios"
+                    }
+                },
+                "intellectualProperty": {
+                    "title": "Propiedad intelectual",
+                    "content": "La plataforma Cevaplıyoruz y todo el contenido relacionado son propiedad de Cevaplıyoruz y están protegidos por derechos de autor, marcas comerciales y otras leyes de propiedad intelectual."
+                },
+                "payment": {
+                    "title": "Pago y facturación",
+                    "content": "Aceptas pagar las tarifas aplicables por nuestros servicios de pago. Todos los pagos se cobran por adelantado según tu ciclo de facturación elegido."
+                },
+                "termination": {
+                    "title": "Terminación",
+                    "content": "Podemos suspender o terminar tu cuenta en cualquier momento por cualquier motivo. La violación de estos términos puede resultar en terminación inmediata."
+                },
+                "liability": {
+                    "title": "Limitación de responsabilidad",
+                    "content": "Nuestros servicios se proporcionan 'tal cual' y 'según disponibilidad'. Cevaplıyoruz no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos."
+                },
+                "changes": {
+                    "title": "Cambios en los términos",
+                    "content": "Nos reservamos el derecho de actualizar estos términos en cualquier momento. Los cambios entran en vigor cuando se publican en esta página."
+                },
+                "contact": {
+                    "title": "Contacto",
+                    "content": "Si tienes preguntas sobre estos Términos de Servicio, contáctanos:"
+                }
+            }
+        },
+        "privacy": {
+            "title": "Política de privacidad",
+            "lastUpdated": "Última actualización",
+            "sections": {
+                "introduction": {
+                    "title": "Introducción",
+                    "content": "En Cevaplıyoruz, valoramos tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, compartimos y protegemos tu información."
+                },
+                "dataCollection": {
+                    "title": "Información que recopilamos",
+                    "content": "Recopilamos varios tipos de información para proporcionar y mejorar nuestros servicios:",
+                    "personal": {
+                        "title": "Información personal",
+                        "items": {
+                            "name": "Nombre y apellido",
+                            "email": "Dirección de email",
+                            "phone": "Número de teléfono",
+                            "company": "Información de la empresa"
+                        }
+                    },
+                    "usage": {
+                        "title": "Información de uso",
+                        "items": {
+                            "ip": "Dirección IP e información de ubicación",
+                            "browser": "Tipo de navegador e información del dispositivo",
+                            "pages": "Páginas visitadas y enlaces clicados",
+                            "time": "Tiempo pasado en el servicio"
+                        }
+                    }
+                },
+                "howWeUse": {
+                    "title": "Cómo usamos tu información",
+                    "content": "Usamos la información recopilada para los siguientes propósitos:",
+                    "items": {
+                        "provide": "Proporcionar y mantener nuestros servicios",
+                        "improve": "Mejorar y personalizar nuestros servicios",
+                        "communicate": "Comunicarnos contigo sobre actualizaciones, ofertas y notificaciones",
+                        "support": "Proporcionar soporte al cliente",
+                        "security": "Garantizar la seguridad y prevenir el fraude"
+                    }
+                },
+                "dataSharing": {
+                    "title": "Compartir información",
+                    "content": "No vendemos tu información personal a terceros. Solo podemos compartir tu información en los siguientes casos:",
+                    "items": {
+                        "providers": "Con nuestros proveedores de servicios para entregar nuestros servicios",
+                        "legal": "Para cumplir con obligaciones legales",
+                        "consent": "Con tu consentimiento explícito"
+                    }
+                },
+                "dataSecurity": {
+                    "title": "Seguridad de datos",
+                    "content": "Implementamos medidas de seguridad estándar de la industria para proteger tu información, incluyendo cifrado, servidores seguros y evaluaciones de seguridad regulares."
+                },
+                "cookies": {
+                    "title": "Cookies y tecnologías de seguimiento",
+                    "content": "Usamos cookies y tecnologías similares para mejorar tu experiencia:",
+                    "items": {
+                        "essential": "Cookies esenciales: Requeridas para que el servicio funcione",
+                        "analytics": "Cookies de análisis: Nos ayudan a entender el uso del servicio",
+                        "functional": "Cookies funcionales: Recuerdan tus preferencias"
+                    }
+                },
+                "yourRights": {
+                    "title": "Tus derechos",
+                    "content": "Bajo KVKK y GDPR, tienes los siguientes derechos:",
+                    "items": {
+                        "access": "Derecho a solicitar acceso a tus datos personales",
+                        "correct": "Derecho a solicitar corrección de datos inexactos",
+                        "delete": "Derecho a solicitar eliminación de tus datos",
+                        "restrict": "Derecho a solicitar restricción del procesamiento de datos",
+                        "portability": "Derecho a la portabilidad de datos",
+                        "object": "Derecho a oponerse al procesamiento de datos"
+                    }
+                },
+                "retention": {
+                    "title": "Retención de datos",
+                    "content": "Retenemos tus datos personales solo mientras sea necesario para cumplir los propósitos para los que fueron recopilados."
+                },
+                "children": {
+                    "title": "Privacidad de menores",
+                    "content": "Nuestros servicios no están dirigidos a personas menores de 18 años. No recopilamos conscientemente información personal de nadie menor de 18 años."
+                },
+                "changes": {
+                    "title": "Cambios en la política",
+                    "content": "Podemos actualizar esta Política de Privacidad de vez en cuando. Los cambios entran en vigor cuando se publican en esta página."
+                },
+                "contact": {
+                    "title": "Contacto",
+                    "content": "Si tienes preguntas sobre nuestra política de privacidad o tus datos, contáctanos:"
+                }
+            }
+        }
+    },
+    "about": {
+        "hero": {
+            "title": "Dando forma al futuro de la comunicación con clientes",
+            "subtitle": "Cevaplıyoruz es una plataforma impulsada por IA que permite a las empresas comunicarse con sus clientes de manera más inteligente, rápida y efectiva."
+        },
+        "mission": {
+            "title": "Nuestra misión",
+            "content": "Transformar la comunicación con clientes para empresas de todos los tamaños y maximizar la satisfacción del cliente con el poder de la tecnología IA."
+        },
+        "story": {
+            "title": "Nuestra historia",
+            "paragraph1": "Cevaplıyoruz fue fundada en 2024 para llenar los vacíos en la comunicación con clientes.",
+            "paragraph2": "Desarrollamos una plataforma innovadora que combina la tecnología IA con la comunicación con clientes.",
+            "paragraph3": "Hoy, ayudamos a cientos de empresas a transformar su comunicación con clientes."
+        },
+        "values": {
+            "title": "Nuestros valores",
+            "innovation": {
+                "title": "Innovación",
+                "content": "Investigamos continuamente nuevas tecnologías y proporcionamos a nuestros clientes las soluciones más avanzadas."
+            },
+            "customer": {
+                "title": "Enfoque en el cliente",
+                "content": "En cada decisión que tomamos, priorizamos las necesidades de nuestros clientes."
+            },
+            "teamwork": {
+                "title": "Trabajo en equipo",
+                "content": "Creemos que el éxito viene de trabajar juntos y actuamos con un fuerte espíritu de equipo."
+            },
+            "transparency": {
+                "title": "Transparencia",
+                "content": "Nos comunicamos abierta y honestamente con nuestros clientes y socios."
+            },
+            "efficiency": {
+                "title": "Eficiencia",
+                "content": "Sabemos que el tiempo es valioso y optimizamos continuamente nuestros procesos."
+            },
+            "quality": {
+                "title": "Calidad",
+                "content": "Apuntamos a los más altos estándares de calidad en cada producto y servicio."
+            }
+        },
+        "stats": {
+            "customers": "Clientes satisfechos",
+            "messages": "Mensajes procesados",
+            "calls": "Llamadas realizadas",
+            "uptime": "Tiempo de actividad"
+        },
+        "contact": {
+            "title": "Contáctanos",
+            "subtitle": "¿Tienes preguntas? Estaremos encantados de ayudarte."
+        }
+    },
+    "pricing": {
+        "title": "Precios simples y transparentes",
+        "subtitle": "Elige el plan que se adapte a las necesidades de tu negocio. Sin tarifas ocultas, sin sorpresas.",
+        "monthly": "Mensual",
+        "annual": "Anual",
+        "save": "Ahorra",
+        "month": "mes",
+        "billedAnnually": "Facturado anualmente",
+        "popular": "Más popular",
+        "plans": {
+            "starter": {
+                "name": "Inicial",
+                "description": "Paquete inicial ideal para pequeñas empresas",
+                "cta": "Empezar gratis",
+                "features": {
+                    "users": "2 usuarios",
+                    "messages": "1.000 mensajes/mes",
+                    "channels": "2 canales (Instagram + WhatsApp)",
+                    "crm": "Funciones CRM básicas",
+                    "support": "Soporte por email",
+                    "ai": "Sugerencias de respuesta IA",
+                    "automation": "Flujos de automatización",
+                    "api": "Acceso API"
+                }
+            },
+            "professional": {
+                "name": "Profesional",
+                "description": "Solución completa para empresas en crecimiento",
+                "cta": "Probar 14 días gratis",
+                "features": {
+                    "users": "10 usuarios",
+                    "messages": "10.000 mensajes/mes",
+                    "channels": "Todos los canales",
+                    "crm": "CRM avanzado y pipeline",
+                    "support": "Soporte prioritario",
+                    "ai": "Sugerencias IA + Llamadas IA",
+                    "automation": "Automatización avanzada",
+                    "api": "Acceso API"
+                }
+            },
+            "enterprise": {
+                "name": "Empresarial",
+                "description": "Soluciones personalizadas para grandes equipos",
+                "cta": "Contactar ventas",
+                "features": {
+                    "users": "Usuarios ilimitados",
+                    "messages": "Mensajes ilimitados",
+                    "channels": "Todos los canales + integraciones personalizadas",
+                    "crm": "Paquete CRM completo",
+                    "support": "Soporte prioritario 24/7",
+                    "ai": "Paquete IA completo + entrenamiento personalizado",
+                    "automation": "Automatización ilimitada",
+                    "api": "Acceso API completo + webhooks"
+                }
+            }
+        },
+        "faq": {
+            "title": "Preguntas frecuentes",
+            "q1": {
+                "question": "¿Puedo cambiar entre planes?",
+                "answer": "Sí, puedes actualizar o degradar tu plan en cualquier momento. Los cambios entran en vigor en el siguiente ciclo de facturación."
+            },
+            "q2": {
+                "question": "¿Hay una prueba gratuita?",
+                "answer": "Sí, ofrecemos una prueba gratuita de 14 días para el plan Profesional. No se requiere tarjeta de crédito."
+            },
+            "q3": {
+                "question": "¿Qué métodos de pago aceptan?",
+                "answer": "Puedes pagar con tarjeta de crédito, tarjeta de débito y transferencia bancaria."
+            },
+            "q4": {
+                "question": "¿Cuál es su política de cancelación?",
+                "answer": "Puedes cancelar en cualquier momento. Para planes anuales, se proporciona un reembolso prorrateado por el período restante."
+            }
+        },
+        "enterprise": {
+            "title": "¿Necesidades personalizadas?",
+            "subtitle": "Contacta a nuestro equipo de ventas para soluciones empresariales, integraciones personalizadas o uso de alto volumen.",
+            "cta": "Contactar ventas"
+        }
+    },
+    "dataDeletion": {
+        "title": "Solicitud de eliminación de datos",
+        "subtitle": "Aprende cómo solicitar la eliminación de tus datos de Cevaplıyoruz.",
+        "sections": {
+            "intro": {
+                "title": "Respetamos tu privacidad",
+                "content": "En Cevaplıyoruz, damos gran importancia a la protección de tus datos personales. Bajo KVKK y GDPR, tienes derecho a solicitar la eliminación de tus datos."
+            },
+            "dataCollected": {
+                "title": "Datos que recopilamos",
+                "content": "Al usar nuestra plataforma, podemos recopilar los siguientes datos:",
+                "items": {
+                    "profile": "Información de perfil (nombre, email, teléfono)",
+                    "messages": "Contenido de mensajes e historial de conversaciones",
+                    "connections": "Información de conexión de redes sociales (Instagram, WhatsApp)",
+                    "usage": "Datos de uso de plataforma y análisis"
+                }
+            },
+            "howToDelete": {
+                "title": "Cómo eliminar tus datos",
+                "content": "Puedes solicitar la eliminación de tus datos de dos maneras:",
+                "method1": {
+                    "title": "Método 1: Desde la configuración de cuenta",
+                    "step1": "Inicia sesión en tu cuenta de Cevaplıyoruz",
+                    "step2": "Ve a Configuración > Perfil",
+                    "step3": "Haz clic en 'Eliminar cuenta'",
+                    "step4": "Confirma la eliminación"
+                },
+                "method2": {
+                    "title": "Método 2: Por email",
+                    "content": "Puedes enviar tu solicitud de eliminación a la dirección de email a continuación. Por favor usa la dirección de email asociada con tu cuenta."
+                }
+            },
+            "afterDeletion": {
+                "title": "Después de la eliminación",
+                "content": "Cuando tu solicitud de eliminación sea aprobada:",
+                "items": {
+                    "permanent": "Todos tus datos personales serán eliminados permanentemente",
+                    "timeframe": "La eliminación se completará en 30 días",
+                    "confirmation": "Serás notificado por email cuando el proceso esté completo",
+                    "exceptions": "Algunos datos pueden retenerse debido a requisitos legales"
+                }
+            },
+            "facebook": {
+                "title": "Para conexión de Facebook/Instagram",
+                "content": "Si te conectaste a Cevaplıyoruz a través de tu cuenta de Facebook o Instagram, también puedes eliminar tus datos de la siguiente manera:",
+                "step1": "Ve a Facebook Configuración y privacidad > Configuración",
+                "step2": "Abre la sección Apps y sitios web",
+                "step3": "Encuentra la app de Cevaplıyoruz",
+                "step4": "Haz clic en 'Eliminar' y marca 'Eliminar toda la información que compartí'",
+                "note": "Esto también eliminará automáticamente tus datos de Facebook/Instagram de nuestros sistemas de Cevaplıyoruz."
+            },
+            "contact": {
+                "title": "¿Necesitas ayuda?",
+                "content": "Contáctanos si tienes preguntas sobre la eliminación de datos.",
+                "cta": "Enviar solicitud de eliminación"
+            }
+        }
+    }
+}

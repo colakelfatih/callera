@@ -172,12 +172,12 @@ export function Hero() {
               </div>
 
               <div className="mt-4 flex gap-1 h-8 items-end">
-                {[...Array(11)].map((_, i) => (
+                {[65, 45, 80, 35, 70, 55, 90, 40, 75, 50, 60].map((height, i) => (
                   <span
                     key={i}
                     className="w-1 bg-primary rounded-full animate-pulse"
                     style={{ 
-                      height: `${Math.random() * 80 + 20}%`,
+                      height: `${height}%`,
                       animationDelay: `${i * 100}ms`
                     }}
                   ></span>
