@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Logo } from '@/components/ui/logo'
 import { Button } from '@/components/ui/button'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Menu, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -17,7 +18,7 @@ export function Header() {
   return (
     <div className="relative">
       <header className="flex items-center justify-between py-4 md:py-6">
-        <Logo size="md" />
+        <Logo size="lg" />
 
         <nav className="hidden md:flex items-center gap-8">
           <a
@@ -27,13 +28,13 @@ export function Header() {
             {t('features')}
           </a>
           <a
-            href="#pricing"
+            href={`/${locale}/pricing`}
             className="text-sm font-medium leading-normal text-navy/80 dark:text-gray-300 hover:text-navy dark:hover:text-white transition-colors"
           >
             {t('pricing')}
           </a>
           <a
-            href="#about"
+            href={`/${locale}/about`}
             className="text-sm font-medium leading-normal text-navy/80 dark:text-gray-300 hover:text-navy dark:hover:text-white transition-colors"
           >
             {t('about')}
@@ -41,6 +42,9 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+          
           <a href={`/${locale}/login`} className="text-sm font-medium text-navy/80 dark:text-gray-300 hover:text-navy dark:hover:text-white transition-colors hidden md:block">
             {tAuth('login')}
           </a>
@@ -68,10 +72,10 @@ export function Header() {
             <a href="#features" className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
               {t('features')}
             </a>
-            <a href="#pricing" className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
+            <a href={`/${locale}/pricing`} className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
               {t('pricing')}
             </a>
-            <a href="#about" className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
+            <a href={`/${locale}/about`} className="text-sm font-medium text-navy dark:text-white py-2" onClick={() => setIsMenuOpen(false)}>
               {t('about')}
             </a>
             <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">

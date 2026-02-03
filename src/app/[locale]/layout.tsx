@@ -3,11 +3,11 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { AuthProvider } from '@/components/auth/auth-provider'
 
-const locales = ['tr', 'en']
+const locales = ['tr', 'en', 'de', 'es']
 
 export const metadata: Metadata = {
-  title: 'Callera - AI Assistant Platform',
-  description: 'An AI assistant that calls your customers for you. Social messages, calls, and CRM in one flow.',
+  title: 'Cevaplıyoruz - AI Müşteri İletişim Platformu',
+  description: 'Müşterileriniz için sizi arayan bir AI asistanı. Sosyal mesajlar, aramalar ve CRM tek bir akışta.',
 }
 
 export function generateStaticParams() {
@@ -18,7 +18,7 @@ export function generateStaticParams() {
 const themeScript = `
   (function() {
     try {
-      var savedTheme = localStorage.getItem('callera-theme');
+      var savedTheme = localStorage.getItem('cevapliyoruz-theme');
       var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
         document.documentElement.classList.add('dark');
@@ -48,7 +48,7 @@ export default async function LocaleLayout({
       </head>
       <body className="font-sans antialiased bg-background-light dark:bg-background-dark text-navy dark:text-gray-200 transition-colors duration-200">
         <AuthProvider>
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
           </NextIntlClientProvider>
         </AuthProvider>

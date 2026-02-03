@@ -17,7 +17,7 @@ export default function DashboardLayoutClient({
 
   useEffect(() => {
     // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('callera-theme')
+    const savedTheme = localStorage.getItem('cevapliyoruz-theme')
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     
     // Priority: saved preference > system preference
@@ -35,7 +35,7 @@ export default function DashboardLayoutClient({
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       // Only apply system preference if no saved preference
-      if (!localStorage.getItem('callera-theme')) {
+      if (!localStorage.getItem('cevapliyoruz-theme')) {
         setIsDark(e.matches)
         if (e.matches) {
           document.documentElement.classList.add('dark')
@@ -72,7 +72,7 @@ export default function DashboardLayoutClient({
   const toggleTheme = () => {
     const newTheme = !isDark
     setIsDark(newTheme)
-    localStorage.setItem('callera-theme', newTheme ? 'dark' : 'light')
+    localStorage.setItem('cevapliyoruz-theme', newTheme ? 'dark' : 'light')
     document.documentElement.classList.toggle('dark')
   }
 

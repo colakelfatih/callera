@@ -149,8 +149,8 @@
             "title": "Everything you need to manage customer relationships",
             "subtitle": "From AI-powered calling to unified inbox management, Callera brings all your customer touchpoints together.",
             "unifiedInbox": {
-                "title": "Unified Inbox",
-                "description": "All your customer conversations in one place. Instagram, WhatsApp, Email, and Phone calls unified.",
+                "title": "All Channels, One Inbox",
+                "description": "WhatsApp, Telegram, Instagram, Email and Phone - all your customer messages unified in one platform.",
                 "stats": "3× faster first contact"
             },
             "aiCalling": {
@@ -180,23 +180,125 @@
             }
         },
         "footer": {
-            "tagline": "An AI assistant that calls your customers for you. Social messages, calls, and CRM in one flow.",
-            "requestDemo": "Request Demo",
-            "tryFree": "Try Free",
+            "tagline": "An AI assistant that calls your customers for you. Manage WhatsApp, Instagram, Telegram and more from a single platform.",
+            "newsletter": "Subscribe to Our Newsletter",
+            "emailPlaceholder": "Your email address",
             "product": "Product",
             "features": "Features",
             "pricing": "Pricing",
             "integrations": "Integrations",
-            "api": "API",
+            "api": "API Documentation",
+            "changelog": "Changelog",
             "company": "Company",
             "about": "About",
             "blog": "Blog",
             "careers": "Careers",
+            "press": "Press",
+            "partners": "Partners",
             "contact": "Contact",
-            "copyright": "© 2024 Callera. All rights reserved.",
-            "privacy": "Privacy",
-            "terms": "Terms",
-            "security": "Security"
+            "supportHours": "Support Hours",
+            "supportTime": "Monday - Friday, 09:00 - 18:00",
+            "allRightsReserved": "All rights reserved.",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "dataDeletion": "Data Deletion",
+            "cookies": "Cookie Policy"
+        },
+        "stats": {
+            "title": "Cevaplıyoruz by the Numbers",
+            "subtitle": "Transforming customer communication for hundreds of businesses",
+            "customers": "Happy Customers",
+            "messages": "Messages Processed",
+            "calls": "AI Calls",
+            "timeSaved": "Time Saved",
+            "uptime": "Uptime",
+            "rating": "Customer Rating"
+        },
+        "pricing": {
+            "title": "Transparent Pricing",
+            "subtitle": "No hidden fees, no surprises. Choose the plan that fits your business.",
+            "monthly": "Monthly",
+            "annual": "Annual",
+            "save": "Save 17%",
+            "month": "month",
+            "popular": "Most Popular",
+            "cta": "Start Free",
+            "viewAll": "Compare all plans",
+            "starter": {
+                "name": "Starter",
+                "feature1": "2 users",
+                "feature2": "1,000 messages/month",
+                "feature3": "2 channel integrations",
+                "feature4": "AI response suggestions",
+                "feature5": "Automation flows"
+            },
+            "professional": {
+                "name": "Professional",
+                "feature1": "10 users",
+                "feature2": "10,000 messages/month",
+                "feature3": "All channel integrations",
+                "feature4": "AI responses + AI calling",
+                "feature5": "Advanced automation"
+            },
+            "enterprise": {
+                "name": "Enterprise",
+                "feature1": "Unlimited users",
+                "feature2": "Unlimited messages",
+                "feature3": "Custom integrations",
+                "feature4": "Full AI package",
+                "feature5": "24/7 priority support"
+            }
+        },
+        "comparison": {
+            "title": "Why Cevaplıyoruz?",
+            "subtitle": "Compare with other platforms and see the difference",
+            "feature": "Feature",
+            "startingFrom": "Starting from",
+            "month": "month",
+            "paidAddon": "Paid Addon",
+            "disclaimer": "* Prices and features may change. Check the respective company websites for the latest information.",
+            "features": {
+                "unifiedInbox": "Unified Inbox",
+                "aiCalling": "AI Calling",
+                "whatsappIntegration": "WhatsApp Integration",
+                "instagramIntegration": "Instagram Integration",
+                "aiResponses": "AI Response Suggestions",
+                "automationFlows": "Automation Flows",
+                "crm": "CRM Integration",
+                "turkishSupport": "Turkish Support",
+                "localPricing": "Local Currency Pricing",
+                "freeSetup": "Free Setup Support"
+            }
+        },
+        "testimonials": {
+            "title": "What Our Customers Say",
+            "subtitle": "Discover the experiences of businesses using Cevaplıyoruz",
+            "testimonial1": {
+                "name": "Ahmet Kaya",
+                "role": "Founder",
+                "company": "TechStore",
+                "content": "Thanks to Cevaplıyoruz, we reduced our customer response time by 80%. The AI suggestions are incredibly accurate and doubled our team's efficiency."
+            },
+            "testimonial2": {
+                "name": "Merve Özdemir",
+                "role": "Customer Service Manager",
+                "company": "ModaHouse",
+                "content": "Managing WhatsApp and Instagram messages from one place changed our lives. We no longer miss any customer messages."
+            },
+            "testimonial3": {
+                "name": "Serkan Yılmaz",
+                "role": "General Manager",
+                "company": "AutoParts TR",
+                "content": "Turkish support and local currency pricing is a huge advantage. Much more affordable than competitors and features are exactly what we need."
+            }
+        },
+        "cta": {
+            "badge": "14 Days Free Trial",
+            "title": "Ready to Transform Your Customer Communication?",
+            "subtitle": "Join thousands of businesses using Cevaplıyoruz to respond to customers faster and more effectively.",
+            "tryFree": "Try Free",
+            "requestDemo": "Request Demo",
+            "noCreditCard": "No credit card required • 14 days free • Cancel anytime"
         }
     },
     "language": {
@@ -309,7 +411,7 @@
         "loggingIn": "Signing in...",
         "loginError": "Invalid email or password",
         "registerTitle": "Create Account",
-        "registerSubtitle": "Sign up to get started with Callera",
+        "registerSubtitle": "Sign up to get started with Cevaplıyoruz",
         "register": "Sign Up",
         "registering": "Creating account...",
         "registerError": "Failed to create account",
@@ -329,5 +431,481 @@
         "noAccount": "Don't have an account?",
         "hasAccount": "Already have an account?",
         "logout": "Logout"
+    },
+    "legal": {
+        "terms": {
+            "title": "Terms of Service",
+            "lastUpdated": "Last Updated",
+            "sections": {
+                "introduction": {
+                    "title": "Introduction",
+                    "content": "Welcome to Cevaplıyoruz. These Terms of Service govern your use of the cevapliyoruz.com website and our related services. By accessing or using our services, you agree to be bound by these terms."
+                },
+                "acceptance": {
+                    "title": "Acceptance of Terms",
+                    "content": "By using Cevaplıyoruz services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree with these terms, please do not use our services."
+                },
+                "services": {
+                    "title": "Our Services",
+                    "content": "Cevaplıyoruz provides an AI-powered customer communication platform that helps businesses manage their customer interactions. Our services include:",
+                    "items": {
+                        "unified": "Unified inbox management from Instagram, WhatsApp, Email, and Phone channels",
+                        "ai": "AI-powered calling and callback services",
+                        "crm": "CRM and pipeline management tools",
+                        "automation": "Automation flows for business processes"
+                    }
+                },
+                "account": {
+                    "title": "Account Responsibilities",
+                    "content": "When you create an account, you are responsible for:",
+                    "items": {
+                        "accurate": "Providing accurate and up-to-date information",
+                        "security": "Maintaining the security of your account and keeping your password confidential",
+                        "notify": "Notifying us immediately of any unauthorized access",
+                        "responsible": "Being responsible for all activities that occur under your account"
+                    }
+                },
+                "acceptableUse": {
+                    "title": "Acceptable Use",
+                    "content": "You agree not to engage in the following activities when using our services:",
+                    "items": {
+                        "laws": "Violating applicable laws and regulations",
+                        "spam": "Sending unsolicited messages or spam",
+                        "harmful": "Distributing harmful or malicious content",
+                        "rights": "Infringing on the intellectual property rights of others",
+                        "interfere": "Disrupting or attempting to interfere with the normal operation of our services"
+                    }
+                },
+                "intellectualProperty": {
+                    "title": "Intellectual Property",
+                    "content": "The Cevaplıyoruz platform and all related content, features, and functionality (including software, text, images, logos, and designs) are owned by Cevaplıyoruz and are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, or distribute our content without written permission."
+                },
+                "payment": {
+                    "title": "Payment and Billing",
+                    "content": "You agree to pay the applicable fees for our paid services. All payments are collected in advance according to your chosen billing cycle. Cancellations take effect from the next billing cycle. Our refund policy is specified in your service agreement."
+                },
+                "termination": {
+                    "title": "Termination",
+                    "content": "We may suspend or terminate your account at any time for any reason. Violation of these terms may result in immediate termination. Upon termination, your right to use the Services will immediately cease. You can contact us for account deletion."
+                },
+                "liability": {
+                    "title": "Limitation of Liability",
+                    "content": "Our services are provided 'as is' and 'as available'. Cevaplıyoruz will not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our services. Our total liability is limited to the amount you paid us in the twelve months preceding the applicable event."
+                },
+                "changes": {
+                    "title": "Changes to Terms",
+                    "content": "We reserve the right to update these terms at any time. Changes take effect when published on this page. We will notify you of significant changes by email. Your continued use of our services after changes constitutes acceptance of the new terms."
+                },
+                "contact": {
+                    "title": "Contact",
+                    "content": "If you have questions about these Terms of Service, please contact us:"
+                }
+            }
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "lastUpdated": "Last Updated",
+            "sections": {
+                "introduction": {
+                    "title": "Introduction",
+                    "content": "At Cevaplıyoruz, we value your privacy. This Privacy Policy explains how we collect, use, share, and protect your information when you use our cevapliyoruz.com website and services."
+                },
+                "dataCollection": {
+                    "title": "Information We Collect",
+                    "content": "We collect various types of information to provide and improve our services:",
+                    "personal": {
+                        "title": "Personal Information",
+                        "items": {
+                            "name": "First and last name",
+                            "email": "Email address",
+                            "phone": "Phone number",
+                            "company": "Company information"
+                        }
+                    },
+                    "usage": {
+                        "title": "Usage Information",
+                        "items": {
+                            "ip": "IP address and location information",
+                            "browser": "Browser type and device information",
+                            "pages": "Pages visited and links clicked",
+                            "time": "Time spent on the service"
+                        }
+                    }
+                },
+                "howWeUse": {
+                    "title": "How We Use Your Information",
+                    "content": "We use the collected information for the following purposes:",
+                    "items": {
+                        "provide": "To provide and maintain our services",
+                        "improve": "To improve and personalize our services",
+                        "communicate": "To communicate with you about updates, offers, and notifications",
+                        "support": "To provide customer support",
+                        "security": "To ensure security and prevent fraud"
+                    }
+                },
+                "dataSharing": {
+                    "title": "Information Sharing",
+                    "content": "We do not sell your personal information to third parties. We may share your information only in the following cases:",
+                    "items": {
+                        "providers": "With our service providers (payment processors, cloud services, etc.) to deliver our services",
+                        "legal": "To comply with legal obligations or respond to legal process",
+                        "consent": "With your explicit consent"
+                    }
+                },
+                "dataSecurity": {
+                    "title": "Data Security",
+                    "content": "We implement industry-standard security measures to protect your information. These measures include encryption, secure servers, and regular security assessments. However, please note that no data transmission over the internet is 100% secure."
+                },
+                "cookies": {
+                    "title": "Cookies and Tracking Technologies",
+                    "content": "We use cookies and similar technologies to enhance your experience:",
+                    "items": {
+                        "essential": "Essential cookies: Required for the service to function",
+                        "analytics": "Analytics cookies: Help us understand service usage",
+                        "functional": "Functional cookies: Remember your preferences"
+                    }
+                },
+                "yourRights": {
+                    "title": "Your Rights",
+                    "content": "Under KVKK and GDPR, you have the following rights:",
+                    "items": {
+                        "access": "Right to request access to your personal data",
+                        "correct": "Right to request correction of inaccurate data",
+                        "delete": "Right to request deletion of your data",
+                        "restrict": "Right to request restriction of data processing",
+                        "portability": "Right to data portability",
+                        "object": "Right to object to data processing"
+                    }
+                },
+                "retention": {
+                    "title": "Data Retention",
+                    "content": "We retain your personal data only as long as necessary to fulfill the purposes for which it was collected. When you delete your account, your data will be deleted within 30 days, except for legal retention requirements."
+                },
+                "children": {
+                    "title": "Children's Privacy",
+                    "content": "Our services are not intended for persons under 18 years of age. We do not knowingly collect personal information from anyone under 18. If we learn that a child has provided us with personal information, we will delete it immediately."
+                },
+                "changes": {
+                    "title": "Policy Changes",
+                    "content": "We may update this Privacy Policy from time to time. Changes take effect when published on this page. We will notify you of significant changes by email."
+                },
+                "contact": {
+                    "title": "Contact",
+                    "content": "If you have questions about our privacy policy or your data, please contact us:"
+                }
+            }
+        }
+    },
+    "about": {
+        "hero": {
+            "title": "Shaping the Future of Customer Communication",
+            "subtitle": "Cevaplıyoruz is an AI-powered platform that enables businesses to communicate with their customers smarter, faster, and more effectively."
+        },
+        "mission": {
+            "title": "Our Mission",
+            "content": "To transform customer communication for businesses of all sizes and maximize customer satisfaction with the power of AI technology. By simplifying complex processes, we help businesses deliver the best experience to their customers."
+        },
+        "story": {
+            "title": "Our Story",
+            "paragraph1": "Cevaplıyoruz was founded in 2024 to fill the gaps in customer communication. We personally experienced how difficult it is to manage messages from different channels, respond to customer inquiries in a timely manner, and organize follow-up processes.",
+            "paragraph2": "We set out to solve these challenges and developed an innovative platform that combines AI technology with customer communication. We created a solution that can manage Instagram, WhatsApp, email, and phone calls from one place, powered by artificial intelligence.",
+            "paragraph3": "Today, we help hundreds of businesses transform their customer communication. Our goal is to turn every customer interaction into a valuable experience and contribute to business growth."
+        },
+        "values": {
+            "title": "Our Values",
+            "innovation": {
+                "title": "Innovation",
+                "content": "We continuously research new technologies and provide our customers with the most advanced solutions."
+            },
+            "customer": {
+                "title": "Customer Focus",
+                "content": "We prioritize our customers' needs in every decision we make."
+            },
+            "teamwork": {
+                "title": "Teamwork",
+                "content": "We believe success comes from working together and act with a strong team spirit."
+            },
+            "transparency": {
+                "title": "Transparency",
+                "content": "We communicate openly and honestly with our customers and partners."
+            },
+            "efficiency": {
+                "title": "Efficiency",
+                "content": "We know that time is valuable and continuously optimize our processes."
+            },
+            "quality": {
+                "title": "Quality",
+                "content": "We aim for the highest quality standards in every product and service."
+            }
+        },
+        "stats": {
+            "customers": "Happy Customers",
+            "messages": "Messages Processed",
+            "calls": "Calls Made",
+            "uptime": "Uptime"
+        },
+        "contact": {
+            "title": "Get in Touch",
+            "subtitle": "Have questions? We'd be happy to help."
+        }
+    },
+    "features": {
+        "hero": {
+            "badge": "AI-Powered Customer Communication",
+            "title": "The Only Platform That",
+            "titleHighlight": "Calls Your Customers For You",
+            "subtitle": "Not just chatbots. Real AI-powered phone calls, unified inbox, and smart automation. Everything you need for customer communication in one platform.",
+            "cta": "Start Free Trial",
+            "secondaryCta": "View Pricing"
+        },
+        "channels": {
+            "title": "All Your Channels, One Inbox",
+            "subtitle": "Connect all your communication channels and manage them from a single dashboard."
+        },
+        "main": {
+            "title": "Features That Set Us Apart",
+            "subtitle": "Discover the capabilities that make Callera the most comprehensive customer communication platform.",
+            "aiCalling": {
+                "title": "AI-Powered Phone Calls",
+                "description": "Our AI doesn't just answer messages—it makes real phone calls on your behalf. Schedule callbacks, follow up on leads, and handle customer inquiries with natural voice conversations.",
+                "highlight": "70% reduction in manual call work",
+                "details": {
+                    "1": "Natural voice conversations with advanced AI",
+                    "2": "Automatic callback scheduling",
+                    "3": "Real-time call transcription",
+                    "4": "Smart lead qualification during calls"
+                }
+            },
+            "unifiedInbox": {
+                "title": "Unified Inbox",
+                "description": "Instagram DMs, WhatsApp messages, emails, and phone calls—all in one place. Never miss a customer message again, regardless of which channel they use.",
+                "highlight": "3× faster first response time",
+                "details": {
+                    "1": "All channels in a single view",
+                    "2": "Automatic conversation threading",
+                    "3": "Priority-based message sorting",
+                    "4": "Team collaboration and assignment"
+                }
+            },
+            "aiResponses": {
+                "title": "Smart AI Responses",
+                "description": "AI analyzes incoming messages and either suggests responses or automatically replies. It learns from your communication style and adapts to your business needs.",
+                "highlight": "90% of routine inquiries handled automatically",
+                "details": {
+                    "1": "Context-aware response generation",
+                    "2": "Automatic sentiment detection",
+                    "3": "Custom training on your business data",
+                    "4": "Multi-language support"
+                }
+            },
+            "automation": {
+                "title": "No-Code Automation",
+                "description": "Build complex workflows without writing a single line of code. Automate follow-ups, tag contacts, trigger actions based on customer behavior, and more.",
+                "highlight": "Unlimited workflow possibilities",
+                "details": {
+                    "1": "Drag-and-drop flow builder",
+                    "2": "Trigger-based automation",
+                    "3": "Conditional logic and branching",
+                    "4": "Integration with external tools"
+                }
+            }
+        },
+        "differentiators": {
+            "title": "Why Choose Callera?",
+            "subtitle": "See what makes us different from other customer communication platforms.",
+            "realCalls": {
+                "title": "Real Phone Calls, Not Just Chat",
+                "description": "While others offer chatbots, we offer AI that actually makes phone calls. Real voice conversations with your customers."
+            },
+            "multiChannel": {
+                "title": "True Multi-Channel",
+                "description": "Instagram, WhatsApp, Email, and Phone—all natively integrated. No third-party connectors needed."
+            },
+            "smartAI": {
+                "title": "Advanced AI Engine",
+                "description": "Powered by the latest AI models, our system understands context, sentiment, and intent better than any competitor."
+            },
+            "realtime": {
+                "title": "Real-Time Everything",
+                "description": "Live message streaming, instant notifications, and real-time analytics. Never miss a beat."
+            },
+            "security": {
+                "title": "Enterprise-Grade Security",
+                "description": "End-to-end encryption, GDPR compliance, and SOC 2 certification. Your data is always safe."
+            },
+            "support": {
+                "title": "Local Support",
+                "description": "Turkish-speaking support team available during business hours. We understand your market."
+            }
+        },
+        "stats": {
+            "title": "Results That Speak",
+            "subtitle": "See the impact our customers experience.",
+            "manualWork": "Less Manual Work",
+            "responseSpeed": "Faster Response",
+            "availability": "AI Availability",
+            "uptime": "Platform Uptime"
+        },
+        "comparison": {
+            "title": "How We Compare",
+            "subtitle": "See how Callera stacks up against other platforms.",
+            "feature": "Feature",
+            "callera": "Callera",
+            "others": "Others",
+            "features": {
+                "aiCalling": "AI Phone Calls",
+                "unifiedInbox": "Unified Inbox",
+                "aiResponses": "AI Auto-Responses",
+                "noCode": "No-Code Automation",
+                "crm": "Built-in CRM",
+                "turkishSupport": "Turkish Language Support"
+            }
+        },
+        "cta": {
+            "title": "Ready to Transform Your Customer Communication?",
+            "subtitle": "Join hundreds of businesses that have already upgraded their customer experience with Callera.",
+            "primary": "Start Free Trial",
+            "secondary": "Schedule a Demo"
+        }
+    },
+    "pricing": {
+        "title": "Simple and Transparent Pricing",
+        "subtitle": "Choose the plan that fits your business needs. No hidden fees, no surprises.",
+        "monthly": "Monthly",
+        "annual": "Annual",
+        "save": "Save",
+        "month": "month",
+        "billedAnnually": "Billed annually",
+        "popular": "Most Popular",
+        "plans": {
+            "starter": {
+                "name": "Starter",
+                "description": "Ideal starter package for small businesses",
+                "cta": "Start Free",
+                "features": {
+                    "users": "2 users",
+                    "messages": "1,000 messages/month",
+                    "channels": "2 channels (Instagram + WhatsApp)",
+                    "crm": "Basic CRM features",
+                    "support": "Email support",
+                    "ai": "AI response suggestions",
+                    "automation": "Automation flows",
+                    "api": "API access"
+                }
+            },
+            "professional": {
+                "name": "Professional",
+                "description": "Comprehensive solution for growing businesses",
+                "cta": "Try 14 Days Free",
+                "features": {
+                    "users": "10 users",
+                    "messages": "10,000 messages/month",
+                    "channels": "All channels",
+                    "crm": "Advanced CRM & pipeline",
+                    "support": "Priority support",
+                    "ai": "AI suggestions + AI calling",
+                    "automation": "Advanced automation flows",
+                    "api": "API access"
+                }
+            },
+            "enterprise": {
+                "name": "Enterprise",
+                "description": "Customized solutions for large teams",
+                "cta": "Contact Sales",
+                "features": {
+                    "users": "Unlimited users",
+                    "messages": "Unlimited messages",
+                    "channels": "All channels + custom integrations",
+                    "crm": "Full CRM package",
+                    "support": "24/7 priority support",
+                    "ai": "Full AI package + custom training",
+                    "automation": "Unlimited automation",
+                    "api": "Full API access + webhooks"
+                }
+            }
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "q1": {
+                "question": "Can I switch between plans?",
+                "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect in the next billing cycle."
+            },
+            "q2": {
+                "question": "Is there a free trial?",
+                "answer": "Yes, we offer a 14-day free trial for the Professional plan. No credit card required."
+            },
+            "q3": {
+                "question": "What payment methods do you accept?",
+                "answer": "You can pay with credit card, debit card, and bank transfer. We can issue custom invoices for enterprise plans."
+            },
+            "q4": {
+                "question": "What is your cancellation policy?",
+                "answer": "You can cancel at any time. For annual plans, a prorated refund is provided for the remaining period."
+            }
+        },
+        "enterprise": {
+            "title": "Have Custom Needs?",
+            "subtitle": "Contact our sales team for enterprise solutions, custom integrations, or high-volume usage.",
+            "cta": "Contact Sales"
+        }
+    },
+    "dataDeletion": {
+        "title": "Data Deletion Request",
+        "subtitle": "Learn how to request deletion of your data from Cevaplıyoruz.",
+        "sections": {
+            "intro": {
+                "title": "We Respect Your Privacy",
+                "content": "At Cevaplıyoruz, we place great importance on protecting your personal data. Under KVKK and GDPR, you have the right to request the deletion of your data. This page explains step by step how you can delete your data."
+            },
+            "dataCollected": {
+                "title": "Data We Collect",
+                "content": "When using our platform, we may collect the following data:",
+                "items": {
+                    "profile": "Profile information (name, email, phone)",
+                    "messages": "Message content and conversation history",
+                    "connections": "Social media connection information (Instagram, WhatsApp)",
+                    "usage": "Platform usage data and analytics"
+                }
+            },
+            "howToDelete": {
+                "title": "How to Delete Your Data",
+                "content": "You can request deletion of your data through two methods:",
+                "method1": {
+                    "title": "Method 1: From Account Settings",
+                    "step1": "Log in to your Cevaplıyoruz account",
+                    "step2": "Go to Settings > Profile",
+                    "step3": "Click on \"Delete Account\"",
+                    "step4": "Confirm the deletion"
+                },
+                "method2": {
+                    "title": "Method 2: Request via Email",
+                    "content": "You can send your data deletion request to the email address below. Please use the email address associated with your account."
+                }
+            },
+            "afterDeletion": {
+                "title": "After Deletion",
+                "content": "When your data deletion request is approved:",
+                "items": {
+                    "permanent": "All your personal data will be permanently deleted",
+                    "timeframe": "Deletion will be completed within 30 days",
+                    "confirmation": "You will be notified by email when the process is complete",
+                    "exceptions": "Some data may be retained due to legal requirements"
+                }
+            },
+            "facebook": {
+                "title": "For Facebook/Instagram Connection",
+                "content": "If you connected to Cevaplıyoruz through your Facebook or Instagram account, you can also delete your data as follows:",
+                "step1": "Go to Facebook Settings & Privacy > Settings",
+                "step2": "Open Apps and Websites section",
+                "step3": "Find the Cevaplıyoruz app",
+                "step4": "Click \"Remove\" and check \"Delete all information I shared\"",
+                "note": "This will automatically delete your Facebook/Instagram data from our Cevaplıyoruz systems as well."
+            },
+            "contact": {
+                "title": "Need Help?",
+                "content": "Contact us if you have questions about data deletion.",
+                "cta": "Send Data Deletion Request"
+            }
+        }
     }
 }

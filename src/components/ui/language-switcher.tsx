@@ -1,32 +1,30 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
-import { useRouter, usePathname } from 'next/navigation'
-import { Button } from './button'
+import { usePathname } from 'next/navigation'
 import { Globe } from 'lucide-react'
 
 export function LanguageSwitcher() {
     const locale = useLocale()
-    const router = useRouter()
     const pathname = usePathname()
     const t = useTranslations('language')
 
-    const toggleLanguage = () => {
-        const newLocale = locale === 'tr' ? 'en' : 'tr'
-        const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`)
-        router.push(newPathname)
+    const newLocale = locale === 'tr' ? 'en' : 'tr'
+    const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`)
+
+    const handleLanguageChange = () => {
+        // Full page navigation to ensure locale change takes effect
+        window.location.href = newPathname
     }
 
     return (
-        <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleLanguage}
-            className="p-2"
+        <button
+            onClick={handleLanguageChange}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-navy/80 dark:text-gray-300 hover:text-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-navy-800 rounded-lg transition-colors"
             title={locale === 'tr' ? t('switchToEnglish') : t('switchToTurkish')}
         >
-            <Globe size={20} />
-            <span className="ml-1 text-xs font-medium">{locale.toUpperCase()}</span>
-        </Button>
+            <Globe size={18} />
+            <span className="text-xs font-bold uppercase">{newLocale}</span>
+        </button>
     )
 }

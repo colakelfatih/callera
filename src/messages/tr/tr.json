@@ -149,8 +149,8 @@
             "title": "Müşteri ilişkilerini yönetmek için ihtiyacınız olan her şey",
             "subtitle": "AI destekli aramalardan birleşik gelen kutusu yönetimine kadar, Callera tüm müşteri dokunuş noktalarınızı bir araya getirir.",
             "unifiedInbox": {
-                "title": "Birleşik Gelen Kutusu",
-                "description": "Tüm müşteri konuşmalarınız tek bir yerde. Instagram, WhatsApp, E-posta ve Telefon aramaları birleşik.",
+                "title": "Tüm Kanallarınız, Tek Gelen Kutusu",
+                "description": "WhatsApp, Telegram, Instagram, E-posta ve Telefon - tüm müşteri mesajlarınız tek platformda birleşik.",
                 "stats": "İlk temas 3× daha hızlı"
             },
             "aiCalling": {
@@ -180,23 +180,125 @@
             }
         },
         "footer": {
-            "tagline": "Müşterileriniz için sizi arayan bir AI asistanı. Sosyal mesajlar, aramalar ve CRM tek bir akışta.",
-            "requestDemo": "Demo Talep Et",
-            "tryFree": "Ücretsiz Dene",
+            "tagline": "Müşterileriniz için sizi arayan bir AI asistanı. WhatsApp, Instagram, Telegram ve daha fazlasını tek platformdan yönetin.",
+            "newsletter": "Bültenimize Abone Olun",
+            "emailPlaceholder": "E-posta adresiniz",
             "product": "Ürün",
             "features": "Özellikler",
             "pricing": "Fiyatlandırma",
             "integrations": "Entegrasyonlar",
-            "api": "API",
+            "api": "API Dokümantasyonu",
+            "changelog": "Güncellemeler",
             "company": "Şirket",
             "about": "Hakkımızda",
             "blog": "Blog",
             "careers": "Kariyer",
+            "press": "Basın",
+            "partners": "İş Ortakları",
             "contact": "İletişim",
-            "copyright": "© 2024 Callera. Tüm hakları saklıdır.",
-            "privacy": "Gizlilik",
-            "terms": "Şartlar",
-            "security": "Güvenlik"
+            "supportHours": "Destek Saatleri",
+            "supportTime": "Pazartesi - Cuma, 09:00 - 18:00",
+            "allRightsReserved": "Tüm hakları saklıdır.",
+            "privacy": "Gizlilik Politikası",
+            "terms": "Kullanım Şartları",
+            "dataDeletion": "Veri Silme",
+            "cookies": "Çerez Politikası"
+        },
+        "stats": {
+            "title": "Rakamlarla Cevaplıyoruz",
+            "subtitle": "Yüzlerce işletmenin müşteri iletişimini dönüştürüyoruz",
+            "customers": "Mutlu Müşteri",
+            "messages": "İşlenen Mesaj",
+            "calls": "AI Arama",
+            "timeSaved": "Zaman Tasarrufu",
+            "uptime": "Çalışma Süresi",
+            "rating": "Müşteri Puanı"
+        },
+        "pricing": {
+            "title": "Şeffaf Fiyatlandırma",
+            "subtitle": "Gizli ücret yok, sürpriz yok. İşletmenize en uygun planı seçin.",
+            "monthly": "Aylık",
+            "annual": "Yıllık",
+            "save": "%17 Tasarruf",
+            "month": "ay",
+            "popular": "En Popüler",
+            "cta": "Ücretsiz Başla",
+            "viewAll": "Tüm planları karşılaştır",
+            "starter": {
+                "name": "Başlangıç",
+                "feature1": "2 kullanıcı",
+                "feature2": "1.000 mesaj/ay",
+                "feature3": "2 kanal entegrasyonu",
+                "feature4": "AI yanıt önerileri",
+                "feature5": "Otomasyon akışları"
+            },
+            "professional": {
+                "name": "Profesyonel",
+                "feature1": "10 kullanıcı",
+                "feature2": "10.000 mesaj/ay",
+                "feature3": "Tüm kanal entegrasyonları",
+                "feature4": "AI yanıt + AI arama",
+                "feature5": "Gelişmiş otomasyon"
+            },
+            "enterprise": {
+                "name": "Kurumsal",
+                "feature1": "Sınırsız kullanıcı",
+                "feature2": "Sınırsız mesaj",
+                "feature3": "Özel entegrasyonlar",
+                "feature4": "Tam AI paketi",
+                "feature5": "7/24 öncelikli destek"
+            }
+        },
+        "comparison": {
+            "title": "Neden Cevaplıyoruz?",
+            "subtitle": "Diğer platformlarla karşılaştırın ve farkı görün",
+            "feature": "Özellik",
+            "startingFrom": "Başlangıç",
+            "month": "ay",
+            "paidAddon": "Ücretli Eklenti",
+            "disclaimer": "* Fiyatlar ve özellikler değişebilir. Son bilgiler için ilgili firmaların web sitelerini kontrol edin.",
+            "features": {
+                "unifiedInbox": "Birleşik Gelen Kutusu",
+                "aiCalling": "AI Arama",
+                "whatsappIntegration": "WhatsApp Entegrasyonu",
+                "instagramIntegration": "Instagram Entegrasyonu",
+                "aiResponses": "AI Yanıt Önerileri",
+                "automationFlows": "Otomasyon Akışları",
+                "crm": "CRM Entegrasyonu",
+                "turkishSupport": "Türkçe Destek",
+                "localPricing": "TL ile Ödeme",
+                "freeSetup": "Ücretsiz Kurulum Desteği"
+            }
+        },
+        "testimonials": {
+            "title": "Müşterilerimiz Ne Diyor?",
+            "subtitle": "Cevaplıyoruz kullanan işletmelerin deneyimlerini keşfedin",
+            "testimonial1": {
+                "name": "Ahmet Kaya",
+                "role": "Kurucu",
+                "company": "TechStore",
+                "content": "Cevaplıyoruz sayesinde müşteri yanıt süremizi %80 azalttık. AI önerileri inanılmaz doğru ve ekibimizin verimliliğini katladı."
+            },
+            "testimonial2": {
+                "name": "Merve Özdemir",
+                "role": "Müşteri Hizmetleri Müdürü",
+                "company": "ModaHouse",
+                "content": "WhatsApp ve Instagram mesajlarını tek yerden yönetmek hayatımızı değiştirdi. Artık hiçbir müşteri mesajını kaçırmıyoruz."
+            },
+            "testimonial3": {
+                "name": "Serkan Yılmaz",
+                "role": "Genel Müdür",
+                "company": "AutoParts TR",
+                "content": "Türkçe destek ve TL ile ödeme yapabilmek büyük avantaj. Rakiplere göre çok daha uygun ve özellikler tam ihtiyacımıza göre."
+            }
+        },
+        "cta": {
+            "badge": "14 Gün Ücretsiz Deneme",
+            "title": "Müşteri İletişiminizi Dönüştürmeye Hazır mısınız?",
+            "subtitle": "Binlerce işletme gibi siz de Cevaplıyoruz ile müşterilerinize daha hızlı ve etkili yanıt verin.",
+            "tryFree": "Ücretsiz Deneyin",
+            "requestDemo": "Demo Talep Edin",
+            "noCreditCard": "Kredi kartı gerekmez • 14 gün ücretsiz • İstediğiniz zaman iptal"
         }
     },
     "language": {
@@ -309,7 +411,7 @@
         "loggingIn": "Giriş yapılıyor...",
         "loginError": "Geçersiz e-posta veya şifre",
         "registerTitle": "Hesap Oluştur",
-        "registerSubtitle": "Callera'ya başlamak için kayıt olun",
+        "registerSubtitle": "Cevaplıyoruz'a başlamak için kayıt olun",
         "register": "Kayıt Ol",
         "registering": "Hesap oluşturuluyor...",
         "registerError": "Hesap oluşturulamadı",
@@ -329,5 +431,481 @@
         "noAccount": "Hesabınız yok mu?",
         "hasAccount": "Zaten hesabınız var mı?",
         "logout": "Çıkış Yap"
+    },
+    "legal": {
+        "terms": {
+            "title": "Kullanım Şartları",
+            "lastUpdated": "Son Güncelleme",
+            "sections": {
+                "introduction": {
+                    "title": "Giriş",
+                    "content": "Cevaplıyoruz platformuna hoş geldiniz. Bu Kullanım Şartları, cevapliyoruz.com web sitesini ve ilgili hizmetlerimizi kullanımınızı düzenlemektedir. Hizmetlerimize erişerek veya kullanarak bu şartları kabul etmiş sayılırsınız."
+                },
+                "acceptance": {
+                    "title": "Şartların Kabulü",
+                    "content": "Cevaplıyoruz hizmetlerini kullanarak, bu Kullanım Şartları'nı ve Gizlilik Politikamızı okuduğunuzu, anladığınızı ve bunlara bağlı olmayı kabul ettiğinizi onaylamış olursunuz. Bu şartları kabul etmiyorsanız, lütfen hizmetlerimizi kullanmayınız."
+                },
+                "services": {
+                    "title": "Hizmetlerimiz",
+                    "content": "Cevaplıyoruz, işletmelerin müşteri iletişimlerini yönetmelerine yardımcı olan yapay zeka destekli bir müşteri iletişim platformu sunar. Hizmetlerimiz şunları içerir:",
+                    "items": {
+                        "unified": "Instagram, WhatsApp, E-posta ve Telefon kanallarından birleşik gelen kutusu yönetimi",
+                        "ai": "Yapay zeka destekli arama ve geri arama hizmetleri",
+                        "crm": "CRM ve pipeline yönetim araçları",
+                        "automation": "İş süreçleri için otomasyon akışları"
+                    }
+                },
+                "account": {
+                    "title": "Hesap Sorumlulukları",
+                    "content": "Bir hesap oluşturduğunuzda aşağıdaki sorumluluklara sahip olursunuz:",
+                    "items": {
+                        "accurate": "Doğru ve güncel bilgi sağlamak",
+                        "security": "Hesap güvenliğinizi korumak ve şifrenizi gizli tutmak",
+                        "notify": "Yetkisiz erişim durumunda derhal bizi bilgilendirmek",
+                        "responsible": "Hesabınız altında gerçekleşen tüm faaliyetlerden sorumlu olmak"
+                    }
+                },
+                "acceptableUse": {
+                    "title": "Kabul Edilebilir Kullanım",
+                    "content": "Hizmetlerimizi kullanırken aşağıdaki faaliyetlerde bulunmayacağınızı kabul edersiniz:",
+                    "items": {
+                        "laws": "Yürürlükteki yasa ve düzenlemeleri ihlal etmek",
+                        "spam": "İstenmeyen mesajlar veya spam göndermek",
+                        "harmful": "Zararlı veya kötü amaçlı içerik yaymak",
+                        "rights": "Başkalarının fikri mülkiyet haklarını ihlal etmek",
+                        "interfere": "Hizmetlerimizin normal işleyişini bozmak veya engellemeye çalışmak"
+                    }
+                },
+                "intellectualProperty": {
+                    "title": "Fikri Mülkiyet",
+                    "content": "Cevaplıyoruz platformu ve tüm ilgili içerik, özellikler ve işlevler (yazılım, metin, görüntüler, logolar ve tasarımlar dahil) Cevaplıyoruz'un mülkiyetindedir ve telif hakkı, ticari marka ve diğer fikri mülkiyet yasaları ile korunmaktadır. Yazılı iznimiz olmadan içeriğimizi kopyalayamaz, değiştiremez veya dağıtamazsınız."
+                },
+                "payment": {
+                    "title": "Ödeme ve Faturalandırma",
+                    "content": "Ücretli hizmetlerimiz için geçerli ücretleri ödemeyi kabul edersiniz. Tüm ödemeler seçtiğiniz fatura döngüsüne göre peşin olarak tahsil edilir. İptaller bir sonraki fatura döngüsünden itibaren geçerli olur. İade politikamız hizmet sözleşmenizde belirtilmiştir."
+                },
+                "termination": {
+                    "title": "Fesih",
+                    "content": "Herhangi bir zamanda herhangi bir nedenle hesabınızı askıya alabilir veya feshedebiliriz. Bu şartların ihlali durumunda derhal fesih yapılabilir. Fesih üzerine, Hizmetleri kullanma hakkınız derhal sona erer. Hesap silme işlemi için bizimle iletişime geçebilirsiniz."
+                },
+                "liability": {
+                    "title": "Sorumluluk Sınırlaması",
+                    "content": "Hizmetlerimiz 'olduğu gibi' ve 'mevcut olduğu şekilde' sunulmaktadır. Cevaplıyoruz, hizmetlerimizin kullanımından kaynaklanan dolaylı, arızi, özel, sonuç niteliğinde veya cezai zararlardan sorumlu olmayacaktır. Toplam sorumluluğumuz, geçerli olaydan önceki on iki ay içinde bize ödediğiniz tutarla sınırlıdır."
+                },
+                "changes": {
+                    "title": "Şartlarda Değişiklikler",
+                    "content": "Bu şartları herhangi bir zamanda güncelleme hakkını saklı tutarız. Değişiklikler bu sayfada yayınlandığında yürürlüğe girer. Önemli değişiklikleri e-posta ile bildireceğiz. Değişikliklerden sonra hizmetlerimizi kullanmaya devam etmeniz, yeni şartları kabul ettiğiniz anlamına gelir."
+                },
+                "contact": {
+                    "title": "İletişim",
+                    "content": "Bu Kullanım Şartları hakkında sorularınız varsa bizimle iletişime geçin:"
+                }
+            }
+        },
+        "privacy": {
+            "title": "Gizlilik Politikası",
+            "lastUpdated": "Son Güncelleme",
+            "sections": {
+                "introduction": {
+                    "title": "Giriş",
+                    "content": "Cevaplıyoruz olarak gizliliğinize değer veriyoruz. Bu Gizlilik Politikası, cevapliyoruz.com web sitemizi ve hizmetlerimizi kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı, paylaştığımızı ve koruduğumuzu açıklamaktadır."
+                },
+                "dataCollection": {
+                    "title": "Topladığımız Bilgiler",
+                    "content": "Hizmetlerimizi sunmak ve geliştirmek için çeşitli türde bilgiler topluyoruz:",
+                    "personal": {
+                        "title": "Kişisel Bilgiler",
+                        "items": {
+                            "name": "Ad ve soyad",
+                            "email": "E-posta adresi",
+                            "phone": "Telefon numarası",
+                            "company": "Şirket bilgileri"
+                        }
+                    },
+                    "usage": {
+                        "title": "Kullanım Bilgileri",
+                        "items": {
+                            "ip": "IP adresi ve konum bilgileri",
+                            "browser": "Tarayıcı türü ve cihaz bilgileri",
+                            "pages": "Ziyaret edilen sayfalar ve tıklanan bağlantılar",
+                            "time": "Hizmette geçirilen süre"
+                        }
+                    }
+                },
+                "howWeUse": {
+                    "title": "Bilgilerinizi Nasıl Kullanıyoruz",
+                    "content": "Toplanan bilgileri aşağıdaki amaçlarla kullanıyoruz:",
+                    "items": {
+                        "provide": "Hizmetlerimizi sunmak ve sürdürmek",
+                        "improve": "Hizmetlerimizi iyileştirmek ve kişiselleştirmek",
+                        "communicate": "Güncellemeler, teklifler ve bildirimler hakkında sizinle iletişim kurmak",
+                        "support": "Müşteri desteği sağlamak",
+                        "security": "Güvenliği sağlamak ve dolandırıcılığı önlemek"
+                    }
+                },
+                "dataSharing": {
+                    "title": "Bilgi Paylaşımı",
+                    "content": "Kişisel bilgilerinizi üçüncü taraflara satmıyoruz. Bilgilerinizi yalnızca aşağıdaki durumlarda paylaşabiliriz:",
+                    "items": {
+                        "providers": "Hizmet sağlayıcılarımızla (ödeme işlemcileri, bulut hizmetleri vb.) hizmetlerimizi sunmak için",
+                        "legal": "Yasal zorunluluklar veya yasal süreçlere yanıt vermek için",
+                        "consent": "Açık izniniz olması durumunda"
+                    }
+                },
+                "dataSecurity": {
+                    "title": "Veri Güvenliği",
+                    "content": "Bilgilerinizi korumak için endüstri standardı güvenlik önlemleri uyguluyoruz. Bu önlemler şifreleme, güvenli sunucular ve düzenli güvenlik değerlendirmelerini içerir. Ancak, internet üzerinden hiçbir veri iletiminin %100 güvenli olmadığını unutmayın."
+                },
+                "cookies": {
+                    "title": "Çerezler ve İzleme Teknolojileri",
+                    "content": "Deneyiminizi geliştirmek için çerezler ve benzer teknolojiler kullanıyoruz:",
+                    "items": {
+                        "essential": "Zorunlu çerezler: Hizmetin çalışması için gerekli",
+                        "analytics": "Analitik çerezler: Hizmet kullanımını anlamamıza yardımcı olur",
+                        "functional": "İşlevsel çerezler: Tercihlerinizi hatırlar"
+                    }
+                },
+                "yourRights": {
+                    "title": "Haklarınız",
+                    "content": "KVKK ve GDPR kapsamında aşağıdaki haklara sahipsiniz:",
+                    "items": {
+                        "access": "Kişisel verilerinize erişim talep etme hakkı",
+                        "correct": "Yanlış verilerin düzeltilmesini isteme hakkı",
+                        "delete": "Verilerinizin silinmesini talep etme hakkı",
+                        "restrict": "Veri işlemenin kısıtlanmasını isteme hakkı",
+                        "portability": "Veri taşınabilirliği hakkı",
+                        "object": "Veri işlemeye itiraz etme hakkı"
+                    }
+                },
+                "retention": {
+                    "title": "Veri Saklama",
+                    "content": "Kişisel verilerinizi yalnızca toplama amaçlarını yerine getirmek için gerekli olduğu sürece saklarız. Hesabınızı sildiğinizde, verileriniz yasal saklama gereklilikleri hariç olmak üzere 30 gün içinde silinir."
+                },
+                "children": {
+                    "title": "Çocukların Gizliliği",
+                    "content": "Hizmetlerimiz 18 yaşın altındaki kişilere yönelik değildir. 18 yaşın altındaki kişilerden bilerek kişisel bilgi toplamıyoruz. Bir çocuğun bize kişisel bilgi sağladığını öğrenirsek, bu bilgileri derhal sileriz."
+                },
+                "changes": {
+                    "title": "Politika Değişiklikleri",
+                    "content": "Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Değişiklikler bu sayfada yayınlandığında yürürlüğe girer. Önemli değişiklikleri e-posta ile bildireceğiz."
+                },
+                "contact": {
+                    "title": "İletişim",
+                    "content": "Gizlilik politikamız veya verileriniz hakkında sorularınız varsa bizimle iletişime geçin:"
+                }
+            }
+        }
+    },
+    "about": {
+        "hero": {
+            "title": "Müşteri İletişiminin Geleceğini Şekillendiriyoruz",
+            "subtitle": "Cevaplıyoruz, işletmelerin müşterileriyle daha akıllı, daha hızlı ve daha etkili bir şekilde iletişim kurmasını sağlayan yapay zeka destekli bir platformdur."
+        },
+        "mission": {
+            "title": "Misyonumuz",
+            "content": "Her ölçekteki işletmenin müşteri iletişimini dönüştürmek ve yapay zeka teknolojisinin gücüyle müşteri memnuniyetini en üst düzeye çıkarmak. Karmaşık süreçleri basitleştirerek, işletmelerin müşterilerine en iyi deneyimi sunmasına yardımcı oluyoruz."
+        },
+        "story": {
+            "title": "Hikayemiz",
+            "paragraph1": "Cevaplıyoruz, 2024 yılında müşteri iletişimindeki boşlukları doldurmak amacıyla kuruldu. Farklı kanallardan gelen mesajları yönetmenin, müşteri sorularına zamanında yanıt vermenin ve takip süreçlerini organize etmenin ne kadar zor olduğunu bizzat deneyimledik.",
+            "paragraph2": "Bu zorlukları çözmek için yola çıktık ve yapay zeka teknolojisini müşteri iletişimi ile birleştiren yenilikçi bir platform geliştirdik. Instagram, WhatsApp, e-posta ve telefon aramalarını tek bir yerden yönetebilen, yapay zeka ile desteklenen bir çözüm oluşturduk.",
+            "paragraph3": "Bugün, yüzlerce işletmenin müşteri iletişimini dönüştürmesine yardımcı oluyoruz. Amacımız, her müşteri etkileşimini değerli bir deneyime dönüştürmek ve işletmelerin büyümesine katkıda bulunmak."
+        },
+        "values": {
+            "title": "Değerlerimiz",
+            "innovation": {
+                "title": "İnovasyon",
+                "content": "Sürekli olarak yeni teknolojileri araştırıyor ve müşterilerimize en ileri çözümleri sunuyoruz."
+            },
+            "customer": {
+                "title": "Müşteri Odaklılık",
+                "content": "Her kararımızda müşterilerimizin ihtiyaçlarını ön planda tutuyoruz."
+            },
+            "teamwork": {
+                "title": "Takım Çalışması",
+                "content": "Başarının birlikte çalışmaktan geçtiğine inanıyoruz ve güçlü bir ekip ruhu ile hareket ediyoruz."
+            },
+            "transparency": {
+                "title": "Şeffaflık",
+                "content": "Müşterilerimiz ve partnerlerimizle açık ve dürüst iletişim kuruyoruz."
+            },
+            "efficiency": {
+                "title": "Verimlilik",
+                "content": "Zamanın değerli olduğunu biliyoruz ve süreçlerimizi sürekli optimize ediyoruz."
+            },
+            "quality": {
+                "title": "Kalite",
+                "content": "Her ürün ve hizmette en yüksek kalite standartlarını hedefliyoruz."
+            }
+        },
+        "stats": {
+            "customers": "Mutlu Müşteri",
+            "messages": "İşlenen Mesaj",
+            "calls": "Yapılan Arama",
+            "uptime": "Çalışma Süresi"
+        },
+        "contact": {
+            "title": "Bizimle İletişime Geçin",
+            "subtitle": "Sorularınız mı var? Size yardımcı olmaktan mutluluk duyarız."
+        }
+    },
+    "features": {
+        "hero": {
+            "badge": "AI Destekli Müşteri İletişimi",
+            "title": "Müşterilerinizi Sizin Yerinize",
+            "titleHighlight": "Arayan Tek Platform",
+            "subtitle": "Sadece chatbot değil. Gerçek AI destekli telefon aramaları, birleşik gelen kutusu ve akıllı otomasyon. Müşteri iletişimi için ihtiyacınız olan her şey tek platformda.",
+            "cta": "Ücretsiz Deneyin",
+            "secondaryCta": "Fiyatları Görün"
+        },
+        "channels": {
+            "title": "Tüm Kanallarınız, Tek Gelen Kutusu",
+            "subtitle": "Tüm iletişim kanallarınızı bağlayın ve tek bir panelden yönetin."
+        },
+        "main": {
+            "title": "Bizi Farklı Kılan Özellikler",
+            "subtitle": "Callera'yı en kapsamlı müşteri iletişim platformu yapan yetenekleri keşfedin.",
+            "aiCalling": {
+                "title": "AI Destekli Telefon Aramaları",
+                "description": "AI'mız sadece mesajları yanıtlamıyor—sizin adınıza gerçek telefon aramaları yapıyor. Geri aramaları planlayın, potansiyel müşterileri takip edin ve müşteri sorularını doğal sesli konuşmalarla yönetin.",
+                "highlight": "Manuel arama işlerinde %70 azalma",
+                "details": {
+                    "1": "Gelişmiş AI ile doğal sesli konuşmalar",
+                    "2": "Otomatik geri arama planlama",
+                    "3": "Gerçek zamanlı arama transkripsiyonu",
+                    "4": "Aramalar sırasında akıllı lead değerlendirmesi"
+                }
+            },
+            "unifiedInbox": {
+                "title": "Birleşik Gelen Kutusu",
+                "description": "Instagram DM'ler, WhatsApp mesajları, e-postalar ve telefon aramaları—hepsi tek bir yerde. Hangi kanalı kullanırlarsa kullansınlar, bir müşteri mesajını asla kaçırmayın.",
+                "highlight": "İlk yanıt süresinde 3 kat hızlanma",
+                "details": {
+                    "1": "Tek görünümde tüm kanallar",
+                    "2": "Otomatik konuşma gruplama",
+                    "3": "Önceliğe göre mesaj sıralama",
+                    "4": "Takım işbirliği ve atama"
+                }
+            },
+            "aiResponses": {
+                "title": "Akıllı AI Yanıtları",
+                "description": "AI gelen mesajları analiz eder ve yanıt önerir ya da otomatik olarak yanıtlar. İletişim tarzınızı öğrenir ve iş ihtiyaçlarınıza uyum sağlar.",
+                "highlight": "Rutin soruların %90'ı otomatik yanıtlanıyor",
+                "details": {
+                    "1": "Bağlama duyarlı yanıt üretimi",
+                    "2": "Otomatik duygu algılama",
+                    "3": "İş verilerinizle özel eğitim",
+                    "4": "Çoklu dil desteği"
+                }
+            },
+            "automation": {
+                "title": "Kodsuz Otomasyon",
+                "description": "Tek bir satır kod yazmadan karmaşık iş akışları oluşturun. Takipleri otomatikleştirin, kişileri etiketleyin, müşteri davranışına göre aksiyonlar tetikleyin ve daha fazlası.",
+                "highlight": "Sınırsız iş akışı olasılıkları",
+                "details": {
+                    "1": "Sürükle-bırak akış oluşturucu",
+                    "2": "Tetikleyici tabanlı otomasyon",
+                    "3": "Koşullu mantık ve dallanma",
+                    "4": "Harici araçlarla entegrasyon"
+                }
+            }
+        },
+        "differentiators": {
+            "title": "Neden Callera?",
+            "subtitle": "Bizi diğer müşteri iletişim platformlarından farklı kılan özellikleri görün.",
+            "realCalls": {
+                "title": "Gerçek Telefon Aramaları",
+                "description": "Diğerleri chatbot sunarken, biz gerçekten telefon araması yapan AI sunuyoruz. Müşterilerinizle gerçek sesli konuşmalar."
+            },
+            "multiChannel": {
+                "title": "Gerçek Çoklu Kanal",
+                "description": "Instagram, WhatsApp, E-posta ve Telefon—hepsi yerel olarak entegre. Üçüncü parti bağlayıcılara gerek yok."
+            },
+            "smartAI": {
+                "title": "Gelişmiş AI Motoru",
+                "description": "En son AI modelleri ile desteklenen sistemimiz, bağlamı, duyguyu ve niyeti rakiplerden daha iyi anlıyor."
+            },
+            "realtime": {
+                "title": "Her Şey Gerçek Zamanlı",
+                "description": "Canlı mesaj akışı, anlık bildirimler ve gerçek zamanlı analitik. Hiçbir şeyi kaçırmayın."
+            },
+            "security": {
+                "title": "Kurumsal Düzey Güvenlik",
+                "description": "Uçtan uca şifreleme, KVKK ve GDPR uyumluluğu. Verileriniz her zaman güvende."
+            },
+            "support": {
+                "title": "Yerel Destek",
+                "description": "Mesai saatlerinde Türkçe konuşan destek ekibi. Pazarınızı anlıyoruz."
+            }
+        },
+        "stats": {
+            "title": "Sonuçlar Kendini Gösteriyor",
+            "subtitle": "Müşterilerimizin deneyimlediği etkiyi görün.",
+            "manualWork": "Daha Az Manuel İş",
+            "responseSpeed": "Daha Hızlı Yanıt",
+            "availability": "AI Erişilebilirliği",
+            "uptime": "Platform Çalışma Süresi"
+        },
+        "comparison": {
+            "title": "Karşılaştırma",
+            "subtitle": "Callera'nın diğer platformlarla nasıl karşılaştığını görün.",
+            "feature": "Özellik",
+            "callera": "Callera",
+            "others": "Diğerleri",
+            "features": {
+                "aiCalling": "AI Telefon Aramaları",
+                "unifiedInbox": "Birleşik Gelen Kutusu",
+                "aiResponses": "AI Otomatik Yanıtlar",
+                "noCode": "Kodsuz Otomasyon",
+                "crm": "Dahili CRM",
+                "turkishSupport": "Türkçe Dil Desteği"
+            }
+        },
+        "cta": {
+            "title": "Müşteri İletişiminizi Dönüştürmeye Hazır mısınız?",
+            "subtitle": "Callera ile müşteri deneyimini yükselten yüzlerce işletmeye katılın.",
+            "primary": "Ücretsiz Deneyin",
+            "secondary": "Demo Planlayın"
+        }
+    },
+    "pricing": {
+        "title": "Basit ve Şeffaf Fiyatlandırma",
+        "subtitle": "İşletmenizin ihtiyaçlarına uygun planı seçin. Gizli ücret yok, sürpriz yok.",
+        "monthly": "Aylık",
+        "annual": "Yıllık",
+        "save": "Tasarruf",
+        "month": "ay",
+        "billedAnnually": "Yıllık faturalandırılır",
+        "popular": "En Popüler",
+        "plans": {
+            "starter": {
+                "name": "Başlangıç",
+                "description": "Küçük işletmeler için ideal başlangıç paketi",
+                "cta": "Ücretsiz Başla",
+                "features": {
+                    "users": "2 kullanıcı",
+                    "messages": "Aylık 1.000 mesaj",
+                    "channels": "2 kanal (Instagram + WhatsApp)",
+                    "crm": "Temel CRM özellikleri",
+                    "support": "E-posta desteği",
+                    "ai": "AI yanıt önerileri",
+                    "automation": "Otomasyon akışları",
+                    "api": "API erişimi"
+                }
+            },
+            "professional": {
+                "name": "Profesyonel",
+                "description": "Büyüyen işletmeler için kapsamlı çözüm",
+                "cta": "14 Gün Ücretsiz Dene",
+                "features": {
+                    "users": "10 kullanıcı",
+                    "messages": "Aylık 10.000 mesaj",
+                    "channels": "Tüm kanallar",
+                    "crm": "Gelişmiş CRM ve pipeline",
+                    "support": "Öncelikli destek",
+                    "ai": "AI yanıt önerileri + AI arama",
+                    "automation": "Gelişmiş otomasyon akışları",
+                    "api": "API erişimi"
+                }
+            },
+            "enterprise": {
+                "name": "Kurumsal",
+                "description": "Büyük ekipler için özelleştirilmiş çözümler",
+                "cta": "Satış ile Görüşün",
+                "features": {
+                    "users": "Sınırsız kullanıcı",
+                    "messages": "Sınırsız mesaj",
+                    "channels": "Tüm kanallar + özel entegrasyonlar",
+                    "crm": "Tam CRM paketi",
+                    "support": "7/24 öncelikli destek",
+                    "ai": "Tam AI paketi + özel eğitim",
+                    "automation": "Sınırsız otomasyon",
+                    "api": "Tam API erişimi + webhook"
+                }
+            }
+        },
+        "faq": {
+            "title": "Sıkça Sorulan Sorular",
+            "q1": {
+                "question": "Planlar arasında geçiş yapabilir miyim?",
+                "answer": "Evet, istediğiniz zaman planınızı yükseltebilir veya düşürebilirsiniz. Değişiklikler bir sonraki fatura döneminde geçerli olur."
+            },
+            "q2": {
+                "question": "Ücretsiz deneme süresi var mı?",
+                "answer": "Evet, Profesyonel plan için 14 günlük ücretsiz deneme sunuyoruz. Kredi kartı gerektirmez."
+            },
+            "q3": {
+                "question": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
+                "answer": "Kredi kartı, banka kartı ve banka havalesi ile ödeme yapabilirsiniz. Kurumsal planlar için özel fatura düzenleyebiliriz."
+            },
+            "q4": {
+                "question": "İptal politikanız nedir?",
+                "answer": "İstediğiniz zaman iptal edebilirsiniz. Yıllık planlarda kalan süre için orantılı iade yapılır."
+            }
+        },
+        "enterprise": {
+            "title": "Özel İhtiyaçlarınız mı Var?",
+            "subtitle": "Kurumsal çözümler, özel entegrasyonlar veya yüksek hacimli kullanım için satış ekibimizle görüşün.",
+            "cta": "Satış ile İletişime Geçin"
+        }
+    },
+    "dataDeletion": {
+        "title": "Veri Silme Talebi",
+        "subtitle": "Cevaplıyoruz'dan verilerinizin silinmesini nasıl talep edebileceğinizi öğrenin.",
+        "sections": {
+            "intro": {
+                "title": "Gizliliğinize Saygı Duyuyoruz",
+                "content": "Cevaplıyoruz olarak kişisel verilerinizin korunmasına büyük önem veriyoruz. KVKK ve GDPR kapsamında verilerinizin silinmesini talep etme hakkına sahipsiniz. Bu sayfa, verilerinizi nasıl silebileceğinizi adım adım açıklamaktadır."
+            },
+            "dataCollected": {
+                "title": "Topladığımız Veriler",
+                "content": "Platformumuzu kullanırken aşağıdaki verileri toplayabiliriz:",
+                "items": {
+                    "profile": "Profil bilgileri (ad, e-posta, telefon)",
+                    "messages": "Mesaj içerikleri ve konuşma geçmişi",
+                    "connections": "Sosyal medya bağlantı bilgileri (Instagram, WhatsApp)",
+                    "usage": "Platform kullanım verileri ve analitikler"
+                }
+            },
+            "howToDelete": {
+                "title": "Verilerinizi Nasıl Silebilirsiniz?",
+                "content": "Verilerinizin silinmesini iki yöntemle talep edebilirsiniz:",
+                "method1": {
+                    "title": "Yöntem 1: Hesap Ayarlarından",
+                    "step1": "Cevaplıyoruz hesabınıza giriş yapın",
+                    "step2": "Ayarlar > Profil bölümüne gidin",
+                    "step3": "\"Hesabı Sil\" seçeneğine tıklayın",
+                    "step4": "Silme işlemini onaylayın"
+                },
+                "method2": {
+                    "title": "Yöntem 2: E-posta ile Talep",
+                    "content": "Aşağıdaki e-posta adresine veri silme talebinizi gönderebilirsiniz. Lütfen hesabınızla ilişkili e-posta adresini kullanın."
+                }
+            },
+            "afterDeletion": {
+                "title": "Silme İşleminden Sonra",
+                "content": "Veri silme talebiniz onaylandığında:",
+                "items": {
+                    "permanent": "Tüm kişisel verileriniz kalıcı olarak silinecektir",
+                    "timeframe": "Silme işlemi 30 gün içinde tamamlanacaktır",
+                    "confirmation": "İşlem tamamlandığında e-posta ile bilgilendirileceksiniz",
+                    "exceptions": "Yasal zorunluluklar nedeniyle bazı veriler saklanabilir"
+                }
+            },
+            "facebook": {
+                "title": "Facebook/Instagram Bağlantısı için",
+                "content": "Facebook veya Instagram hesabınız üzerinden Cevaplıyoruz'a bağlandıysanız, verilerinizi şu şekilde de silebilirsiniz:",
+                "step1": "Facebook Ayarlar ve Gizlilik > Ayarlar'a gidin",
+                "step2": "Uygulamalar ve Web Siteleri bölümünü açın",
+                "step3": "Cevaplıyoruz uygulamasını bulun",
+                "step4": "\"Kaldır\" butonuna tıklayın ve \"Paylaştığım tüm bilgileri sil\" seçeneğini işaretleyin",
+                "note": "Bu işlem otomatik olarak Cevaplıyoruz sistemlerimizdeki Facebook/Instagram verilerinizi de silecektir."
+            },
+            "contact": {
+                "title": "Yardıma mı İhtiyacınız Var?",
+                "content": "Veri silme ile ilgili sorularınız için bizimle iletişime geçin.",
+                "cta": "Veri Silme Talebi Gönder"
+            }
+        }
     }
 }

@@ -114,4 +114,3 @@ export async function cleanupInactiveSessions(userId: string, inactiveHours: num
     return 0
   }
 }
-
