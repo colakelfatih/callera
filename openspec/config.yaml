@@ -1,0 +1,52 @@
+schema: spec-driven
+
+# Project context – used when creating proposals, specs, design, tasks
+context: |
+  ## Product
+  Cevaplıyoruz: AI destekli müşteri iletişim platformu. Marka adı Cevaplıyoruz, domain cevapliyoruz.com.
+  - Birleşik gelen kutusu: WhatsApp, Instagram, (Facebook DM) tek panelde
+  - AI yanıt önerileri / Wiro entegrasyonu
+  - CRM: Contact, pipeline, etiketler
+  - Onboarding: işletme profili → entegrasyon → test mesajı
+  - Çok dilli: next-intl, locale prefix [locale], tr/en/de/es
+
+  ## Tech stack
+  - Next.js 16 (App Router), React 19, TypeScript
+  - Prisma 7 + PostgreSQL (prisma/schema.prisma, src/lib/db.ts)
+  - Auth: Better Auth (src/lib/auth.ts), session, 2FA (otplib)
+  - i18n: next-intl, src/i18n/routing.ts, src/messages/{locale}/
+  - Styling: Tailwind, src/app/globals.css
+  - Queue: BullMQ + Redis (message-worker, message-queue)
+  - Search: Typesense (src/lib/typesense/)
+  - Path alias: @/ → src/
+
+  ## App structure
+  - Routes: src/app/[locale]/* (dashboard, login, register, onboarding, about, pricing, terms, privacy, data-deletion, features)
+  - API: src/app/api/* (auth, contacts, messages, integrations/instagram|whatsapp, facebook, instagram, user, ai, wiro, admin)
+  - Components: src/components/ (landing, dashboard, ui, auth, session, whatsapp)
+  - Lib: src/lib/ (auth, db, clients, queue, redis, typesense, instagram, contacts, ai)
+  - Repositories: src/repositories/ (integration, onboarding)
+  - Workers: src/workers/message-worker.ts (Instagram/WhatsApp mesaj işleme, Wiro AI)
+
+  ## Domain concepts
+  - User, Session, Account (Better Auth)
+  - Contact, Conversation, Message (MessageChannel: whatsapp | instagram | facebook_dm)
+  - InstagramConnection, WhatsAppConnection (entegrasyonlar)
+  - AutomationFlow, Call, ConversationLabel
+  - Onboarding: onboardingStep 0..4, business profile alanları
+
+  ## Conventions
+  - Server components varsayılan; client için 'use client'
+  - API route handlers: NextRequest/NextResponse, try/catch, db ile Prisma
+  - Çeviriler: useTranslations('namespace'), messages/*.json
+  - Hassas işlemler: getCurrentUser() (auth-helpers), session kontrolü
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
